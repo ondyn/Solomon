@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ building.name }} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'buildings:building-list' %}">{% trans "Buildings" %}</a></li>
+<li class="breadcrumb-item active">{{ building.name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><span class="material-icons md-36 me-2" style="color: var(--md-primary);">business</span>{{ building.name }}</h2>
+  <div>
+    {% if perms.buildings.change_building %}
+      <a href="{% url 'buildings:building-update' building.pk %}" class="btn btn-outline-secondary">
+        <span class="material-icons md-18">edit</span> {% trans "Edit" %}
+      </a>
+    {% endif %}
+    {% if perms.buildings.delete_building %}
+      <a href="{% url 'buildings:building-delete' building.pk %}" class="btn btn-outline-danger ms-1">
+        <span class="material-icons md-18">delete</span> {% trans "Delete" %}
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">{% trans "Street" %}</dt>
+          <dd class="col-sm-7">{{ building.street }}</dd>
+
+          <dt class="col-sm-5">{% trans "House number" %}</dt>
+          <dd class="col-sm-7">{{ building.house_number }}</dd>
+
+          <dt class="col-sm-5">{% trans "City" %}</dt>
+          <dd class="col-sm-7">{{ building.city }}</dd>
+
+          <dt class="col-sm-5">{% trans "Postal code" %}</dt>
+          <dd class="col-sm-7">{{ building.postal_code }}</dd>
+
+          <dt class="col-sm-5">{% trans "Number of floors" %}</dt>
+          <dd class="col-sm-7">{{ building.number_of_floors|default:"—" }}</dd>
+
+          <dt class="col-sm-5">{% trans "Elevator" %}</dt>
+          <dd class="col-sm-7">{% if building.elevator %}<span class="material-icons md-18 text-success">check_circle</span> {% trans "Yes" %}{% else %}<span class="material-icons md-18 text-danger">cancel</span> {% trans "No" %}{% endif %}</dd>
+
+          <dt class="col-sm-5">{% trans "Year built" %}</dt>
+          <dd class="col-sm-7">{{ building.year_built|default:"—" }}</dd>
+
+          <dt class="col-sm-5">{% trans "Total units" %}</dt>
+          <dd class="col-sm-7">{{ building.total_units|default:"—" }}</dd>
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">{% trans "Land plot number" %}</dt>
+          <dd class="col-sm-7">{{ building.land_plot_number|default:"—" }}</dd>
+
+          {% if building.floor_plan_url %}
+          <dt class="col-sm-5">{% trans "Floor plan" %}</dt>
+          <dd class="col-sm-7"><a href="{{ building.floor_plan_url }}" target="_blank"><span class="material-icons md-18">open_in_new</span> {% trans "View" %}</a></dd>
+          {% endif %}
+
+          <dt class="col-sm-5">{% trans "Created" %}</dt>
+          <dd class="col-sm-7">{{ building.created_at }}</dd>
+
+          <dt class="col-sm-5">{% trans "Updated" %}</dt>
+          <dd class="col-sm-7">{{ building.updated_at }}</dd>
+        </dl>
+        {% if building.common_rooms %}
+          <dl class="row mb-0">
+            <dt class="col-sm-5">{% trans "Common rooms" %}</dt>
+            <dd class="col-sm-7">{{ building.common_rooms }}</dd>
+          </dl>
+        {% endif %}
+        {% if building.common_area_rental %}
+          <dl class="row mb-0">
+            <dt class="col-sm-5">{% trans "Common area rental" %}</dt>
+            <dd class="col-sm-7">{{ building.common_area_rental }}</dd>
+          </dl>
+        {% endif %}
+        {% if building.note %}
+          <dl class="row mb-0">
+            <dt class="col-sm-5">{% trans "Note" %}</dt>
+            <dd class="col-sm-7">{{ building.note }}</dd>
+          </dl>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Flats in this building #}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4><span class="material-icons md-24 me-1" style="color: var(--md-success);">door_front</span> {% trans "Flats" %} <span class="badge bg-secondary">{{ building.flats.count }}</span></h4>
+  {% if perms.flats.add_flat %}
+    <a href="{% url 'flats:flat-create' %}?building={{ building.pk }}" class="btn btn-sm btn-primary">
+      <span class="material-icons md-18">add</span> {% trans "Add flat" %}
+    </a>
+  {% endif %}
+</div>
+
+{% if building.flats.all %}
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead>
+          <tr>
+            <th>{% trans "Flat number" %}</th>
+            <th>{% trans "Floor" %}</th>
+            <th>{% trans "Area (m²)" %}</th>
+            <th>{% trans "Disposition" %}</th>
+            <th>{% trans "Owners" %}</th>
+            <th>{% trans "Tenants" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for flat in building.flats.all %}
+          <tr>
+            <td><a href="{% url 'flats:flat-detail' flat.pk %}">{{ flat.flat_number }}</a></td>
+            <td>{{ flat.floor|default:"—" }}</td>
+            <td>{{ flat.area_m2|default:"—" }}</td>
+            <td>{{ flat.disposition|default:"—" }}</td>
+            <td><span class="badge bg-secondary">{{ flat.flat_owners.count }}</span></td>
+            <td><span class="badge bg-secondary">{{ flat.tenants.count }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <p class="text-muted"><span class="material-icons md-18">info</span> {% trans "No flats in this building yet." %}</p>
+{% endif %}
+{% endblock %}

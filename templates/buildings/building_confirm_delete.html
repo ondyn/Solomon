@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete building" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'buildings:building-list' %}">{% trans "Buildings" %}</a></li>
+<li class="breadcrumb-item"><a href="{% url 'buildings:building-detail' building.pk %}">{{ building.name }}</a></li>
+<li class="breadcrumb-item active">{% trans "Delete" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="form-centered">
+<div class="card border-danger">
+  <div class="card-header bg-danger">
+    <h5 class="mb-0"><span class="material-icons md-18 me-1">warning</span>{% trans "Confirm deletion" %}</h5>
+  </div>
+  <div class="card-body">
+    <p>{% blocktrans with name=building.name %}Are you sure you want to delete the building <strong>{{ name }}</strong>?{% endblocktrans %}</p>
+
+    {% if building.flats.count > 0 %}
+      <div class="alert alert-warning">
+        <span class="material-icons md-18 me-1">info</span>
+        {% blocktrans with count=building.flats.count %}This building has {{ count }} flat(s). They will also be soft-deleted.{% endblocktrans %}
+      </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger"><span class="material-icons md-18">delete_forever</span> {% trans "Yes, delete" %}</button>
+      <a href="{% url 'buildings:building-detail' building.pk %}" class="btn btn-outline-secondary ms-2">{% trans "Cancel" %}</a>
+    </form>
+  </div>
+</div>
+</div>
+{% endblock %}

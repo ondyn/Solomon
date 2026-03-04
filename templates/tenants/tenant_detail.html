@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ tenant.full_name }} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'tenants:tenant-list' %}">{% trans "Tenants" %}</a></li>
+<li class="breadcrumb-item active">{{ tenant.full_name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><span class="material-icons md-36 me-2" style="color: var(--md-warning);">badge</span>{{ tenant.full_name }}</h2>
+  <div>
+    {% if perms.tenants.change_tenant %}
+      <a href="{% url 'tenants:tenant-update' tenant.pk %}" class="btn btn-outline-secondary"><span class="material-icons md-18">edit</span> {% trans "Edit" %}</a>
+    {% endif %}
+    {% if perms.tenants.delete_tenant %}
+      <a href="{% url 'tenants:tenant-delete' tenant.pk %}" class="btn btn-outline-danger ms-1"><span class="material-icons md-18">delete</span> {% trans "Delete" %}</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">{% trans "First name" %}</dt>
+          <dd class="col-sm-7">{{ tenant.first_name }}</dd>
+
+          <dt class="col-sm-5">{% trans "Last name" %}</dt>
+          <dd class="col-sm-7">{{ tenant.last_name }}</dd>
+
+          <dt class="col-sm-5">{% trans "Email" %}</dt>
+          <dd class="col-sm-7">{{ tenant.email|default:"—" }}</dd>
+
+          <dt class="col-sm-5">{% trans "Phone" %}</dt>
+          <dd class="col-sm-7">{{ tenant.phone|default:"—" }}</dd>
+
+          <dt class="col-sm-5">{% trans "Permanent address" %}</dt>
+          <dd class="col-sm-7">{{ tenant.permanent_address|default:"—" }}</dd>
+
+          <dt class="col-sm-5">{% trans "Contact address" %}</dt>
+          <dd class="col-sm-7">{{ tenant.contact_address|default:"—" }}</dd>
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">{% trans "Flat" %}</dt>
+          <dd class="col-sm-7"><a href="{% url 'flats:flat-detail' tenant.flat.pk %}">{{ tenant.flat }}</a></dd>
+
+          <dt class="col-sm-5">{% trans "Lease start" %}</dt>
+          <dd class="col-sm-7">{{ tenant.effective_from }}</dd>
+
+          <dt class="col-sm-5">{% trans "Lease end" %}</dt>
+          <dd class="col-sm-7">{{ tenant.effective_to|default:"—" }}</dd>
+
+          <dt class="col-sm-5">{% trans "Created" %}</dt>
+          <dd class="col-sm-7">{{ tenant.created_at }}</dd>
+
+          <dt class="col-sm-5">{% trans "Updated" %}</dt>
+          <dd class="col-sm-7">{{ tenant.updated_at }}</dd>
+        </dl>
+        {% if tenant.note %}
+          <dl class="row mb-0">
+            <dt class="col-sm-5">{% trans "Note" %}</dt>
+            <dd class="col-sm-7">{{ tenant.note }}</dd>
+          </dl>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

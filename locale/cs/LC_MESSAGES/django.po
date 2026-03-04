@@ -1,0 +1,722 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Solomon 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-04 14:12+0100\n"
+"PO-Revision-Date: 2026-03-04 14:12+0100\n"
+"Last-Translator: Solomon Team\n"
+"Language-Team: Czech\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+msgid "Accounts"
+msgstr "Účty"
+
+msgid "Role"
+msgstr "Role"
+
+msgid "Assign the user to a role group."
+msgstr "Přiřaďte uživatele k roli."
+
+msgid "Password"
+msgstr "Heslo"
+
+msgid "Confirm password"
+msgstr "Potvrzení hesla"
+
+msgid "Passwords do not match."
+msgstr "Hesla se neshodují."
+
+msgid "User created successfully."
+msgstr "Uživatel byl úspěšně vytvořen."
+
+msgid "User updated successfully."
+msgstr "Uživatel byl úspěšně upraven."
+
+msgid "Notes"
+msgstr "Poznámky"
+
+msgid "Metadata"
+msgstr "Metadata"
+
+msgid "Buildings"
+msgstr "Budovy"
+
+msgid "Name"
+msgstr "Název"
+
+msgid "Building name or label, e.g. 'Salounova 1'"
+msgstr "Název budovy, např. „Salounova 1“"
+
+msgid "Street"
+msgstr "Ulice"
+
+msgid "House number"
+msgstr "Číslo domu"
+
+msgid "Číslo popisné / orientační"
+msgstr "Číslo popisné / orientační"
+
+msgid "City"
+msgstr "Město"
+
+msgid "Postal code"
+msgstr "PSČ"
+
+msgid "Number of floors"
+msgstr "Počet podlaží"
+
+msgid "Elevator"
+msgstr "Výtah"
+
+msgid "Year built"
+msgstr "Rok výstavby"
+
+msgid "Total units"
+msgstr "Celkem jednotek"
+
+msgid "Total number of flats/units in the building"
+msgstr "Celkový počet bytů/jednotek v budově"
+
+msgid "Land plot number"
+msgstr "Číslo pozemku"
+
+msgid "Číslo pozemku"
+msgstr "Číslo pozemku"
+
+msgid "Common rooms"
+msgstr "Společné prostory"
+
+msgid "Description of common areas (e.g. laundry, bike storage)"
+msgstr "Popis společných prostor (např. prádelna, kolárna)"
+
+msgid "Floor plan URL"
+msgstr "URL půdorysu"
+
+msgid "Common area rental"
+msgstr "Pronájem společných prostor"
+
+msgid "Information about rented common areas"
+msgstr "Informace o pronajatých společných prostorách"
+
+msgid "Note"
+msgstr "Poznámka"
+
+msgid "Building"
+msgstr "Budova"
+
+msgid "Building created successfully."
+msgstr "Budova byla úspěšně vytvořena."
+
+msgid "Building updated successfully."
+msgstr "Budova byla úspěšně upravena."
+
+msgid "Building deleted successfully."
+msgstr "Budova byla úspěšně odstraněna."
+
+msgid "Core"
+msgstr "Jádro"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Created at"
+msgstr "Vytvořeno"
+
+msgid "Updated at"
+msgstr "Upraveno"
+
+msgid "Administrator"
+msgstr "Správce"
+
+msgid "Chairman"
+msgstr "Předseda"
+
+msgid "Board member"
+msgstr "Člen výboru"
+
+msgid "Owner"
+msgstr "Vlastník"
+
+msgid "Flats"
+msgstr "Byty"
+
+msgid "Flat number"
+msgstr "Číslo bytu"
+
+msgid "Apartment number within the building"
+msgstr "Číslo bytu v rámci budovy"
+
+msgid "Floor"
+msgstr "Podlaží"
+
+msgid "Area (m²)"
+msgstr "Plocha (m²)"
+
+msgid "Disposition"
+msgstr "Dispozice"
+
+msgid "e.g. 2+1, 3+kk"
+msgstr "např. 2+1, 3+kk"
+
+msgid "Number of rooms"
+msgstr "Počet pokojů"
+
+msgid "Water outlets"
+msgstr "Vodovodní přípojky"
+
+msgid "Waste outlets"
+msgstr "Odpadní přípojky"
+
+msgid "Radiator count"
+msgstr "Počet radiátorů"
+
+msgid "Radiator power (kW)"
+msgstr "Výkon radiátorů (kW)"
+
+msgid "Gas installed"
+msgstr "Plyn zaveden"
+
+msgid "Has balcony"
+msgstr "Balkon"
+
+msgid "Cellar unit"
+msgstr "Sklep"
+
+msgid "Cellar / storage unit number"
+msgstr "Číslo sklepní/úložné jednotky"
+
+msgid "Ownership certificate number"
+msgstr "Číslo listu vlastnictví"
+
+msgid "Číslo listu vlastnictví"
+msgstr "Číslo listu vlastnictví"
+
+msgid "Flat"
+msgstr "Byt"
+
+msgid "Flat created successfully."
+msgstr "Byt byl úspěšně vytvořen."
+
+msgid "Flat updated successfully."
+msgstr "Byt byl úspěšně upraven."
+
+msgid "Flat deleted successfully."
+msgstr "Byt byl úspěšně odstraněn."
+
+msgid "Owners"
+msgstr "Vlastníci"
+
+#, python-format
+msgid ""
+"Warning: Total ownership shares for this flat sum to %(pct).1f%%, not 100%%."
+msgstr "Upozornění: Celkové vlastnické podíly pro tento byt činí %(pct).1f %%, nikoli 100 %%."
+
+msgid "Natural person"
+msgstr "Fyzická osoba"
+
+msgid "Legal person"
+msgstr "Právnická osoba"
+
+msgid "Person type"
+msgstr "Typ osoby"
+
+msgid "First name"
+msgstr "Jméno"
+
+msgid "Last name"
+msgstr "Příjmení"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Date of birth"
+msgstr "Datum narození"
+
+msgid "Permanent address"
+msgstr "Trvalé bydliště"
+
+msgid "Trvalé bydliště"
+msgstr "Trvalé bydliště"
+
+msgid "Contact address"
+msgstr "Korespondenční adresa"
+
+msgid "Korespondenční adresa (if different from permanent)"
+msgstr "Korespondenční adresa (liší-li se od trvalé)"
+
+msgid "Deputy name"
+msgstr "Jméno zástupce"
+
+msgid "Name of deputy / authorized representative"
+msgstr "Jméno zástupce / zmocněné osoby"
+
+msgid "Deputy contact"
+msgstr "Kontakt na zástupce"
+
+msgid "Phone or email of deputy"
+msgstr "Telefon nebo e-mail zástupce"
+
+msgid "User account"
+msgstr "Uživatelský účet"
+
+msgid "Share numerator"
+msgstr "Čitatel podílu"
+
+msgid "Podíl — čitatel"
+msgstr "Podíl — čitatel"
+
+msgid "Share denominator"
+msgstr "Jmenovatel podílu"
+
+msgid "Podíl — jmenovatel"
+msgstr "Podíl — jmenovatel"
+
+msgid "Effective from"
+msgstr "Platnost od"
+
+msgid "Effective to"
+msgstr "Platnost do"
+
+msgid "Leave blank if still active"
+msgstr "Ponechte prázdné, pokud stále platí"
+
+msgid "Flat ownership"
+msgstr "Vlastnictví bytu"
+
+msgid "Flat ownerships"
+msgstr "Vlastnictví bytů"
+
+msgid "Owner created successfully."
+msgstr "Vlastník byl úspěšně vytvořen."
+
+msgid "Owner updated successfully."
+msgstr "Vlastník byl úspěšně upraven."
+
+msgid "Owner deleted successfully."
+msgstr "Vlastník byl úspěšně odstraněn."
+
+msgid "Ownership assigned successfully."
+msgstr "Vlastnictví bylo úspěšně přiřazeno."
+
+msgid "Ownership updated successfully."
+msgstr "Vlastnictví bylo úspěšně upraveno."
+
+msgid "Ownership removed successfully."
+msgstr "Vlastnictví bylo úspěšně odstraněno."
+
+msgid "Users"
+msgstr "Uživatelé"
+
+msgid "Edit"
+msgstr "Upravit"
+
+msgid "Username"
+msgstr "Uživatelské jméno"
+
+msgid "Active"
+msgstr "Aktivní"
+
+msgid "Yes"
+msgstr "Ano"
+
+msgid "No"
+msgstr "Ne"
+
+msgid "Superuser"
+msgstr "Superuživatel"
+
+msgid "Last login"
+msgstr "Poslední přihlášení"
+
+msgid "Date joined"
+msgstr "Datum registrace"
+
+msgid "Linked owner"
+msgstr "Propojený vlastník"
+
+msgid "Edit user"
+msgstr "Upravit uživatele"
+
+msgid "New user"
+msgstr "Nový uživatel"
+
+msgid "New"
+msgstr "Nový"
+
+msgid "Save"
+msgstr "Uložit"
+
+msgid "Cancel"
+msgstr "Zrušit"
+
+msgid "Add user"
+msgstr "Přidat uživatele"
+
+msgid "Actions"
+msgstr "Akce"
+
+msgid "Detail"
+msgstr "Detail"
+
+msgid "No users found."
+msgstr "Žádní uživatelé nenalezeni."
+
+msgid "Delete building"
+msgstr "Smazat budovu"
+
+msgid "Delete"
+msgstr "Smazat"
+
+msgid "Confirm deletion"
+msgstr "Potvrzení smazání"
+
+#, python-format
+msgid "Are you sure you want to delete the building <strong>%(name)s</strong>?"
+msgstr "Opravdu chcete smazat budovu <strong>%(name)s</strong>?"
+
+#, python-format
+msgid "This building has %(count)s flat(s). They will also be soft-deleted."
+msgstr "Tato budova má %(count)s byt(ů). Budou také smazány."
+
+msgid "Yes, delete"
+msgstr "Ano, smazat"
+
+msgid "Floor plan"
+msgstr "Půdorys"
+
+msgid "View"
+msgstr "Zobrazit"
+
+msgid "Created"
+msgstr "Vytvořeno"
+
+msgid "Updated"
+msgstr "Upraveno"
+
+msgid "Add flat"
+msgstr "Přidat byt"
+
+msgid "Tenants"
+msgstr "Nájemníci"
+
+msgid "No flats in this building yet."
+msgstr "V této budově zatím nejsou žádné byty."
+
+msgid "Edit building"
+msgstr "Upravit budovu"
+
+msgid "New building"
+msgstr "Nová budova"
+
+msgid "Save changes"
+msgstr "Uložit změny"
+
+msgid "Create building"
+msgstr "Vytvořit budovu"
+
+msgid "Add building"
+msgstr "Přidat budovu"
+
+msgid "No buildings found."
+msgstr "Žádné budovy nenalezeny."
+
+msgid "Add the first building."
+msgstr "Přidejte první budovu."
+
+msgid "Audit Log Entry"
+msgstr "Záznam auditu"
+
+msgid "Audit Log"
+msgstr "Audit"
+
+msgid "Timestamp"
+msgstr "Časová značka"
+
+msgid "User"
+msgstr "Uživatel"
+
+msgid "Action"
+msgstr "Akce"
+
+msgid "Entity type"
+msgstr "Typ entity"
+
+msgid "Object ID"
+msgstr "ID objektu"
+
+msgid "Object"
+msgstr "Objekt"
+
+msgid "Changes"
+msgstr "Změny"
+
+msgid "Field"
+msgstr "Pole"
+
+msgid "Old value"
+msgstr "Stará hodnota"
+
+msgid "New value"
+msgstr "Nová hodnota"
+
+msgid "All"
+msgstr "Vše"
+
+msgid "Filter"
+msgstr "Filtrovat"
+
+msgid "Clear"
+msgstr "Vyčistit"
+
+msgid "Entity"
+msgstr "Entita"
+
+msgid "Create"
+msgstr "Vytvoření"
+
+msgid "Update"
+msgstr "Úprava"
+
+msgid "Access"
+msgstr "Přístup"
+
+msgid "No audit log entries found."
+msgstr "Žádné záznamy auditu nenalezeny."
+
+msgid "Delete flat"
+msgstr "Smazat byt"
+
+#, python-format
+msgid "Are you sure you want to delete the flat <strong>%(flat)s</strong>?"
+msgstr "Opravdu chcete smazat byt <strong>%(flat)s</strong>?"
+
+msgid "Ownership cert."
+msgstr "List vlastnictví"
+
+msgid "Radiators"
+msgstr "Radiátory"
+
+msgid "Add owner"
+msgstr "Přidat vlastníka"
+
+msgid "Share"
+msgstr "Podíl"
+
+msgid "Remove"
+msgstr "Odebrat"
+
+msgid "Warning:"
+msgstr "Upozornění:"
+
+#, python-format
+msgid "Total ownership shares sum to %(pct)s%%, not 100%%."
+msgstr "Celkové vlastnické podíly činí %(pct)s %%, nikoli 100 %%."
+
+msgid "No owners assigned to this flat."
+msgstr "K tomuto bytu nejsou přiřazeni žádní vlastníci."
+
+msgid "Add tenant"
+msgstr "Přidat nájemníka"
+
+msgid "Lease start"
+msgstr "Začátek nájmu"
+
+msgid "Lease end"
+msgstr "Konec nájmu"
+
+msgid "No tenants in this flat."
+msgstr "V tomto bytě nejsou žádní nájemníci."
+
+msgid "Edit flat"
+msgstr "Upravit byt"
+
+msgid "New flat"
+msgstr "Nový byt"
+
+msgid "Create flat"
+msgstr "Vytvořit byt"
+
+msgid "No flats found."
+msgstr "Žádné byty nenalezeny."
+
+msgid "Add the first flat."
+msgstr "Přidejte první byt."
+
+msgid "Home"
+msgstr "Domů"
+
+msgid "Dashboard"
+msgstr "Přehled"
+
+msgid "Welcome to Solomon — Facility management system for BD Salounova."
+msgstr "Vítejte v systému Solomon — Správa nemovitostí BD Salounova."
+
+msgid "Manage"
+msgstr "Spravovat"
+
+msgid "Facility management system for BD Salounova"
+msgstr "Systém správy nemovitostí BD Salounova"
+
+msgid "Login"
+msgstr "Přihlášení"
+
+msgid "Change password"
+msgstr "Změna hesla"
+
+msgid "Audit log"
+msgstr "Audit"
+
+msgid "Admin"
+msgstr "Administrace"
+
+msgid "Logout"
+msgstr "Odhlásit se"
+
+msgid "Page navigation"
+msgstr "Navigace stránek"
+
+msgid "First"
+msgstr "První"
+
+msgid "Previous"
+msgstr "Předchozí"
+
+msgid "Next"
+msgstr "Další"
+
+msgid "Last"
+msgstr "Poslední"
+
+msgid "Remove ownership"
+msgstr "Odebrat vlastnictví"
+
+msgid "Confirm removal"
+msgstr "Potvrzení odebrání"
+
+#, python-format
+msgid ""
+"Are you sure you want to remove ownership of <strong>%(owner)s</strong> from "
+"flat <strong>%(flat)s</strong>?"
+msgstr "Opravdu chcete odebrat vlastnictví <strong>%(owner)s</strong> z bytu <strong>%(flat)s</strong>?"
+
+msgid "Yes, remove"
+msgstr "Ano, odebrat"
+
+msgid "Edit ownership"
+msgstr "Upravit vlastnictví"
+
+msgid "Assign ownership"
+msgstr "Přiřadit vlastnictví"
+
+msgid "Assign flat ownership"
+msgstr "Přiřadit vlastnictví bytu"
+
+msgid "Delete owner"
+msgstr "Smazat vlastníka"
+
+#, python-format
+msgid "Are you sure you want to delete the owner <strong>%(name)s</strong>?"
+msgstr "Opravdu chcete smazat vlastníka <strong>%(name)s</strong>?"
+
+msgid "Deputy"
+msgstr "Zástupce"
+
+msgid "Owned flats"
+msgstr "Vlastněné byty"
+
+msgid "Assign flat"
+msgstr "Přiřadit byt"
+
+msgid "No flats assigned to this owner."
+msgstr "Tomuto vlastníkovi nejsou přiřazeny žádné byty."
+
+msgid "Edit owner"
+msgstr "Upravit vlastníka"
+
+msgid "New owner"
+msgstr "Nový vlastník"
+
+msgid "Create owner"
+msgstr "Vytvořit vlastníka"
+
+msgid "No owners found."
+msgstr "Žádní vlastníci nenalezeni."
+
+msgid "Add the first owner."
+msgstr "Přidejte prvního vlastníka."
+
+msgid "Sign in to your account"
+msgstr "Přihlaste se ke svému účtu"
+
+msgid "Please enter a correct username and password."
+msgstr "Zadejte prosím správné uživatelské jméno a heslo."
+
+msgid "Old password"
+msgstr "Staré heslo"
+
+msgid "New password"
+msgstr "Nové heslo"
+
+msgid "New password (again)"
+msgstr "Nové heslo (znovu)"
+
+msgid "Password changed"
+msgstr "Heslo změněno"
+
+msgid "Password changed successfully"
+msgstr "Heslo bylo úspěšně změněno"
+
+msgid "Your password has been changed."
+msgstr "Vaše heslo bylo změněno."
+
+msgid "Continue"
+msgstr "Pokračovat"
+
+msgid "Delete tenant"
+msgstr "Smazat nájemníka"
+
+#, python-format
+msgid "Are you sure you want to delete the tenant <strong>%(name)s</strong>?"
+msgstr "Opravdu chcete smazat nájemníka <strong>%(name)s</strong>?"
+
+msgid "Edit tenant"
+msgstr "Upravit nájemníka"
+
+msgid "New tenant"
+msgstr "Nový nájemník"
+
+msgid "Create tenant"
+msgstr "Vytvořit nájemníka"
+
+msgid "No tenants found."
+msgstr "Žádní nájemníci nenalezeni."
+
+msgid "Add the first tenant."
+msgstr "Přidejte prvního nájemníka."
+
+msgid "Korespondenční adresa"
+msgstr "Korespondenční adresa"
+
+msgid "Tenant"
+msgstr "Nájemník"
+
+msgid "Tenant created successfully."
+msgstr "Nájemník byl úspěšně vytvořen."
+
+msgid "Tenant updated successfully."
+msgstr "Nájemník byl úspěšně upraven."
+
+msgid "Tenant deleted successfully."
+msgstr "Nájemník byl úspěšně odstraněn."

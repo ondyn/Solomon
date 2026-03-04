@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Owners" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active">{% trans "Owners" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><span class="material-icons md-36 me-2" style="color: var(--md-info);">groups</span>{% trans "Owners" %}</h2>
+  {% if perms.owners.add_owner %}
+    <a href="{% url 'owners:owner-create' %}" class="btn btn-primary">
+      <span class="material-icons md-18">add</span> {% trans "Add owner" %}
+    </a>
+  {% endif %}
+</div>
+
+{% if owners %}
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead>
+          <tr>
+            <th>{% trans "Last name" %}</th>
+            <th>{% trans "First name" %}</th>
+            <th>{% trans "Email" %}</th>
+            <th>{% trans "Phone" %}</th>
+            <th>{% trans "Flats" %}</th>
+            <th class="text-end">{% trans "Actions" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for owner in owners %}
+          <tr>
+            <td><a href="{% url 'owners:owner-detail' owner.pk %}">{{ owner.last_name }}</a></td>
+            <td>{{ owner.first_name }}</td>
+            <td>{{ owner.email|default:"—" }}</td>
+            <td>{{ owner.phone|default:"—" }}</td>
+            <td><span class="badge bg-secondary">{{ owner.flat_owners.count }}</span></td>
+            <td class="text-end action-buttons">
+              <a href="{% url 'owners:owner-detail' owner.pk %}" class="btn btn-sm btn-outline-primary" title="{% trans 'Detail' %}">
+                <span class="material-icons md-18">visibility</span>
+              </a>
+              {% if perms.owners.change_owner %}
+                <a href="{% url 'owners:owner-update' owner.pk %}" class="btn btn-sm btn-outline-secondary" title="{% trans 'Edit' %}">
+                  <span class="material-icons md-18">edit</span>
+                </a>
+              {% endif %}
+              {% if perms.owners.delete_owner %}
+                <a href="{% url 'owners:owner-delete' owner.pk %}" class="btn btn-sm btn-outline-danger" title="{% trans 'Delete' %}">
+                  <span class="material-icons md-18">delete</span>
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% include "includes/pagination.html" %}
+{% else %}
+  <div class="empty-state">
+    <span class="material-icons">groups</span>
+    <p>{% trans "No owners found." %}</p>
+    {% if perms.owners.add_owner %}
+      <a href="{% url 'owners:owner-create' %}" class="btn btn-primary">
+        <span class="material-icons md-18">add</span> {% trans "Add the first owner." %}
+      </a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

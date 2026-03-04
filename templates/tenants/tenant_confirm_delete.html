@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete tenant" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'tenants:tenant-list' %}">{% trans "Tenants" %}</a></li>
+<li class="breadcrumb-item"><a href="{% url 'tenants:tenant-detail' tenant.pk %}">{{ tenant.full_name }}</a></li>
+<li class="breadcrumb-item active">{% trans "Delete" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="form-centered">
+<div class="card border-danger">
+  <div class="card-header bg-danger">
+    <h5 class="mb-0"><span class="material-icons md-18 me-1">warning</span>{% trans "Confirm deletion" %}</h5>
+  </div>
+  <div class="card-body">
+    <p>{% blocktrans with name=tenant.full_name %}Are you sure you want to delete the tenant <strong>{{ name }}</strong>?{% endblocktrans %}</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger"><span class="material-icons md-18">delete_forever</span> {% trans "Yes, delete" %}</button>
+      <a href="{% url 'tenants:tenant-detail' tenant.pk %}" class="btn btn-outline-secondary ms-2">{% trans "Cancel" %}</a>
+    </form>
+  </div>
+</div>
+</div>
+{% endblock %}

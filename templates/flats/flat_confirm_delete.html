@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete flat" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'flats:flat-list' %}">{% trans "Flats" %}</a></li>
+<li class="breadcrumb-item"><a href="{% url 'flats:flat-detail' flat.pk %}">{{ flat.flat_number }}</a></li>
+<li class="breadcrumb-item active">{% trans "Delete" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="form-centered">
+<div class="card border-danger">
+  <div class="card-header bg-danger">
+    <h5 class="mb-0"><span class="material-icons md-18 me-1">warning</span>{% trans "Confirm deletion" %}</h5>
+  </div>
+  <div class="card-body">
+    <p>{% blocktrans with flat=flat %}Are you sure you want to delete the flat <strong>{{ flat }}</strong>?{% endblocktrans %}</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger"><span class="material-icons md-18">delete_forever</span> {% trans "Yes, delete" %}</button>
+      <a href="{% url 'flats:flat-detail' flat.pk %}" class="btn btn-outline-secondary ms-2">{% trans "Cancel" %}</a>
+    </form>
+  </div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,133 @@
+[project]
+name = "solomon"
+version = "0.1.0"
+description = "Facility Management System for SVJ (BD Salounova)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Solomon Team"},
+]
+
+dependencies = [
+    "django>=5.1,<6.0",
+    "django-environ>=0.11",
+    "django-auditlog>=3.0",
+    "django-safedelete>=1.4",
+    "django-htmx>=1.19",
+    "psycopg[binary]>=3.2",
+    "gunicorn>=23.0",
+    "whitenoise>=6.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "django-stubs>=5.1",
+    "pre-commit>=4.0",
+    "pytest>=8.3",
+    "pytest-django>=4.9",
+    "pytest-cov>=6.0",
+    "factory-boy>=3.3",
+    "faker>=33.0",
+    "django-debug-toolbar>=4.4",
+    "debugpy>=1.8",
+    "ipython>=8.29",
+]
+
+# =============================================================================
+# Ruff — linter + formatter (replaces flake8, isort, black, pycodestyle)
+# =============================================================================
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+src = ["solomon"]
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort (import sorting)
+    "N",     # pep8-naming
+    "UP",    # pyupgrade
+    "B",     # flake8-bugbear
+    "A",     # flake8-builtins
+    "DJ",    # flake8-django
+    "SIM",   # flake8-simplify
+    "RUF",   # ruff-specific rules
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "RUF012",  # mutable class attributes (Django models use them)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["solomon", "core", "buildings", "flats", "owners", "tenants"]
+
+[tool.ruff.lint.per-file-ignores]
+"*/migrations/*" = ["E501", "N", "DJ"]  # auto-generated migrations
+"*/tests/*" = ["S101"]  # allow assert in tests
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# =============================================================================
+# Mypy — static type checking
+# =============================================================================
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main"]
+ignore_missing_imports = true
+strict = false
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.django-stubs]
+django_settings_module = "solomon.settings.dev"
+
+# =============================================================================
+# Pytest — test runner
+# =============================================================================
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "solomon.settings.test"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--tb=short",
+    "-v",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+# =============================================================================
+# Coverage — test coverage reporting
+# =============================================================================
+[tool.coverage.run]
+source = ["solomon", "core", "buildings", "flats", "owners", "tenants"]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/test_*",
+    "manage.py",
+    "solomon/settings/*",
+    "solomon/wsgi.py",
+    "solomon/asgi.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 70
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if TYPE_CHECKING:",
+    "if settings.DEBUG",
+]

@@ -1,0 +1,16 @@
+# Solomon — Docker Compose override for debugging
+#
+# This file is automatically merged with docker-compose.yml.
+# To debug Django in Docker:
+#   1. docker compose up
+#   2. In VS Code, select "Django: Docker Attach" launch config
+#   3. Press F5
+#
+# To run WITHOUT debugpy, rename or delete this file.
+
+services:
+  web:
+    command: >
+      python -m debugpy
+        --listen 0.0.0.0:5678
+        manage.py runserver 0.0.0.0:8000

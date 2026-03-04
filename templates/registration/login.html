@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Login" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active">{% trans "Login" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5 col-lg-4">
+    <div class="card login-card shadow-sm mt-5">
+      <div class="card-body p-4">
+        <div class="text-center mb-4">
+          <span class="material-icons" style="font-size: 48px; color: var(--md-primary);">apartment</span>
+          <h2 class="card-title mt-2"><strong>Solomon</strong></h2>
+          <p class="text-muted">{% trans "Sign in to your account" %}</p>
+        </div>
+
+        {% if form.errors %}
+          <div class="alert alert-danger">
+            <span class="material-icons md-18 me-1">error_outline</span>
+            {% trans "Please enter a correct username and password." %}
+          </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="id_username" class="form-label">{% trans "Username" %}</label>
+            <div class="input-group">
+              <span class="input-group-text"><span class="material-icons md-18">person</span></span>
+              <input type="text" name="username" id="id_username"
+                     class="form-control {% if form.errors %}is-invalid{% endif %}"
+                     autofocus required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="id_password" class="form-label">{% trans "Password" %}</label>
+            <div class="input-group">
+              <span class="input-group-text"><span class="material-icons md-18">lock</span></span>
+              <input type="password" name="password" id="id_password"
+                     class="form-control {% if form.errors %}is-invalid{% endif %}"
+                     required>
+            </div>
+          </div>
+
+          <input type="hidden" name="next" value="{{ next }}">
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <span class="material-icons md-18 me-1">login</span> {% trans "Login" %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

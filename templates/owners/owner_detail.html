@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ owner.full_name }} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'owners:owner-list' %}">{% trans "Owners" %}</a></li>
+<li class="breadcrumb-item active">{{ owner.full_name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><span class="material-icons md-36 me-2" style="color: var(--md-info);">person</span>{{ owner.full_name }}</h2>
+  <div>
+    {% if perms.owners.change_owner %}
+      <a href="{% url 'owners:owner-update' owner.pk %}" class="btn btn-outline-secondary"><span class="material-icons md-18">edit</span> {% trans "Edit" %}</a>
+    {% endif %}
+    {% if perms.owners.delete_owner %}
+      <a href="{% url 'owners:owner-delete' owner.pk %}" class="btn btn-outline-danger ms-1"><span class="material-icons md-18">delete</span> {% trans "Delete" %}</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">{% trans "Person type" %}</dt>
+          <dd class="col-sm-7">{{ owner.get_person_type_display }}</dd>
+
+          <dt class="col-sm-5">{% trans "First name" %}</dt>
+          <dd class="col-sm-7">{{ owner.first_name }}</dd>
+
+          <dt class="col-sm-5">{% trans "Last name" %}</dt>
+          <dd class="col-sm-7">{{ owner.last_name }}</dd>
+
+          <dt class="col-sm-5">{% trans "Email" %}</dt>
+          <dd class="col-sm-7">{{ owner.email|default:"—" }}</dd>
+
+          <dt class="col-sm-5">{% trans "Phone" %}</dt>
+          <dd class="col-sm-7">{{ owner.phone|default:"—" }}</dd>
+
+          <dt class="col-sm-5">{% trans "Date of birth" %}</dt>
+          <dd class="col-sm-7">{{ owner.date_of_birth|default:"—" }}</dd>
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">{% trans "Permanent address" %}</dt>
+          <dd class="col-sm-7">{{ owner.permanent_address|default:"—" }}</dd>
+
+          <dt class="col-sm-5">{% trans "Contact address" %}</dt>
+          <dd class="col-sm-7">{{ owner.contact_address|default:"—" }}</dd>
+
+          {% if owner.deputy_name %}
+          <dt class="col-sm-5">{% trans "Deputy" %}</dt>
+          <dd class="col-sm-7">{{ owner.deputy_name }}{% if owner.deputy_contact %} ({{ owner.deputy_contact }}){% endif %}</dd>
+          {% endif %}
+
+          <dt class="col-sm-5">{% trans "User account" %}</dt>
+          <dd class="col-sm-7">{{ owner.user.username|default:"—" }}</dd>
+
+          <dt class="col-sm-5">{% trans "Created" %}</dt>
+          <dd class="col-sm-7">{{ owner.created_at }}</dd>
+
+          <dt class="col-sm-5">{% trans "Updated" %}</dt>
+          <dd class="col-sm-7">{{ owner.updated_at }}</dd>
+        </dl>
+        {% if owner.note %}
+          <dl class="row mb-0">
+            <dt class="col-sm-5">{% trans "Note" %}</dt>
+            <dd class="col-sm-7">{{ owner.note }}</dd>
+          </dl>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Owned flats #}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4><span class="material-icons md-24 me-1" style="color: var(--md-success);">door_front</span> {% trans "Owned flats" %} <span class="badge bg-secondary">{{ owner.flat_owners.count }}</span></h4>
+  {% if perms.owners.add_flatowner %}
+    <a href="{% url 'owners:flatowner-create' %}?owner={{ owner.pk }}" class="btn btn-sm btn-primary"><span class="material-icons md-18">add</span> {% trans "Assign flat" %}</a>
+  {% endif %}
+</div>
+
+{% if owner.flat_owners.all %}
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>{% trans "Flat" %}</th>
+          <th>{% trans "Building" %}</th>
+          <th>{% trans "Share" %}</th>
+          <th>{% trans "Effective from" %}</th>
+          <th>{% trans "Effective to" %}</th>
+          <th class="text-end">{% trans "Actions" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fo in owner.flat_owners.all %}
+        <tr>
+          <td><a href="{% url 'flats:flat-detail' fo.flat.pk %}">{{ fo.flat.flat_number }}</a></td>
+          <td><a href="{% url 'buildings:building-detail' fo.flat.building.pk %}">{{ fo.flat.building.name }}</a></td>
+          <td>{{ fo.share_numerator }}/{{ fo.share_denominator }} ({{ fo.share_percentage }}%)</td>
+          <td>{{ fo.effective_from }}</td>
+          <td>{{ fo.effective_to|default:"—" }}</td>
+          <td class="text-end">
+            {% if perms.owners.change_flatowner %}
+              <a href="{% url 'owners:flatowner-update' fo.pk %}" class="btn btn-sm btn-outline-secondary">{% trans "Edit" %}</a>
+            {% endif %}
+            {% if perms.owners.delete_flatowner %}
+              <a href="{% url 'owners:flatowner-delete' fo.pk %}" class="btn btn-sm btn-outline-danger">{% trans "Remove" %}</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p class="text-muted">{% trans "No flats assigned to this owner." %}</p>
+{% endif %}
+{% endblock %}

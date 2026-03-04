@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Audit Log Entry" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'core:auditlog-list' %}">{% trans "Audit Log" %}</a></li>
+<li class="breadcrumb-item active">#{{ entry.pk }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><span class="material-icons md-36 me-2" style="color: var(--md-primary);">history</span>{% trans "Audit Log Entry" %} #{{ entry.pk }}</h2>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">{% trans "Timestamp" %}</dt>
+          <dd class="col-sm-7">{{ entry.timestamp }}</dd>
+
+          <dt class="col-sm-5">{% trans "User" %}</dt>
+          <dd class="col-sm-7">{{ entry.actor.username|default:"system" }}</dd>
+
+          <dt class="col-sm-5">{% trans "Action" %}</dt>
+          <dd class="col-sm-7">{{ entry.get_action_display }}</dd>
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <dl class="row mb-0">
+          <dt class="col-sm-5">{% trans "Entity type" %}</dt>
+          <dd class="col-sm-7">{{ entry.content_type }}</dd>
+
+          <dt class="col-sm-5">{% trans "Object ID" %}</dt>
+          <dd class="col-sm-7"><code>{{ entry.object_id }}</code></dd>
+
+          <dt class="col-sm-5">{% trans "Object" %}</dt>
+          <dd class="col-sm-7">{{ entry.object_repr }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if entry.changes_dict %}
+<div class="card">
+  <div class="card-header">
+    <span class="material-icons md-18 me-1">compare_arrows</span> {% trans "Changes" %}
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-sm mb-0">
+      <thead>
+        <tr>
+          <th>{% trans "Field" %}</th>
+          <th>{% trans "Old value" %}</th>
+          <th>{% trans "New value" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for field, values in entry.changes_dict.items %}
+        <tr>
+          <td><strong>{{ field }}</strong></td>
+          <td>{{ values.0|default:"—" }}</td>
+          <td>{{ values.1|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

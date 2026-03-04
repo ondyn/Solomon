@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Users" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active">{% trans "Users" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><span class="material-icons md-36 me-2" style="color: var(--md-primary);">manage_accounts</span>{% trans "Users" %}</h2>
+  {% if perms.auth.add_user %}
+    <a href="{% url 'accounts:user-create' %}" class="btn btn-primary">
+      <span class="material-icons md-18">person_add</span> {% trans "Add user" %}
+    </a>
+  {% endif %}
+</div>
+
+{% if users %}
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead>
+          <tr>
+            <th>{% trans "Username" %}</th>
+            <th>{% trans "Name" %}</th>
+            <th>{% trans "Email" %}</th>
+            <th>{% trans "Role" %}</th>
+            <th>{% trans "Active" %}</th>
+            <th class="text-end">{% trans "Actions" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user_obj in users %}
+          <tr>
+            <td>
+              <a href="{% url 'accounts:user-detail' user_obj.pk %}">{{ user_obj.username }}</a>
+            </td>
+            <td>{{ user_obj.get_full_name|default:"—" }}</td>
+            <td>{{ user_obj.email|default:"—" }}</td>
+            <td>
+              {% for group in user_obj.groups.all %}
+                <span class="badge bg-info">{{ group.name }}</span>
+              {% empty %}
+                {% if user_obj.is_superuser %}<span class="badge bg-danger">superuser</span>{% else %}—{% endif %}
+              {% endfor %}
+            </td>
+            <td>
+              {% if user_obj.is_active %}
+                <span class="material-icons md-18 text-success">check_circle</span>
+              {% else %}
+                <span class="material-icons md-18 text-danger">cancel</span>
+              {% endif %}
+            </td>
+            <td class="text-end action-buttons">
+              <a href="{% url 'accounts:user-detail' user_obj.pk %}" class="btn btn-sm btn-outline-primary" title="{% trans 'Detail' %}">
+                <span class="material-icons md-18">visibility</span>
+              </a>
+              {% if perms.auth.change_user %}
+                <a href="{% url 'accounts:user-update' user_obj.pk %}" class="btn btn-sm btn-outline-secondary" title="{% trans 'Edit' %}">
+                  <span class="material-icons md-18">edit</span>
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% include "includes/pagination.html" %}
+{% else %}
+  <div class="empty-state">
+    <span class="material-icons">manage_accounts</span>
+    <p>{% trans "No users found." %}</p>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+{% load i18n %}
+
+<header class="topbar d-print-none">
+  <div class="topbar-inner">
+
+    {# Mobile menu toggle #}
+    <button class="btn btn-link sidebar-toggle d-lg-none" type="button" onclick="document.body.classList.toggle('sidebar-open')">
+      <span class="material-icons">menu</span>
+    </button>
+
+    {# Breadcrumb area (filled by child templates) #}
+    <div class="topbar-breadcrumbs">
+      {% block breadcrumbs %}{% endblock %}
+    </div>
+
+    {# Right side: user menu #}
+    <div class="topbar-actions">
+      {% if user.is_authenticated %}
+      <div class="dropdown">
+        <a class="topbar-user dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <span class="material-icons md-24">account_circle</span>
+          <span class="user-name d-none d-md-inline">{{ user.get_full_name|default:user.username }}</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="{% url 'password_change' %}">
+              <span class="material-icons md-18 me-2">lock</span>{% trans "Change password" %}
+            </a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <form method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="dropdown-item d-flex align-items-center">
+                <span class="material-icons md-18 me-2">logout</span>{% trans "Logout" %}
+              </button>
+            </form>
+          </li>
+        </ul>
+      </div>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">
+        <span class="material-icons md-18 me-1">login</span>{% trans "Login" %}
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</header>

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Tenants" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active">{% trans "Tenants" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><span class="material-icons md-36 me-2" style="color: var(--md-warning);">badge</span>{% trans "Tenants" %}</h2>
+  {% if perms.tenants.add_tenant %}
+    <a href="{% url 'tenants:tenant-create' %}" class="btn btn-primary">
+      <span class="material-icons md-18">add</span> {% trans "Add tenant" %}
+    </a>
+  {% endif %}
+</div>
+
+{% if tenants %}
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead>
+          <tr>
+            <th>{% trans "Last name" %}</th>
+            <th>{% trans "First name" %}</th>
+            <th>{% trans "Flat" %}</th>
+            <th>{% trans "Email" %}</th>
+            <th>{% trans "Phone" %}</th>
+            <th>{% trans "Lease start" %}</th>
+            <th>{% trans "Lease end" %}</th>
+            <th class="text-end">{% trans "Actions" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tenant in tenants %}
+          <tr>
+            <td><a href="{% url 'tenants:tenant-detail' tenant.pk %}">{{ tenant.last_name }}</a></td>
+            <td>{{ tenant.first_name }}</td>
+            <td><a href="{% url 'flats:flat-detail' tenant.flat.pk %}">{{ tenant.flat }}</a></td>
+            <td>{{ tenant.email|default:"—" }}</td>
+            <td>{{ tenant.phone|default:"—" }}</td>
+            <td>{{ tenant.effective_from }}</td>
+            <td>{{ tenant.effective_to|default:"—" }}</td>
+            <td class="text-end action-buttons">
+              <a href="{% url 'tenants:tenant-detail' tenant.pk %}" class="btn btn-sm btn-outline-primary" title="{% trans 'Detail' %}">
+                <span class="material-icons md-18">visibility</span>
+              </a>
+              {% if perms.tenants.change_tenant %}
+                <a href="{% url 'tenants:tenant-update' tenant.pk %}" class="btn btn-sm btn-outline-secondary" title="{% trans 'Edit' %}">
+                  <span class="material-icons md-18">edit</span>
+                </a>
+              {% endif %}
+              {% if perms.tenants.delete_tenant %}
+                <a href="{% url 'tenants:tenant-delete' tenant.pk %}" class="btn btn-sm btn-outline-danger" title="{% trans 'Delete' %}">
+                  <span class="material-icons md-18">delete</span>
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% include "includes/pagination.html" %}
+{% else %}
+  <div class="empty-state">
+    <span class="material-icons">badge</span>
+    <p>{% trans "No tenants found." %}</p>
+    {% if perms.tenants.add_tenant %}
+      <a href="{% url 'tenants:tenant-create' %}" class="btn btn-primary">
+        <span class="material-icons md-18">add</span> {% trans "Add the first tenant." %}
+      </a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

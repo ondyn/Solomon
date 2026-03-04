@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Remove ownership" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'owners:owner-list' %}">{% trans "Owners" %}</a></li>
+<li class="breadcrumb-item active">{% trans "Remove ownership" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="form-centered">
+<div class="card border-danger">
+  <div class="card-header bg-danger">
+    <h5 class="mb-0"><span class="material-icons md-18 me-1">warning</span>{% trans "Confirm removal" %}</h5>
+  </div>
+  <div class="card-body">
+    <p>{% blocktrans with owner=flatowner.owner.full_name flat=flatowner.flat %}Are you sure you want to remove ownership of <strong>{{ owner }}</strong> from flat <strong>{{ flat }}</strong>?{% endblocktrans %}</p>
+
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger"><span class="material-icons md-18">delete_forever</span> {% trans "Yes, remove" %}</button>
+      <a href="javascript:history.back()" class="btn btn-outline-secondary ms-2">{% trans "Cancel" %}</a>
+    </form>
+  </div>
+</div>
+</div>
+{% endblock %}

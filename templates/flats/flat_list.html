@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Flats" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active">{% trans "Flats" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><span class="material-icons md-36 me-2" style="color: var(--md-success);">door_front</span>{% trans "Flats" %}</h2>
+  {% if perms.flats.add_flat %}
+    <a href="{% url 'flats:flat-create' %}" class="btn btn-primary">
+      <span class="material-icons md-18">add</span> {% trans "Add flat" %}
+    </a>
+  {% endif %}
+</div>
+
+{% if flats %}
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead>
+          <tr>
+            <th>{% trans "Flat number" %}</th>
+            <th>{% trans "Building" %}</th>
+            <th>{% trans "Floor" %}</th>
+            <th>{% trans "Area (m²)" %}</th>
+            <th>{% trans "Disposition" %}</th>
+            <th>{% trans "Owners" %}</th>
+            <th>{% trans "Tenants" %}</th>
+            <th class="text-end">{% trans "Actions" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for flat in flats %}
+          <tr>
+            <td><a href="{% url 'flats:flat-detail' flat.pk %}">{{ flat.flat_number }}</a></td>
+            <td><a href="{% url 'buildings:building-detail' flat.building.pk %}">{{ flat.building.name }}</a></td>
+            <td>{{ flat.floor|default:"—" }}</td>
+            <td>{{ flat.area_m2|default:"—" }}</td>
+            <td>{{ flat.disposition|default:"—" }}</td>
+            <td><span class="badge bg-secondary">{{ flat.flat_owners.count }}</span></td>
+            <td><span class="badge bg-secondary">{{ flat.tenants.count }}</span></td>
+            <td class="text-end action-buttons">
+              <a href="{% url 'flats:flat-detail' flat.pk %}" class="btn btn-sm btn-outline-primary" title="{% trans 'Detail' %}">
+                <span class="material-icons md-18">visibility</span>
+              </a>
+              {% if perms.flats.change_flat %}
+                <a href="{% url 'flats:flat-update' flat.pk %}" class="btn btn-sm btn-outline-secondary" title="{% trans 'Edit' %}">
+                  <span class="material-icons md-18">edit</span>
+                </a>
+              {% endif %}
+              {% if perms.flats.delete_flat %}
+                <a href="{% url 'flats:flat-delete' flat.pk %}" class="btn btn-sm btn-outline-danger" title="{% trans 'Delete' %}">
+                  <span class="material-icons md-18">delete</span>
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% include "includes/pagination.html" %}
+{% else %}
+  <div class="empty-state">
+    <span class="material-icons">door_front</span>
+    <p>{% trans "No flats found." %}</p>
+    {% if perms.flats.add_flat %}
+      <a href="{% url 'flats:flat-create' %}" class="btn btn-primary">
+        <span class="material-icons md-18">add</span> {% trans "Add the first flat." %}
+      </a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

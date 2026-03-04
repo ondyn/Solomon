@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Buildings" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active">{% trans "Buildings" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2><span class="material-icons md-36 me-2" style="color: var(--md-primary);">business</span>{% trans "Buildings" %}</h2>
+  {% if perms.buildings.add_building %}
+    <a href="{% url 'buildings:building-create' %}" class="btn btn-primary">
+      <span class="material-icons md-18">add</span> {% trans "Add building" %}
+    </a>
+  {% endif %}
+</div>
+
+{% if buildings %}
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead>
+          <tr>
+            <th>{% trans "Name" %}</th>
+            <th>{% trans "Street" %}</th>
+            <th>{% trans "House number" %}</th>
+            <th>{% trans "City" %}</th>
+            <th>{% trans "Postal code" %}</th>
+            <th>{% trans "Flats" %}</th>
+            <th class="text-end">{% trans "Actions" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for building in buildings %}
+          <tr>
+            <td>
+              <a href="{% url 'buildings:building-detail' building.pk %}">{{ building.name }}</a>
+            </td>
+            <td>{{ building.street }}</td>
+            <td>{{ building.house_number }}</td>
+            <td>{{ building.city }}</td>
+            <td>{{ building.postal_code }}</td>
+            <td><span class="badge bg-secondary">{{ building.flats.count }}</span></td>
+            <td class="text-end action-buttons">
+              <a href="{% url 'buildings:building-detail' building.pk %}" class="btn btn-sm btn-outline-primary" title="{% trans 'Detail' %}">
+                <span class="material-icons md-18">visibility</span>
+              </a>
+              {% if perms.buildings.change_building %}
+                <a href="{% url 'buildings:building-update' building.pk %}" class="btn btn-sm btn-outline-secondary" title="{% trans 'Edit' %}">
+                  <span class="material-icons md-18">edit</span>
+                </a>
+              {% endif %}
+              {% if perms.buildings.delete_building %}
+                <a href="{% url 'buildings:building-delete' building.pk %}" class="btn btn-sm btn-outline-danger" title="{% trans 'Delete' %}">
+                  <span class="material-icons md-18">delete</span>
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% include "includes/pagination.html" %}
+{% else %}
+  <div class="empty-state">
+    <span class="material-icons">business</span>
+    <p>{% trans "No buildings found." %}</p>
+    {% if perms.buildings.add_building %}
+      <a href="{% url 'buildings:building-create' %}" class="btn btn-primary">
+        <span class="material-icons md-18">add</span> {% trans "Add the first building." %}
+      </a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Home" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active">{% trans "Dashboard" %}</li>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  {# Dashboard for authenticated users #}
+  <div class="py-4">
+    <h2 class="mb-1">{% trans "Dashboard" %}</h2>
+    <p class="text-muted">{% trans "Welcome to Solomon — Facility management system for BD Salounova." %}</p>
+
+    <div class="row mt-4 g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card card-buildings h-100">
+          <div class="card-body text-center">
+            <span class="material-icons card-icon">business</span>
+            <h5 class="card-title">{% trans "Buildings" %}</h5>
+            <a href="{% url 'buildings:building-list' %}" class="btn btn-outline-primary">
+              <span class="material-icons md-18">arrow_forward</span> {% trans "Manage" %}
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card card-flats h-100">
+          <div class="card-body text-center">
+            <span class="material-icons card-icon">door_front</span>
+            <h5 class="card-title">{% trans "Flats" %}</h5>
+            <a href="{% url 'flats:flat-list' %}" class="btn btn-outline-info">
+              <span class="material-icons md-18">arrow_forward</span> {% trans "Manage" %}
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card card-owners h-100">
+          <div class="card-body text-center">
+            <span class="material-icons card-icon">groups</span>
+            <h5 class="card-title">{% trans "Owners" %}</h5>
+            <a href="{% url 'owners:owner-list' %}" class="btn btn-outline-info">
+              <span class="material-icons md-18">arrow_forward</span> {% trans "Manage" %}
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card card-tenants h-100">
+          <div class="card-body text-center">
+            <span class="material-icons card-icon">badge</span>
+            <h5 class="card-title">{% trans "Tenants" %}</h5>
+            <a href="{% url 'tenants:tenant-list' %}" class="btn btn-outline-warning">
+              <span class="material-icons md-18">arrow_forward</span> {% trans "Manage" %}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+  {# Landing page for anonymous users #}
+  <div class="text-center py-5">
+    <span class="material-icons login-icon mb-3" style="font-size:80px;">apartment</span>
+    <h1 class="mb-2">Solomon</h1>
+    <p class="lead">{% trans "Facility management system for BD Salounova" %}</p>
+    <a href="{% url 'login' %}" class="btn btn-primary btn-lg mt-3">
+      <span class="material-icons md-18 me-1">login</span> {% trans "Login" %}
+    </a>
+  </div>
+{% endif %}
+{% endblock %}

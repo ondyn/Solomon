@@ -1,0 +1,87 @@
+{% load i18n %}
+
+<aside class="sidebar d-print-none">
+  <div class="sidebar-inner">
+
+    {# Brand #}
+    <div class="sidebar-brand">
+      <a href="{% url 'home' %}">
+        <span class="material-icons brand-icon">apartment</span>
+        <span class="brand-text">Solomon</span>
+      </a>
+    </div>
+
+    {% if user.is_authenticated %}
+    {# Navigation #}
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">{% trans "Navigation" %}</div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+            <span class="material-icons">dashboard</span>
+            <span class="nav-text">{% trans "Dashboard" %}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.app_name == 'buildings' %}active{% endif %}" href="{% url 'buildings:building-list' %}">
+            <span class="material-icons">business</span>
+            <span class="nav-text">{% trans "Buildings" %}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.app_name == 'flats' %}active{% endif %}" href="{% url 'flats:flat-list' %}">
+            <span class="material-icons">door_front</span>
+            <span class="nav-text">{% trans "Flats" %}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.app_name == 'owners' %}active{% endif %}" href="{% url 'owners:owner-list' %}">
+            <span class="material-icons">groups</span>
+            <span class="nav-text">{% trans "Owners" %}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.app_name == 'tenants' %}active{% endif %}" href="{% url 'tenants:tenant-list' %}">
+            <span class="material-icons">badge</span>
+            <span class="nav-text">{% trans "Tenants" %}</span>
+          </a>
+        </li>
+      </ul>
+
+      {% if perms.auth.view_user or user.is_staff %}
+      <div class="nav-section-title">{% trans "Administration" %}</div>
+      <ul class="nav flex-column">
+        {% if perms.auth.view_user %}
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.app_name == 'accounts' %}active{% endif %}" href="{% url 'accounts:user-list' %}">
+            <span class="material-icons">manage_accounts</span>
+            <span class="nav-text">{% trans "Users" %}</span>
+          </a>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.app_name == 'core' %}active{% endif %}" href="{% url 'core:auditlog-list' %}">
+            <span class="material-icons">history</span>
+            <span class="nav-text">{% trans "Audit Log" %}</span>
+          </a>
+        </li>
+        {% if user.is_staff %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'admin:index' %}">
+            <span class="material-icons">admin_panel_settings</span>
+            <span class="nav-text">{% trans "Admin" %}</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+      {% endif %}
+    </nav>
+
+    {# Version #}
+    <div class="sidebar-footer">
+      <span class="text-muted small">Solomon v{{ APP_VERSION }}</span>
+    </div>
+    {% endif %}
+
+  </div>
+</aside>
