@@ -1,0 +1,9 @@
+api description
+
+url=https://api-kn.cuzk.gov.cz
+CUZK_API_KEY - get from environments variables
+
+land(allotment) number=2031/66
+munnicipality=Praha [554782]
+title deed=	10136
+cadastral territory=Chodov [728225]

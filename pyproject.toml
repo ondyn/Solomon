@@ -18,6 +18,7 @@ dependencies = [
     "psycopg[binary]>=3.2",
     "gunicorn>=23.0",
     "whitenoise>=6.7",
+    "requests>=2.31",
 ]
 
 [project.optional-dependencies]
@@ -131,3 +132,10 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "if settings.DEBUG",
 ]
+
+# =============================================================================
+# Build system
+# =============================================================================
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

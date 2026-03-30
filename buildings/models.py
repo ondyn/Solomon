@@ -89,6 +89,21 @@ class Building(BaseModel):
         verbose_name=_("Note"),
     )
 
+    # CUZK integration
+    cuzk_building_id = models.BigIntegerField(
+        blank=True,
+        null=True,
+        unique=True,
+        verbose_name=_("CUZK building ID"),
+        help_text=_("Unikátní identifikátor stavby v ISKN (ČÚZK)"),
+    )
+    cuzk_lv_number = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_("Title deed number"),
+        help_text=_("Číslo listu vlastnictví (LV) z ČÚZK"),
+    )
+
     class Meta(BaseModel.Meta):
         verbose_name = _("Building")
         verbose_name_plural = _("Buildings")

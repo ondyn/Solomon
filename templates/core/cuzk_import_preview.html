@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "CUZK Import — Preview" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'core:cuzk-import-search' %}">{% trans "CUZK Import" %}</a></li>
+<li class="breadcrumb-item active">{% trans "Preview" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>
+    <span class="material-icons md-36 me-2" style="color: var(--md-primary);">preview</span>
+    {% trans "Import Preview" %}
+  </h2>
+</div>
+
+<form method="post" action="{% url 'core:cuzk-import-preview' %}">
+  {% csrf_token %}
+
+  {# ── Building section ────────────────────────────────────────────── #}
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>
+        <span class="material-icons md-18 me-1">business</span>
+        {% trans "Building" %}: <strong>{{ building_diff.cuzk_building.municipality_name }}</strong>
+        {% if building_diff.cuzk_building.house_numbers %}
+          č.p. {{ building_diff.cuzk_building.house_numbers|join:", " }}
+        {% endif %}
+        <span class="text-muted ms-2">(CUZK ID: {{ building_diff.cuzk_building.id }})</span>
+      </span>
+      <span>
+        {% if building_diff.suggested_action == "create" %}
+          <span class="badge bg-success">{% trans "NEW" %}</span>
+        {% elif building_diff.suggested_action == "update" %}
+          <span class="badge bg-warning text-dark">{% trans "CHANGED" %}</span>
+        {% else %}
+          <span class="badge bg-secondary">{% trans "NO CHANGES" %}</span>
+        {% endif %}
+      </span>
+    </div>
+    <div class="card-body">
+      {% if building_diff.existing_building %}
+        <p class="text-muted mb-2">
+          {% trans "Matching existing building:" %}
+          <a href="{% url 'buildings:building-detail' building_diff.existing_building.pk %}">
+            {{ building_diff.existing_building }}
+          </a>
+        </p>
+      {% else %}
+        <p class="text-muted mb-2">{% trans "No matching building found in database. A new building will be created." %}</p>
+      {% endif %}
+
+      <div class="table-responsive">
+        <table class="table table-sm table-striped mb-3">
+          <thead>
+            <tr>
+              <th>{% trans "Field" %}</th>
+              <th>{% trans "Current value" %}</th>
+              <th>{% trans "CUZK value" %}</th>
+              <th>{% trans "Changed" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for diff in building_diff.field_diffs %}
+            <tr{% if diff.is_changed %} class="table-warning"{% endif %}>
+              <td>{{ diff.field_label }}</td>
+              <td>{{ diff.current_value|default:"—" }}</td>
+              <td><strong>{{ diff.new_value|default:"—" }}</strong></td>
+              <td>
+                {% if diff.is_changed %}
+                  <span class="material-icons md-18 text-warning">change_circle</span>
+                {% else %}
+                  <span class="material-icons md-18 text-muted">check_circle</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {# Additional CUZK info #}
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <small class="text-muted">
+            {% trans "Building type" %}: {{ building_diff.cuzk_building.building_type_name|default:"—" }}<br>
+            {% trans "Usage" %}: {{ building_diff.cuzk_building.usage_name|default:"—" }}<br>
+            {% trans "City part" %}: {{ building_diff.cuzk_building.city_part_name|default:"—" }}
+            {% if building_diff.cuzk_building.lv %}
+              <br>{% trans "Title deed (LV)" %}: {{ building_diff.cuzk_building.lv.number }}
+              ({{ building_diff.cuzk_building.lv.cadastral_territory_name }})
+            {% endif %}
+          </small>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <label class="form-label fw-bold">{% trans "Action for building" %}:</label>
+          <select name="building_action" class="form-select">
+            {% for value, label in action_choices %}
+              <option value="{{ value }}" {% if value == building_diff.suggested_action %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        {% if building_diff.suggested_action == "create" %}
+        <div class="col-md-4">
+          <label class="form-label fw-bold">{% trans "Or link to existing" %}:</label>
+          <select name="link_to_building" class="form-select">
+            <option value="">{% trans "— Create new —" %}</option>
+            {% for b in buildings %}
+              <option value="{{ b.pk }}">{{ b }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {# ── Units section ───────────────────────────────────────────────── #}
+  <div class="card mb-4">
+    <div class="card-header">
+      <span class="material-icons md-18 me-1">door_front</span>
+      {% trans "Units (Flats)" %}
+      <span class="badge bg-secondary ms-1">{{ unit_diffs|length }}</span>
+    </div>
+    <div class="card-body">
+      {% if unit_diffs %}
+        {% for udiff in unit_diffs %}
+        <div class="border rounded p-3 mb-3 {% if udiff.suggested_action == 'create' %}border-success{% elif udiff.suggested_action == 'update' %}border-warning{% else %}border-secondary{% endif %}">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">
+              {% trans "Unit" %} {{ udiff.cuzk_unit.unit_number }}
+              <span class="text-muted small">(CUZK ID: {{ udiff.cuzk_unit.id }})</span>
+              {% if udiff.cuzk_unit.unit_type_name %}
+                <span class="text-muted small ms-1">— {{ udiff.cuzk_unit.unit_type_name }}</span>
+              {% endif %}
+            </h6>
+            <span>
+              {% if udiff.suggested_action == "create" %}
+                <span class="badge bg-success">{% trans "NEW" %}</span>
+              {% elif udiff.suggested_action == "update" %}
+                <span class="badge bg-warning text-dark">{% trans "CHANGED" %}</span>
+              {% else %}
+                <span class="badge bg-secondary">{% trans "NO CHANGES" %}</span>
+              {% endif %}
+            </span>
+          </div>
+
+          {% if udiff.existing_flat %}
+            <p class="text-muted small mb-2">
+              {% trans "Matches existing flat:" %}
+              <a href="{% url 'flats:flat-detail' udiff.existing_flat.pk %}">{{ udiff.existing_flat }}</a>
+            </p>
+          {% endif %}
+
+          <div class="table-responsive">
+            <table class="table table-sm table-striped mb-2">
+              <thead>
+                <tr>
+                  <th>{% trans "Field" %}</th>
+                  <th>{% trans "Current value" %}</th>
+                  <th>{% trans "CUZK value" %}</th>
+                  <th>{% trans "Changed" %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for diff in udiff.field_diffs %}
+                <tr{% if diff.is_changed %} class="table-warning"{% endif %}>
+                  <td>{{ diff.field_label }}</td>
+                  <td>{{ diff.current_value|default:"—" }}</td>
+                  <td><strong>{{ diff.new_value|default:"—" }}</strong></td>
+                  <td>
+                    {% if diff.is_changed %}
+                      <span class="material-icons md-18 text-warning">change_circle</span>
+                    {% else %}
+                      <span class="material-icons md-18 text-muted">check_circle</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          {% if udiff.cuzk_unit.lv %}
+          <small class="text-muted">
+            {% trans "Title deed (LV)" %}: {{ udiff.cuzk_unit.lv.number }}
+            ({{ udiff.cuzk_unit.lv.cadastral_territory_name }})
+          </small>
+          {% endif %}
+
+          <div class="mt-2">
+            <label class="form-label small fw-bold">{% trans "Action" %}:</label>
+            <select name="unit_action_{{ udiff.cuzk_unit.id }}" class="form-select form-select-sm" style="max-width: 200px;">
+              {% for value, label in action_choices %}
+                <option value="{{ value }}" {% if value == udiff.suggested_action %}selected{% endif %}>
+                  {{ label }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted">{% trans "No units found for this building in the CUZK registry." %}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ── Action buttons ──────────────────────────────────────────────── #}
+  <div class="d-flex justify-content-between mb-4">
+    <a href="{% url 'core:cuzk-import-search' %}" class="btn btn-outline-secondary">
+      <span class="material-icons md-18 me-1">arrow_back</span> {% trans "Back to search" %}
+    </a>
+    <button type="submit" class="btn btn-success">
+      <span class="material-icons md-18 me-1">save</span> {% trans "Execute Import" %}
+    </button>
+  </div>
+</form>
+{% endblock %}

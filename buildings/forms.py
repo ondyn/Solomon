@@ -16,6 +16,7 @@ class BuildingForm(forms.ModelForm):
             "number_of_floors", "elevator", "year_built", "total_units",
             "land_plot_number", "common_rooms", "floor_plan_url",
             "common_area_rental", "note",
+            "cuzk_building_id", "cuzk_lv_number",
         ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),
@@ -32,4 +33,6 @@ class BuildingForm(forms.ModelForm):
             "floor_plan_url": forms.URLInput(attrs={"class": "form-control"}),
             "common_area_rental": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
             "note": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "cuzk_building_id": forms.NumberInput(attrs={"class": "form-control"}),
+            "cuzk_lv_number": forms.NumberInput(attrs={"class": "form-control"}),
         }

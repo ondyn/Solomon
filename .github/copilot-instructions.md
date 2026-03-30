@@ -13,6 +13,7 @@ Solomon is a **facility management system** for managing apartment buildings und
 - **Backend:** Django 5.x (Python 3.12+)
 - **Frontend:** Django Templates + HTMX + Bootstrap 5
 - **Database:** PostgreSQL 16 (SQLite for local development without Docker)
+- **Package Manager:** uv (fast Python package manager by Astral)
 - **Key packages:** django-environ, django-auditlog, django-safedelete, django-htmx, whitenoise
 - **Linting & Formatting:** Ruff (replaces flake8, isort, black)
 - **Type Checking:** mypy + django-stubs
@@ -175,25 +176,24 @@ Four roles defined in `core/permissions.py` → `Roles` class:
 - Test audit trail: verify changes are logged correctly
 - Test soft delete: verify deleted records are excluded from queries but preserved in DB
 - Test ownership share validation: warn if shares don't sum to 100%
-- Run tests: `pytest` (or `pytest --cov` for coverage report)
+- Run tests: `uv run pytest` (or `uv run pytest --cov` for coverage report)
 
 ## Development Workflow
 
 ### Local Setup (without Docker)
 ```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-cp .env.example .env            # Edit as needed
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
+uv sync                          # Creates .venv and installs all deps (incl. dev)
+cp .env.example .env             # Edit as needed
+uv run python manage.py migrate
+uv run python manage.py createsuperuser
+uv run python manage.py runserver
 ```
 
 ### Local Setup (with Docker)
 ```bash
 docker compose up -d            # PostgreSQL + Django on localhost:8000
-docker compose exec web python manage.py migrate
-docker compose exec web python manage.py createsuperuser
+docker compose exec web uv run python manage.py migrate
+docker compose exec web uv run python manage.py createsuperuser
 ```
 
 ### Debugging
@@ -202,8 +202,8 @@ docker compose exec web python manage.py createsuperuser
 
 ### Pre-commit
 ```bash
-pre-commit install              # One-time setup
-pre-commit run --all-files      # Manual run
+uv run pre-commit install       # One-time setup
+uv run pre-commit run --all-files  # Manual run
 ```
 
 ## Git Conventions
@@ -211,7 +211,7 @@ pre-commit run --all-files      # Manual run
 - Branch naming: `feature/module-name`, `fix/description`, `docs/description`
 - Commit messages: imperative mood, e.g., "Add building model", "Fix owner permission check"
 - Keep commits focused — one logical change per commit
-- Always run tests before pushing (`pytest`)
+- Always run tests before pushing (`uv run pytest`)
 - Pre-commit hooks auto-run on `git commit` (ruff lint, ruff format, mypy)
 
 ## Key Business Rules (Reference)

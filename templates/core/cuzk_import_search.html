@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "CUZK Import" %} — Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active">{% trans "CUZK Import" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>
+    <span class="material-icons md-36 me-2" style="color: var(--md-primary);">cloud_download</span>
+    {% trans "Import from CUZK" %}
+  </h2>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <p class="text-muted mb-3">
+      {% trans "Enter a CUZK building ID (ISKN identifier) to fetch building and unit data from the Czech cadastral register." %}
+    </p>
+
+    <form method="post" action="{% url 'core:cuzk-import-search' %}">
+      {% csrf_token %}
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="cuzk_building_id" class="form-label">{% trans "CUZK Building ID" %}</label>
+          <input type="number" class="form-control" id="cuzk_building_id" name="cuzk_building_id"
+                 placeholder="{% trans 'e.g. 951290101' %}" required>
+          <div class="form-text">{% trans "Unikátní identifikátor stavby v ISKN. You can find this on the CUZK website." %}</div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="target_building" class="form-label">{% trans "Link to existing building (optional)" %}</label>
+          <select class="form-select" id="target_building" name="target_building">
+            <option value="">{% trans "— Create new building —" %}</option>
+            {% for building in buildings %}
+              <option value="{{ building.pk }}">{{ building }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">{% trans "Select an existing building if you want to update it with CUZK data." %}</div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">
+          <span class="material-icons md-18 me-1">search</span> {% trans "Fetch from CUZK" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# Quick help card #}
+<div class="card">
+  <div class="card-header">
+    <span class="material-icons md-18 me-1">help_outline</span> {% trans "How to find the CUZK Building ID" %}
+  </div>
+  <div class="card-body">
+    <ol class="mb-0">
+      <li>{% trans "Visit" %} <a href="https://nahlizenidokn.cuzk.cz/" target="_blank" rel="noopener">{% trans "nahlížení do KN" %} <span class="material-icons md-14">open_in_new</span></a></li>
+      <li>{% trans "Search for the building by address or parcel number." %}</li>
+      <li>{% trans "The building ID is shown in the detail view as 'Identifikátor stavby'." %}</li>
+      <li>{% trans "Alternatively, use the CUZK API directly with the building address." %}</li>
+    </ol>
+  </div>
+</div>
+{% endblock %}

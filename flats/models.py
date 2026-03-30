@@ -102,6 +102,27 @@ class Flat(BaseModel):
         verbose_name=_("Note"),
     )
 
+    # CUZK integration
+    cuzk_unit_id = models.BigIntegerField(
+        blank=True,
+        null=True,
+        unique=True,
+        verbose_name=_("CUZK unit ID"),
+        help_text=_("Unikátní identifikátor jednotky v ISKN (ČÚZK)"),
+    )
+    cuzk_share_numerator = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_("CUZK share numerator"),
+        help_text=_("Podíl na společných částech domu — čitatel (z ČÚZK)"),
+    )
+    cuzk_share_denominator = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_("CUZK share denominator"),
+        help_text=_("Podíl na společných částech domu — jmenovatel (z ČÚZK)"),
+    )
+
     class Meta(BaseModel.Meta):
         verbose_name = _("Flat")
         verbose_name_plural = _("Flats")

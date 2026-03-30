@@ -60,6 +60,16 @@
           <dt class="col-sm-5">{% trans "Land plot number" %}</dt>
           <dd class="col-sm-7">{{ building.land_plot_number|default:"—" }}</dd>
 
+          {% if building.cuzk_building_id %}
+          <dt class="col-sm-5">{% trans "CUZK Building ID" %}</dt>
+          <dd class="col-sm-7">{{ building.cuzk_building_id }}</dd>
+          {% endif %}
+
+          {% if building.cuzk_lv_number %}
+          <dt class="col-sm-5">{% trans "Title deed (LV)" %}</dt>
+          <dd class="col-sm-7">{{ building.cuzk_lv_number }}</dd>
+          {% endif %}
+
           {% if building.floor_plan_url %}
           <dt class="col-sm-5">{% trans "Floor plan" %}</dt>
           <dd class="col-sm-7"><a href="{{ building.floor_plan_url }}" target="_blank"><span class="material-icons md-18">open_in_new</span> {% trans "View" %}</a></dd>

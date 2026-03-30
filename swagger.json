@@ -1,0 +1,4745 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "REST API dálkového přístupu k datům KN",
+    "description": "REST API dálkového přístupu k datům KN",
+    "termsOfService": "/podminkyuzivani",
+    "contact": {
+      "name": "Uživatelská podpora",
+      "url": "https://podpora.cuzk.gov.cz"
+    },
+    "version": "v1.0"
+  },
+  "paths": {
+    "/api/v1/AplikacniSluzby/CiselnikZprav": {
+      "get": {
+        "tags": [
+          "AplikacniSluzby"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Zprava"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/AplikacniSluzby/AktualnostDat": {
+      "get": {
+        "tags": [
+          "AplikacniSluzby"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AktualnostDat"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/AplikacniSluzby/ProvozniInformace": {
+      "get": {
+        "tags": [
+          "AplikacniSluzby"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProvozniInformace"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/AplikacniSluzby/StavUctu": {
+      "get": {
+        "tags": [
+          "AplikacniSluzby"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StavUctu"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/AplikacniSluzby/Health": {
+      "get": {
+        "tags": [
+          "AplikacniSluzby"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResults"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error"
+          },
+          "503": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/api/v1/CiselnikyISKN/DruhyPozemku": {
+      "get": {
+        "tags": [
+          "CiselnikyISKN"
+        ],
+        "summary": "Seznam druhů pozemku",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DruhPozemkuListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyISKN/ZpusobyUrceniVymery": {
+      "get": {
+        "tags": [
+          "CiselnikyISKN"
+        ],
+        "summary": "Seznam způsobů určení výměry",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZpusobUrceniVymeryListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyISKN/TypyJednotky": {
+      "get": {
+        "tags": [
+          "CiselnikyISKN"
+        ],
+        "summary": "Seznam typů jednotek",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TypJednotkyListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyISKN/TypyStavby": {
+      "get": {
+        "tags": [
+          "CiselnikyISKN"
+        ],
+        "summary": "Seznam typů staveb",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TypStavbyListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyISKN/ZpusobyVyuzitiParcely": {
+      "get": {
+        "tags": [
+          "CiselnikyISKN"
+        ],
+        "summary": "Seznam způsobů využití parcely",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZpusobVyuzitiParcelyListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyISKN/ZpusobyVyuzitiStavby": {
+      "get": {
+        "tags": [
+          "CiselnikyISKN"
+        ],
+        "summary": "Seznam způsobů využití stavby",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZpusobVyuzitiStavbyListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyISKN/ZpusobyVyuzitiJednotky": {
+      "get": {
+        "tags": [
+          "CiselnikyISKN"
+        ],
+        "summary": "Seznam způsobů využití jednotky",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZpusobVyuzitiJednotkyListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyISKN/ZpusobyOchrany": {
+      "get": {
+        "tags": [
+          "CiselnikyISKN"
+        ],
+        "summary": "Seznam způsobů ochrany nemovitosti",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZpusobOchranyListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyISKN/Pracoviste/{kod}": {
+      "get": {
+        "tags": [
+          "CiselnikyISKN"
+        ],
+        "summary": "Vyhledání pracoviště podle kódu",
+        "parameters": [
+          {
+            "name": "kod",
+            "in": "path",
+            "description": "Kód pracoviště",
+            "required": true,
+            "schema": {
+              "maximum": 999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 101
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PracovisteVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyISKN/Pracoviste": {
+      "get": {
+        "tags": [
+          "CiselnikyISKN"
+        ],
+        "summary": "Seznam pracovišť resortu",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PracovisteListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyUzemnichJednotek/Obce/{kod}": {
+      "get": {
+        "tags": [
+          "CiselnikyUzemnichJednotek"
+        ],
+        "summary": "Vyhledání obce podle kódu",
+        "parameters": [
+          {
+            "name": "kod",
+            "in": "path",
+            "description": "Kód obce",
+            "required": true,
+            "schema": {
+              "maximum": 999999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 588903
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObecVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyUzemnichJednotek/Obce": {
+      "get": {
+        "tags": [
+          "CiselnikyUzemnichJednotek"
+        ],
+        "summary": "Seznam obcí",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObecListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyUzemnichJednotek/CastiObci/{kod}": {
+      "get": {
+        "tags": [
+          "CiselnikyUzemnichJednotek"
+        ],
+        "summary": "Vyhledání části obce podle kódu",
+        "parameters": [
+          {
+            "name": "kod",
+            "in": "path",
+            "description": "Kód části obce",
+            "required": true,
+            "schema": {
+              "maximum": 999999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 133990
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CastObceVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyUzemnichJednotek/CastiObci": {
+      "get": {
+        "tags": [
+          "CiselnikyUzemnichJednotek"
+        ],
+        "summary": "Seznam částí obcí",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CastObceListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyUzemnichJednotek/KatastralniUzemi/{kod}": {
+      "get": {
+        "tags": [
+          "CiselnikyUzemnichJednotek"
+        ],
+        "summary": "Vyhledání katastrálního území podle kódu",
+        "parameters": [
+          {
+            "name": "kod",
+            "in": "path",
+            "description": "Kód katastrálního území",
+            "required": true,
+            "schema": {
+              "maximum": 999999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 733997
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KatastralniUzemiVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyUzemnichJednotek/KatastralniUzemi": {
+      "get": {
+        "tags": [
+          "CiselnikyUzemnichJednotek"
+        ],
+        "summary": "Seznam katastrálních území",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KatastralniUzemiListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyUzemnichJednotek/Okresy/{kod}": {
+      "get": {
+        "tags": [
+          "CiselnikyUzemnichJednotek"
+        ],
+        "summary": "Vyhledání okresu podle kódu",
+        "parameters": [
+          {
+            "name": "kod",
+            "in": "path",
+            "description": "Kód okresu",
+            "required": true,
+            "schema": {
+              "maximum": 9999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 3708
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkresVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyUzemnichJednotek/Okresy": {
+      "get": {
+        "tags": [
+          "CiselnikyUzemnichJednotek"
+        ],
+        "summary": "Seznam okresů",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkresListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyUzemnichJednotek/Kraje/{kod}": {
+      "get": {
+        "tags": [
+          "CiselnikyUzemnichJednotek"
+        ],
+        "summary": "Vyhledání kraje podle kódu",
+        "parameters": [
+          {
+            "name": "kod",
+            "in": "path",
+            "description": "Kód kraje",
+            "required": true,
+            "schema": {
+              "maximum": 999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            },
+            "example": 141
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KrajVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/CiselnikyUzemnichJednotek/Kraje": {
+      "get": {
+        "tags": [
+          "CiselnikyUzemnichJednotek"
+        ],
+        "summary": "Seznam krajů",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KrajListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Jednotky/{id}": {
+      "get": {
+        "tags": [
+          "Jednotky"
+        ],
+        "summary": "Vyhledání nemovitosti podle unikátního identifikátoru ISKN",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unikátní identifikátor nemovitosti v ISKN",
+            "required": true,
+            "schema": {
+              "pattern": "^[1-9]{1}\\d{0,27}$",
+              "type": "number",
+              "format": "double"
+            },
+            "example": 145572605
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JednotkaVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Jednotky/Vyhledani": {
+      "get": {
+        "tags": [
+          "Jednotky"
+        ],
+        "summary": "Vyhledání jednotky pomocí přirozené identifikace",
+        "parameters": [
+          {
+            "name": "KodCastiObce",
+            "in": "query",
+            "description": "Kód části obce",
+            "required": true,
+            "schema": {
+              "maximum": 999999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "example": 410373
+            },
+            "example": 410373
+          },
+          {
+            "name": "TypStavby",
+            "in": "query",
+            "description": "Typ stavby",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/TypyStavbyQuery"
+            },
+            "example": 1
+          },
+          {
+            "name": "CisloDomovni",
+            "in": "query",
+            "description": "Číslo popisné nebo číslo evidenční",
+            "required": true,
+            "schema": {
+              "maximum": 99999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "example": 253
+            },
+            "example": 253
+          },
+          {
+            "name": "CisloJednotky",
+            "in": "query",
+            "description": "Číslo jednotky. Pokud je zadáno číslo >9999 tak se hledá číslo jednotky na přesnou shodu. Pokud je zadáno číslo menší, hledá se číslo jednotku modulo 10000 ve všech částech budovy.",
+            "required": true,
+            "schema": {
+              "maximum": 99999999,
+              "minimum": 0,
+              "type": "integer",
+              "format": "int64",
+              "example": 1
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JednotkaListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Parcely/{id}": {
+      "get": {
+        "tags": [
+          "Parcely"
+        ],
+        "summary": "Vyhledání nemovitosti podle unikátního identifikátoru ISKN",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unikátní identifikátor nemovitosti v ISKN",
+            "required": true,
+            "schema": {
+              "pattern": "^[1-9]{1}\\d{0,27}$",
+              "type": "number",
+              "format": "double"
+            },
+            "example": 2235132101
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcelaVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Parcely/SousedniParcely/{id}": {
+      "get": {
+        "tags": [
+          "Parcely"
+        ],
+        "summary": "Vyhledání sousedních parcel k zadané parcele. Pokud není zadaná parcela nalezena, vrací http 404. Pokud je nalezena, ale nejsou nalezeny sousední parcely (v území bez digitální mapy), vrací http 200 s odpovědí.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unikátní identifikátor nemovitosti v ISKN",
+            "required": true,
+            "schema": {
+              "pattern": "^[1-9]{1}\\d{0,27}$",
+              "type": "number",
+              "format": "double"
+            },
+            "example": 2235132101
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcelaDefListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Parcely/Vyhledani": {
+      "get": {
+        "tags": [
+          "Parcely"
+        ],
+        "summary": "Vyhledání parcely pomocí přirozené identifikace",
+        "parameters": [
+          {
+            "name": "KodKatastralnihoUzemi",
+            "in": "query",
+            "description": "Kód katastrálního území",
+            "required": true,
+            "schema": {
+              "maximum": 999999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "example": 730475
+            },
+            "example": 730475
+          },
+          {
+            "name": "TypParcely",
+            "in": "query",
+            "description": "Typ parcely (povolené hodnoty jsou PKN a PZE)",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/TypyParcely"
+            },
+            "example": "PKN"
+          },
+          {
+            "name": "DruhCislovaniParcely",
+            "in": "query",
+            "description": "Druh číslování parcely",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/TypyDruhuCislovaniParcely"
+            },
+            "example": 2
+          },
+          {
+            "name": "KmenoveCisloParcely",
+            "in": "query",
+            "description": "Parcelní číslo",
+            "required": true,
+            "schema": {
+              "maximum": 99999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "example": 605
+            },
+            "example": 605
+          },
+          {
+            "name": "PoddeleniCislaParcely",
+            "in": "query",
+            "description": "Poddělení čísla parcely",
+            "schema": {
+              "maximum": 999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "example": 12
+            },
+            "example": 12
+          },
+          {
+            "name": "PuvodParcelyZE",
+            "in": "query",
+            "description": "Původ parcely ZE",
+            "schema": {
+              "$ref": "#/components/schemas/TypyZdrojuParcelZE"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcelaListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Parcely/Polygon": {
+      "get": {
+        "tags": [
+          "Parcely"
+        ],
+        "summary": "Vyhledání parcel pomocí polygonu nad definičními body",
+        "parameters": [
+          {
+            "name": "SeznamSouradnic",
+            "in": "query",
+            "description": "Seznam souřadnic bodů polygonu (nezáleží na orientaci) v EPSG:5514 nebo EPSG:5513, JSON pole dvojic souřadnic x,y v metrech s přesností max. 2 desetinná čísla.",
+            "required": true,
+            "schema": {
+              "maxLength": 2000,
+              "type": "string",
+              "example": "[{\"y\":-1039161.96,\"x\":-739860.96},{\"y\":-1039156.08,\"x\":-739788.58},{\"y\":-1039197.24,\"x\":-739849.20},{\"y\":-1039221.18,\"x\":-739849.48},{\"y\":-1039161.96,\"x\":-739860.96}]"
+            },
+            "example": "[{\"y\":-1039161.96,\"x\":-739860.96},{\"y\":-1039156.08,\"x\":-739788.58},{\"y\":-1039197.24,\"x\":-739849.20},{\"y\":-1039221.18,\"x\":-739849.48},{\"y\":-1039161.96,\"x\":-739860.96}]"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcelaDefListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/PravaStavby/{id}": {
+      "get": {
+        "tags": [
+          "PravaStavby"
+        ],
+        "summary": "Vyhledání nemovitosti podle unikátního identifikátoru ISKN",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unikátní identifikátor nemovitosti v ISKN",
+            "required": true,
+            "schema": {
+              "pattern": "^[1-9]{1}\\d{0,27}$",
+              "type": "number",
+              "format": "double"
+            },
+            "example": 74034
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PravoStavbyVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/PravaStavby/Parcela/{id}": {
+      "get": {
+        "tags": [
+          "PravaStavby"
+        ],
+        "summary": "Vyhledání práva stavby pomocí ID parcely. Pokud není zadaná parcela nalezena nebo k ní není zapsáno právo stavby, vrací http 404 (s upřesněním v ProblemDetail).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unikátní identifikátor nemovitosti v ISKN",
+            "required": true,
+            "schema": {
+              "pattern": "^[1-9]{1}\\d{0,27}$",
+              "type": "number",
+              "format": "double"
+            },
+            "example": 2286016202
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PravoStavbyVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/PravaStavby/Stavba/{id}": {
+      "get": {
+        "tags": [
+          "PravaStavby"
+        ],
+        "summary": "Vyhledání práva stavby pomocí ID stavby. Pokud není zadaná stavba nalezena nebo není součástí práva stavby, vrací http 404 (s upřesněním v ProblemDetail).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unikátní identifikátor nemovitosti v ISKN",
+            "required": true,
+            "schema": {
+              "pattern": "^[1-9]{1}\\d{0,27}$",
+              "type": "number",
+              "format": "double"
+            },
+            "example": 59701754010
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PravoStavbyVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Rizeni/{id}": {
+      "get": {
+        "tags": [
+          "Rizeni"
+        ],
+        "summary": "Vyhledání řízení podle unikátního identifikátoru ISKN",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unikátní identifikátor řízení v ISKN",
+            "required": true,
+            "schema": {
+              "pattern": "^[1-9]{1}\\d{0,27}$",
+              "type": "number",
+              "format": "double"
+            },
+            "example": 50434446010
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RizeniVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Rizeni/Vyhledani": {
+      "get": {
+        "tags": [
+          "Rizeni"
+        ],
+        "summary": "Vyhledání řízení pomocí identifikace",
+        "parameters": [
+          {
+            "name": "TypRizeni",
+            "in": "query",
+            "description": "Typ řízení",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/TypyRizeni"
+            },
+            "example": "Z"
+          },
+          {
+            "name": "Cislo",
+            "in": "query",
+            "description": "Pořadové číslo řízení",
+            "required": true,
+            "schema": {
+              "maximum": 99999999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "example": 37641
+            },
+            "example": 37641
+          },
+          {
+            "name": "Rok",
+            "in": "query",
+            "description": "Rok",
+            "required": true,
+            "schema": {
+              "maximum": 2099,
+              "minimum": 2003,
+              "type": "integer",
+              "format": "int32",
+              "example": 2017
+            },
+            "example": 2017
+          },
+          {
+            "name": "KodPracoviste",
+            "in": "query",
+            "description": "Kód pracoviště",
+            "required": true,
+            "schema": {
+              "maximum": 999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "example": 101
+            },
+            "example": 101
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RizeniListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Rizeni/PrijateDne": {
+      "get": {
+        "tags": [
+          "Rizeni"
+        ],
+        "summary": "Seznam hlaviček přijatých řízení za den",
+        "parameters": [
+          {
+            "name": "TypRizeni",
+            "in": "query",
+            "description": "Typ řízení",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/TypyRizeni"
+            },
+            "example": "Z"
+          },
+          {
+            "name": "KodPracoviste",
+            "in": "query",
+            "description": "Kód pracoviště",
+            "required": true,
+            "schema": {
+              "maximum": 999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "example": 740
+            },
+            "example": 740
+          },
+          {
+            "name": "DatumPrijeti",
+            "in": "query",
+            "description": "Datum přijetí řízení ve formátu YYYY-MM-DD",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2022-06-30"
+            },
+            "example": "2022-06-30"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RizeniDefListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Stavby/{id}": {
+      "get": {
+        "tags": [
+          "Stavby"
+        ],
+        "summary": "Vyhledání nemovitosti podle unikátního identifikátoru ISKN",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unikátní identifikátor nemovitosti v ISKN",
+            "required": true,
+            "schema": {
+              "pattern": "^[1-9]{1}\\d{0,27}$",
+              "type": "number",
+              "format": "double"
+            },
+            "example": 951290101
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StavbaVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Stavby/Vyhledani": {
+      "get": {
+        "tags": [
+          "Stavby"
+        ],
+        "summary": "Vyhledání stavby pomocí přirozené identifikace",
+        "parameters": [
+          {
+            "name": "KodCastiObce",
+            "in": "query",
+            "description": "Kód části obce",
+            "required": true,
+            "schema": {
+              "maximum": 999999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "example": 400611
+            },
+            "example": 400611
+          },
+          {
+            "name": "TypStavby",
+            "in": "query",
+            "description": "Typ stavby",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/TypyStavbyQuery"
+            },
+            "example": 1
+          },
+          {
+            "name": "CisloDomovni",
+            "in": "query",
+            "description": "Číslo popisné nebo číslo evidenční",
+            "required": true,
+            "schema": {
+              "maximum": 99999,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "example": 1800
+            },
+            "example": 1800
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StavbaListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Stavby/AdresniMisto/{kod}": {
+      "get": {
+        "tags": [
+          "Stavby"
+        ],
+        "summary": "Vyhledání stavby pomocí kódu adresního místa. Pokud není adresní místo nalezeno nebo k adresnímu místu chybí vazba na stavbu, vrací http 404 (s upřesněním v ProblemDetail).",
+        "parameters": [
+          {
+            "name": "kod",
+            "in": "path",
+            "description": "Kód adresního místa",
+            "required": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 25133616
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StavbaVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/v1/Stavby/Polygon": {
+      "get": {
+        "tags": [
+          "Stavby"
+        ],
+        "summary": "Vyhledání staveb pomocí polygonu nad definičními body",
+        "parameters": [
+          {
+            "name": "SeznamSouradnic",
+            "in": "query",
+            "description": "Seznam souřadnic bodů polygonu (nezáleží na orientaci) v EPSG:5514 nebo EPSG:5513, JSON pole dvojic souřadnic x,y v metrech s přesností max. 2 desetinná čísla.",
+            "required": true,
+            "schema": {
+              "maxLength": 2000,
+              "type": "string",
+              "example": "[{\"y\":-1039161.96,\"x\":-739860.96},{\"y\":-1039156.08,\"x\":-739788.58},{\"y\":-1039197.24,\"x\":-739849.20},{\"y\":-1039221.18,\"x\":-739849.48},{\"y\":-1039161.96,\"x\":-739860.96}]"
+            },
+            "example": "[{\"y\":-1039161.96,\"x\":-739860.96},{\"y\":-1039156.08,\"x\":-739788.58},{\"y\":-1039197.24,\"x\":-739849.20},{\"y\":-1039221.18,\"x\":-739849.48},{\"y\":-1039161.96,\"x\":-739860.96}]"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StavbaDefListVysledekZpracovani"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "429": {
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        },
+        "security": [
+          {
+            "ApiKey": [
+              "Policy:",
+              "Roles:",
+              "AuthenticationSchemes:ApiKey"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AktualnostDat": {
+        "type": "object",
+        "properties": {
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "BPEJ": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "type": "integer",
+            "description": "Kód BPEJ",
+            "format": "int32"
+          },
+          "vymera": {
+            "type": "number",
+            "description": "Výměra v metrech čtverečních",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Bonitovaná půdně ekologická jednotka (BPEJ)"
+      },
+      "CastObce": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 999999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Název"
+          },
+          "kodObce": {
+            "maximum": 999999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Kód obce, ke které část obce přísluší",
+            "format": "int32"
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Část obce"
+      },
+      "CastObceDef": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 999999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Část obce"
+      },
+      "CastObceListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CastObce"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CastObceVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CastObce"
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DefinicniBod": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number",
+            "description": "Souřadnice X",
+            "format": "double"
+          },
+          "y": {
+            "type": "number",
+            "description": "Souřadnice Y",
+            "format": "double"
+          },
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Definiční bod v EPSG:5514, https://epsg.io/5514"
+      },
+      "DruhPozemku": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          },
+          "zkratka": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Zkratka",
+            "nullable": true
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Druh pozemku"
+      },
+      "DruhPozemkuDef": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Druh pozemku"
+      },
+      "DruhPozemkuListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DruhPozemku"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "HealthProbe": {
+        "type": "object",
+        "properties": {
+          "check": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          },
+          "duration": {
+            "type": "string",
+            "example": "00:00:00.0000000"
+          },
+          "status": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": { },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "HealthResults": {
+        "type": "object",
+        "properties": {
+          "lastCheck": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "totalDuration": {
+            "type": "string",
+            "example": "00:00:00.0000000"
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HealthProbe"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "HealthStatus": {
+        "enum": [
+          0,
+          1,
+          2
+        ],
+        "type": "integer",
+        "description": "<p>Possible values:</p>\r\n<ul>\r\n<li>0 - Unhealthy: </li>\r\n<li>1 - Degraded: </li>\r\n<li>2 - Healthy: </li>\r\n</ul>\r\n",
+        "format": "int32"
+      },
+      "Jednotka": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          },
+          "cisloJednotky": {
+            "type": "integer",
+            "description": "Číslo jednotky",
+            "format": "int64"
+          },
+          "typJednotky": {
+            "$ref": "#/components/schemas/TypJednotkyDef"
+          },
+          "zpusobVyuziti": {
+            "$ref": "#/components/schemas/ZpusobVyuzitiJednotkyDef"
+          },
+          "zpusobyOchrany": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZpusobOchranyDef"
+            },
+            "description": "Způsoby ochrany jednotky"
+          },
+          "podilNaSpolecnychCastechDomu": {
+            "$ref": "#/components/schemas/Podil"
+          },
+          "lv": {
+            "$ref": "#/components/schemas/LVDef"
+          },
+          "vymezenaVeStavbe": {
+            "$ref": "#/components/schemas/StavbaDef"
+          },
+          "rizeniPlomby": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RizeniDef"
+            },
+            "description": "Seznam řízení, ve kterých je objekt dotčen změnou právního vztahu"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Stavba"
+      },
+      "JednotkaDef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          },
+          "cisloJednotky": {
+            "type": "integer",
+            "description": "Číslo jednotky",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Základní definiční atributy jednotky"
+      },
+      "JednotkaListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Jednotka"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "JednotkaVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Jednotka"
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "KatastralniUzemi": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 999999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Název"
+          },
+          "kodObce": {
+            "maximum": 999999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Kód obce, ke které katastrální území přísluší",
+            "format": "int32"
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Katastrální území"
+      },
+      "KatastralniUzemiDef": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 999999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Katastrální území"
+      },
+      "KatastralniUzemiListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KatastralniUzemi"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "KatastralniUzemiVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/KatastralniUzemi"
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Kraj": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          },
+          "nutS3": {
+            "type": "string",
+            "description": "Jednotka NUTS3 (Nomenclature of Units for Territorial Statistics)",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Kraj"
+      },
+      "KrajListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Kraj"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "KrajVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Kraj"
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LVDef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          },
+          "cislo": {
+            "maximum": 999999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Číslo LV",
+            "format": "int32"
+          },
+          "katastralniUzemi": {
+            "$ref": "#/components/schemas/KatastralniUzemiDef"
+          }
+        },
+        "additionalProperties": false,
+        "description": "List vlastnictví"
+      },
+      "MapovyList": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "type": "number",
+            "description": "Kód mapového listu",
+            "format": "double"
+          },
+          "oznaceni": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Označení mapového listu"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Mapový list"
+      },
+      "Obec": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 999999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Název"
+          },
+          "kodOkresu": {
+            "maximum": 9999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Kód okresu, ke kterému obec přísluší",
+            "format": "int32",
+            "nullable": true
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Obec"
+      },
+      "ObecDef": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 999999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Obec"
+      },
+      "ObecListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Obec"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ObecVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Obec"
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Okres": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 9999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 60,
+            "type": "string",
+            "description": "Název"
+          },
+          "kodKraje": {
+            "maximum": 999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Kód kraje, ve kterému okres přísluší",
+            "format": "int32",
+            "nullable": true
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          },
+          "nutS4": {
+            "type": "string",
+            "description": "Jednotka NUTS4 (Nomenclature of Units for Territorial Statistics)",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Okres"
+      },
+      "OkresListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Okres"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OkresVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Okres"
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OperaceRizeni": {
+        "type": "object",
+        "properties": {
+          "nazev": {
+            "type": "string",
+            "description": "Název"
+          },
+          "datumProvedeni": {
+            "type": "string",
+            "description": "Datum provedení operace",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Provedená operace řízení"
+      },
+      "Parcela": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          },
+          "typParcely": {
+            "$ref": "#/components/schemas/TypyParcely"
+          },
+          "druhCislovaniParcely": {
+            "$ref": "#/components/schemas/TypyDruhuCislovaniParcely"
+          },
+          "kmenoveCisloParcely": {
+            "maximum": 99999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Parcelní číslo",
+            "format": "int32",
+            "example": 605
+          },
+          "poddeleniCislaParcely": {
+            "maximum": 999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Poddělení čísla parcely",
+            "format": "int32",
+            "nullable": true,
+            "example": 12
+          },
+          "katastralniUzemi": {
+            "$ref": "#/components/schemas/KatastralniUzemiDef"
+          },
+          "zdrojParcelyZE": {
+            "$ref": "#/components/schemas/TypyZdrojuParcelZE"
+          },
+          "katastralniUzemiPuvodni": {
+            "$ref": "#/components/schemas/KatastralniUzemiDef"
+          },
+          "dilParcely": {
+            "maximum": 9,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Díl parcely",
+            "format": "int32",
+            "nullable": true
+          },
+          "vymera": {
+            "type": "number",
+            "description": "Výměra parcely v metrech čtverečních",
+            "format": "double"
+          },
+          "lv": {
+            "$ref": "#/components/schemas/LVDef"
+          },
+          "mapovyList": {
+            "$ref": "#/components/schemas/MapovyList"
+          },
+          "zpusobUrceniVymery": {
+            "$ref": "#/components/schemas/ZpusobUrceniVymeryDef"
+          },
+          "druhPozemku": {
+            "$ref": "#/components/schemas/DruhPozemkuDef"
+          },
+          "stavba": {
+            "$ref": "#/components/schemas/StavbaDef"
+          },
+          "pravoStavby": {
+            "$ref": "#/components/schemas/PravoStavbyDef"
+          },
+          "definicniBod": {
+            "$ref": "#/components/schemas/DefinicniBod"
+          },
+          "zpusobVyuziti": {
+            "$ref": "#/components/schemas/ZpusobVyuzitiParcelyDef"
+          },
+          "zpusobyOchrany": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZpusobOchranyDef"
+            },
+            "description": "Způsoby ochrany parcely"
+          },
+          "bpej": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BPEJ"
+            },
+            "description": "Bonitovaná půdně ekologické jednotky (BPEJ)"
+          },
+          "rizeniPlomby": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RizeniDef"
+            },
+            "description": "Seznam řízení, ve kterých je objekt dotčen změnou právního vztahu"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Parcela"
+      },
+      "ParcelaDef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          },
+          "typParcely": {
+            "$ref": "#/components/schemas/TypyParcely"
+          },
+          "druhCislovaniParcely": {
+            "$ref": "#/components/schemas/TypyDruhuCislovaniParcely"
+          },
+          "kmenoveCisloParcely": {
+            "maximum": 99999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Parcelní číslo",
+            "format": "int32",
+            "example": 605
+          },
+          "poddeleniCislaParcely": {
+            "maximum": 999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Poddělení čísla parcely",
+            "format": "int32",
+            "nullable": true,
+            "example": 12
+          },
+          "katastralniUzemi": {
+            "$ref": "#/components/schemas/KatastralniUzemiDef"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Základní definiční atributy parcely"
+      },
+      "ParcelaDefListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParcelaDef"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ParcelaListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Parcela"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ParcelaVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Parcela"
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Podil": {
+        "type": "object",
+        "properties": {
+          "citatel": {
+            "type": "number",
+            "description": "Čitatel",
+            "format": "double"
+          },
+          "jmenovatel": {
+            "type": "number",
+            "description": "Jmenovatel",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Podíl"
+      },
+      "Pracoviste": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          },
+          "kodNadrizenehoPracoviste": {
+            "maximum": 999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód nadrízeného pracoviště",
+            "format": "int32",
+            "nullable": true
+          },
+          "ico": {
+            "maximum": 9999999999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "IČO",
+            "format": "int32",
+            "nullable": true
+          },
+          "telefon": {
+            "maxLength": 40,
+            "type": "string",
+            "description": "Telefon",
+            "nullable": true
+          },
+          "email": {
+            "maxLength": 80,
+            "type": "string",
+            "description": "Email",
+            "nullable": true
+          },
+          "idds": {
+            "maxLength": 10,
+            "type": "string",
+            "description": "ID datové schránky",
+            "nullable": true
+          },
+          "kodKraje": {
+            "maximum": 999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód kraje",
+            "format": "int32",
+            "nullable": true
+          },
+          "kodOkresu": {
+            "maximum": 9999,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód okresu",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Pracoviště"
+      },
+      "PracovisteListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Pracoviste"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PracovisteVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Pracoviste"
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PravoStavby": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          },
+          "datumUkonceni": {
+            "type": "string",
+            "description": "Datum konce platnosti práva stavby",
+            "format": "date-time"
+          },
+          "datumPrijeti": {
+            "type": "string",
+            "description": "Datum přijetí",
+            "format": "date-time"
+          },
+          "ucelyPravaStavby": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UcelPravaStavby"
+            },
+            "description": "Účely práva stavby"
+          },
+          "lv": {
+            "$ref": "#/components/schemas/LVDef"
+          },
+          "parcely": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParcelaDef"
+            },
+            "description": "Parcely, ke kterým je právo stavby zapsáno"
+          },
+          "stavby": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StavbaDef"
+            },
+            "description": "Stavby, které jsou součástí práva stavby"
+          },
+          "zpusobyOchrany": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZpusobOchranyDef"
+            },
+            "description": "Způsoby ochrany práva stavby"
+          },
+          "rizeniPlomby": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RizeniDef"
+            },
+            "description": "Seznam řízení, ve kterých je objekt dotčen změnou právního vztahu"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Právo stavby"
+      },
+      "PravoStavbyDef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          },
+          "datumUkonceni": {
+            "type": "string",
+            "description": "Datum konce platnosti práva stavby",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Základní definiční atributy práva stavby. V případě pozemku práva stavby k pozemku; v případě stavby práva stavby, jehož je stavba součástí"
+      },
+      "PravoStavbyVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PravoStavby"
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProvozniInformace": {
+        "type": "object",
+        "properties": {
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "Rizeni": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          },
+          "typRizeni": {
+            "$ref": "#/components/schemas/TypyRizeni"
+          },
+          "poradoveCislo": {
+            "maximum": 99999999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Pořadové číslo řízení",
+            "format": "int32",
+            "example": 37641
+          },
+          "rok": {
+            "maximum": 2099,
+            "minimum": 2003,
+            "type": "integer",
+            "description": "Rok",
+            "format": "int32",
+            "example": 2017
+          },
+          "kodPracoviste": {
+            "maximum": 999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Kód pracoviště",
+            "format": "int32",
+            "example": 101
+          },
+          "datumPrijeti": {
+            "type": "string",
+            "description": "Datum přijetí",
+            "format": "date-time"
+          },
+          "stav": {
+            "type": "string",
+            "description": "Stav řízení. Hodnota je plněna pouze u některých typů řízení.",
+            "nullable": true
+          },
+          "stavUhrady": {
+            "$ref": "#/components/schemas/StavyUhrady"
+          },
+          "provedeneOperace": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperaceRizeni"
+            },
+            "description": "Provedené operace v rámci řízení (vracejí se pouze vybrané operace, jako v interaktivním Nahlížení). Hodnota je plněna pouze u některých typů řízení.",
+            "nullable": true
+          },
+          "navazanaRizeni": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RizeniDef"
+            },
+            "description": "Navázaná řízení (v případě řízení typu PD). Hodnota je plněna pouze u některých typů řízení.",
+            "nullable": true
+          },
+          "poznamky": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Poznámka k řízení (např. upozornění na skartaci atd.).",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Parcela"
+      },
+      "RizeniDef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          },
+          "typRizeni": {
+            "$ref": "#/components/schemas/TypyRizeni"
+          },
+          "poradoveCislo": {
+            "maximum": 99999999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Pořadové číslo řízení",
+            "format": "int32",
+            "example": 37641
+          },
+          "rok": {
+            "maximum": 2099,
+            "minimum": 2003,
+            "type": "integer",
+            "description": "Rok",
+            "format": "int32",
+            "example": 2017
+          },
+          "kodPracoviste": {
+            "maximum": 999,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Kód pracoviště",
+            "format": "int32",
+            "example": 101
+          }
+        },
+        "additionalProperties": false,
+        "description": "Základní definiční atributy řízení"
+      },
+      "RizeniDefListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RizeniDef"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RizeniListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Rizeni"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RizeniVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Rizeni"
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StavUctu": {
+        "type": "object",
+        "properties": {
+          "idSluzby": {
+            "type": "string"
+          },
+          "aktualniObdobi": {
+            "type": "string"
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          },
+          "limitVolani": {
+            "type": "number",
+            "format": "double"
+          },
+          "expiraceApiKey": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Stavba": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          },
+          "typStavby": {
+            "$ref": "#/components/schemas/TypStavbyDef"
+          },
+          "cislaDomovni": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Čísla popisná nebo evidenční",
+            "nullable": true
+          },
+          "castObce": {
+            "$ref": "#/components/schemas/CastObceDef"
+          },
+          "docasna": {
+            "type": "boolean",
+            "description": "Příznak, zda se jedná o dočasnou stavbu"
+          },
+          "typyVazby": {
+            "$ref": "#/components/schemas/TypyVazebStavby"
+          },
+          "obec": {
+            "$ref": "#/components/schemas/ObecDef"
+          },
+          "lv": {
+            "$ref": "#/components/schemas/LVDef"
+          },
+          "pravoStavby": {
+            "$ref": "#/components/schemas/PravoStavbyDef"
+          },
+          "definicniBod": {
+            "$ref": "#/components/schemas/DefinicniBod"
+          },
+          "jednotky": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JednotkaDef"
+            },
+            "description": "Jednotky ve stavbě"
+          },
+          "zpusobVyuziti": {
+            "$ref": "#/components/schemas/ZpusobVyuzitiStavbyDef"
+          },
+          "zpusobyOchrany": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZpusobOchranyDef"
+            },
+            "description": "Způsoby ochrany stavby"
+          },
+          "parcely": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ParcelaDef"
+            },
+            "description": "Parcely na kterých stavba stojí"
+          },
+          "adresniMista": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Kódy adresních míst stavby"
+          },
+          "rizeniPlomby": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RizeniDef"
+            },
+            "description": "Seznam řízení, ve kterých je objekt dotčen změnou právního vztahu"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Stavba"
+      },
+      "StavbaDef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "Unikátní identifikátor objektu v ISKN",
+            "format": "double"
+          },
+          "typStavby": {
+            "$ref": "#/components/schemas/TypStavbyDef"
+          },
+          "cislaDomovni": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Čísla popisná nebo evidenční",
+            "nullable": true
+          },
+          "castObce": {
+            "$ref": "#/components/schemas/CastObceDef"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Základní definiční atributy stavby"
+      },
+      "StavbaDefListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StavbaDef"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StavbaListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Stavba"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StavbaVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Stavba"
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StavyUhrady": {
+        "enum": [
+          "O",
+          "U",
+          "N"
+        ],
+        "type": "string",
+        "description": "<p>Possible values:</p>\r\n<ul>\r\n<li>O: Řízení je od úhrady SP osvobozeno</li>\r\n<li>U: Uhrazen</li>\r\n<li>N: Neuhrazen</li>\r\n</ul>\r\n"
+      },
+      "TypJednotky": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          },
+          "zkratka": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Zkratka",
+            "nullable": true
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Typ jednotky"
+      },
+      "TypJednotkyDef": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Typ jednotky"
+      },
+      "TypJednotkyListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypJednotky"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TypStavby": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          },
+          "zkratka": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Zkratka",
+            "nullable": true
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Typ stavby"
+      },
+      "TypStavbyDef": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Typ stavby"
+      },
+      "TypStavbyListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypStavby"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TypyDruhuCislovaniParcely": {
+        "enum": [
+          1,
+          2
+        ],
+        "type": "integer",
+        "description": "Druhy číslování parcel<p>Possible values:</p>\r\n<ul>\r\n<li>1: Stavební parcela</li>\r\n<li>2: Pozemková parcela</li>\r\n</ul>\r\n",
+        "format": "int32"
+      },
+      "TypyParcely": {
+        "enum": [
+          "PKN",
+          "PZE"
+        ],
+        "type": "string",
+        "description": "Typy parcel<p>Possible values:</p>\r\n<ul>\r\n<li>PKN: Parcela katastru nemovitostí</li>\r\n<li>PZE: Parcela zjednodušené evidence</li>\r\n</ul>\r\n"
+      },
+      "TypyRizeni": {
+        "enum": [
+          "V",
+          "Z",
+          "PGP",
+          "PD",
+          "ZPV"
+        ],
+        "type": "string",
+        "description": "<p>Possible values:</p>\r\n<ul>\r\n<li>V: Vklad</li>\r\n<li>Z: Záznam,</li>\r\n<li>PGP: Potvrzení geometrického plánu</li>\r\n<li>PD: Podací deník</li>\r\n<li>ZPV: Pomocné řízení V</li>\r\n</ul>\r\n"
+      },
+      "TypyStavbyQuery": {
+        "enum": [
+          1,
+          2
+        ],
+        "type": "integer",
+        "description": "Typy staveb pro vyhledávání (výběr z číselníku TypStavby)<p>Possible values:</p>\r\n<ul>\r\n<li>1: Stavba s číslem popisným</li>\r\n<li>2: Stavba s číslem evidenčním</li>\r\n</ul>\r\n",
+        "format": "int32"
+      },
+      "TypyVazebStavby": {
+        "enum": [
+          "PostavenaNaPozemku",
+          "JeSoucastiPozemku",
+          "JeSoucastiPravaStavby"
+        ],
+        "type": "string",
+        "description": "Typy vazeb stavby<p>Possible values:</p>\r\n<ul>\r\n<li>PostavenaNaPozemku: Stavba je postavena na pozemku</li>\r\n<li>JeSoucastiPozemku: Stavba je součástí pozemku (podle § 506 odst. 1 NOZ)</li>\r\n<li>JeSoucastiPravaStavby: Stavba je součástí práva stavby (§ 1240 až 1256 NOZ)</li>\r\n</ul>\r\n"
+      },
+      "TypyZavaznostiZpravy": {
+        "enum": [
+          "Informace",
+          "Varovani",
+          "Chyba"
+        ],
+        "type": "string",
+        "description": "<p>Possible values:</p>\r\n<ul>\r\n<li>Informace: </li>\r\n<li>Varovani: </li>\r\n<li>Chyba: </li>\r\n</ul>\r\n"
+      },
+      "TypyZdrojuParcelZE": {
+        "enum": [
+          3,
+          4,
+          6
+        ],
+        "type": "integer",
+        "description": "Zdroje evidence parcel v ZE.<p>Possible values:</p>\r\n<ul>\r\n<li>3: Evidence nemovitostí</li>\r\n<li>4: Pozemkový katastr</li>\r\n<li>6: Přídělový plán nebo jiný podklad</li>\r\n</ul>\r\n",
+        "format": "int32"
+      },
+      "UcelPravaStavby": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Účel práva stavby"
+      },
+      "Zprava": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "typZavaznosti": {
+            "$ref": "#/components/schemas/TypyZavaznostiZpravy"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ZpusobOchrany": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          },
+          "typOchrany": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Typ ochrany",
+            "nullable": true
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Způsob určení výměry parcely"
+      },
+      "ZpusobOchranyDef": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Způsob ochrany nemovitosti"
+      },
+      "ZpusobOchranyListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZpusobOchrany"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ZpusobUrceniVymery": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Způsob určení výměry parcely"
+      },
+      "ZpusobUrceniVymeryDef": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Způsob určení výměry parcely"
+      },
+      "ZpusobUrceniVymeryListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZpusobUrceniVymery"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ZpusobVyuzitiJednotky": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          },
+          "zkratka": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Zkratka",
+            "nullable": true
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Způsob využití jednotky"
+      },
+      "ZpusobVyuzitiJednotkyDef": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Způsob využití jednotky"
+      },
+      "ZpusobVyuzitiJednotkyListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZpusobVyuzitiJednotky"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ZpusobVyuzitiParcely": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          },
+          "zkratka": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Zkratka",
+            "nullable": true
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Způsob využití Parcely"
+      },
+      "ZpusobVyuzitiParcelyDef": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Způsob využití Parcely"
+      },
+      "ZpusobVyuzitiParcelyListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZpusobVyuzitiParcely"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ZpusobVyuzitiStavby": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          },
+          "zkratka": {
+            "maxLength": 20,
+            "type": "string",
+            "description": "Zkratka",
+            "nullable": true
+          },
+          "platnostDo": {
+            "type": "string",
+            "description": "Datum konce platnosti záznamu",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Způsob využití stavby"
+      },
+      "ZpusobVyuzitiStavbyDef": {
+        "type": "object",
+        "properties": {
+          "kod": {
+            "maximum": 99,
+            "minimum": 0,
+            "type": "integer",
+            "description": "Kód",
+            "format": "int32"
+          },
+          "nazev": {
+            "maxLength": 100,
+            "type": "string",
+            "description": "Název"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Způsob využití stavby"
+      },
+      "ZpusobVyuzitiStavbyListVysledekZpracovani": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZpusobVyuzitiStavby"
+            },
+            "nullable": true,
+            "readOnly": true
+          },
+          "zpravy": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zprava"
+            },
+            "readOnly": true
+          },
+          "aktualnostDatK": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "provedenoVolani": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "description": "Autentizace prostřednictvím http hlavičky ApiKey",
+        "name": "ApiKey",
+        "in": "header"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "CiselnikyISKN",
+      "description": "Vybrané číselníky ISKN používané v odpovědích API"
+    },
+    {
+      "name": "CiselnikyUzemnichJednotek",
+      "description": "Vybrané číselníky územních jednotek používané v odpovědích API"
+    },
+    {
+      "name": "Jednotky",
+      "description": "Jednotka"
+    },
+    {
+      "name": "Parcely",
+      "description": "Parcela"
+    },
+    {
+      "name": "PravaStavby",
+      "description": "Právo stavby"
+    },
+    {
+      "name": "Rizeni",
+      "description": "Řízení"
+    },
+    {
+      "name": "Stavby",
+      "description": "Stavba"
+    },
+    {
+      "name": "AplikacniSluzby",
+      "description": "Obslužné/servisní služby"
+    }
+  ]
+}

@@ -15,6 +15,7 @@ class FlatForm(forms.ModelForm):
             "number_of_rooms", "water_outlets", "waste_outlets",
             "radiator_count", "radiator_power_kw", "gas_installed",
             "has_balcony", "cellar_unit", "ownership_cert_number", "note",
+            "cuzk_unit_id", "cuzk_share_numerator", "cuzk_share_denominator",
         ]
         widgets = {
             "building": forms.Select(attrs={"class": "form-select"}),
@@ -32,4 +33,7 @@ class FlatForm(forms.ModelForm):
             "cellar_unit": forms.TextInput(attrs={"class": "form-control"}),
             "ownership_cert_number": forms.TextInput(attrs={"class": "form-control"}),
             "note": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "cuzk_unit_id": forms.NumberInput(attrs={"class": "form-control"}),
+            "cuzk_share_numerator": forms.NumberInput(attrs={"class": "form-control"}),
+            "cuzk_share_denominator": forms.NumberInput(attrs={"class": "form-control"}),
         }

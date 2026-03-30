@@ -132,7 +132,10 @@ code {
 
 /* Brand */
 .sidebar-brand {
-  padding: 0.75rem 1rem;
+  padding: 0 1rem;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
   border-bottom: 1px solid var(--md-border);
   flex-shrink: 0;
 }
@@ -159,6 +162,11 @@ code {
   flex: 1;
   padding: 0.25rem 0;
   overflow-y: auto;
+}
+.sidebar-nav ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin-bottom: 0;
 }
 .nav-section-title {
   color: var(--md-on-surface-dim);
@@ -206,7 +214,10 @@ code {
 
 /* Sidebar footer */
 .sidebar-footer {
-  padding: 0.5rem 1rem;
+  padding: 0 1rem;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
   border-top: 1px solid var(--md-border);
   font-size: 0.6875rem;
   color: var(--md-on-surface-dim);
@@ -264,6 +275,9 @@ code {
 }
 .sidebar-toggle {
   color: var(--md-on-surface);
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   padding: 0.25rem;
   align-items: center;
   display: none;
@@ -273,8 +287,12 @@ code {
     display: flex;
   }
 }
-.sidebar-toggle:hover {
-  color: var(--md-primary-light);
+.sidebar-toggle:hover,
+.sidebar-toggle:focus {
+  color: var(--md-primary-light) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 /* ---- User menu (NetBox-style) ---- */
 .topbar-user {
@@ -329,11 +347,13 @@ code {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-left: 1rem;
 }
 
 /* ---- Page footer ---- */
 .page-footer {
-  padding: 0.5rem 0.75rem;
+  padding: 0 0.75rem;
+  min-height: 40px;
   border-top: 1px solid var(--md-border);
   display: flex;
   justify-content: center;

@@ -20,6 +20,7 @@
           <div class="card-body text-center">
             <span class="material-icons card-icon">business</span>
             <h5 class="card-title">{% trans "Buildings" %}</h5>
+            <div class="h2 mb-3 fw-light">{{ buildings_count|default:"0" }}</div>
             <a href="{% url 'buildings:building-list' %}" class="btn btn-outline-primary">
               <span class="material-icons md-18">arrow_forward</span> {% trans "Manage" %}
             </a>
@@ -31,6 +32,7 @@
           <div class="card-body text-center">
             <span class="material-icons card-icon">door_front</span>
             <h5 class="card-title">{% trans "Flats" %}</h5>
+            <div class="h2 mb-3 fw-light">{{ flats_count|default:"0" }}</div>
             <a href="{% url 'flats:flat-list' %}" class="btn btn-outline-info">
               <span class="material-icons md-18">arrow_forward</span> {% trans "Manage" %}
             </a>
@@ -42,6 +44,7 @@
           <div class="card-body text-center">
             <span class="material-icons card-icon">groups</span>
             <h5 class="card-title">{% trans "Owners" %}</h5>
+            <div class="h2 mb-3 fw-light">{{ owners_count|default:"0" }}</div>
             <a href="{% url 'owners:owner-list' %}" class="btn btn-outline-info">
               <span class="material-icons md-18">arrow_forward</span> {% trans "Manage" %}
             </a>
@@ -53,6 +56,7 @@
           <div class="card-body text-center">
             <span class="material-icons card-icon">badge</span>
             <h5 class="card-title">{% trans "Tenants" %}</h5>
+            <div class="h2 mb-3 fw-light">{{ tenants_count|default:"0" }}</div>
             <a href="{% url 'tenants:tenant-list' %}" class="btn btn-outline-warning">
               <span class="material-icons md-18">arrow_forward</span> {% trans "Manage" %}
             </a>

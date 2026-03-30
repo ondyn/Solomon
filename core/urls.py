@@ -1,14 +1,17 @@
 """
-Solomon — Core app URLs (audit trail).
+Solomon — Core app URLs (audit trail, CUZK import).
 """
 
 from django.urls import path
 
 from . import views
+from .cuzk_import import CUZKImportPreviewView, CUZKImportSearchView
 
 app_name = "core"
 
 urlpatterns = [
     path("auditlog/", views.AuditLogListView.as_view(), name="auditlog-list"),
     path("auditlog/<int:pk>/", views.AuditLogDetailView.as_view(), name="auditlog-detail"),
+    path("cuzk-import/", CUZKImportSearchView.as_view(), name="cuzk-import-search"),
+    path("cuzk-import/preview/", CUZKImportPreviewView.as_view(), name="cuzk-import-preview"),
 ]

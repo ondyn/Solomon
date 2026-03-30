@@ -118,13 +118,13 @@ class FlatOwner(BaseModel):
 
     flat = models.ForeignKey(
         "flats.Flat",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="flat_owners",
         verbose_name=_("Flat"),
     )
     owner = models.ForeignKey(
         "owners.Owner",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="flat_owners",
         verbose_name=_("Owner"),
     )

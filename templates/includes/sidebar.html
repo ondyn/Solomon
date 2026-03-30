@@ -6,7 +6,8 @@
     {# Brand #}
     <div class="sidebar-brand">
       <a href="{% url 'home' %}">
-        <span class="material-icons brand-icon">apartment</span>
+        {% load static %}
+        <img src="{% static 'images/logo.svg' %}" alt="Logo" class="brand-icon" style="height: 24px; width: auto; margin-right: 8px;">
         <span class="brand-text">Solomon</span>
       </a>
     </div>
@@ -63,6 +64,12 @@
           <a class="nav-link {% if request.resolver_match.app_name == 'core' %}active{% endif %}" href="{% url 'core:auditlog-list' %}">
             <span class="material-icons">history</span>
             <span class="nav-text">{% trans "Audit Log" %}</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'cuzk-import-search' or request.resolver_match.url_name == 'cuzk-import-preview' %}active{% endif %}" href="{% url 'core:cuzk-import-search' %}">
+            <span class="material-icons">cloud_download</span>
+            <span class="nav-text">{% trans "CUZK Import" %}</span>
           </a>
         </li>
         {% if user.is_staff %}
