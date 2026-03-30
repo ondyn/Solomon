@@ -10,11 +10,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# System dependencies
+# System dependencies (libpq-dev for psycopg, gettext for i18n, postgresql-client for pg_dump/pg_restore)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libpq-dev \
         gettext \
+        postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv — fast Python package manager
@@ -44,11 +45,14 @@ CMD ["gunicorn", "solomon.wsgi:application", "--bind", "0.0.0.0:8000", "--worker
 # ---- Development stage ----
 FROM base AS development
 
+# Install ALL dependencies (including dev: debugpy, ruff, pytest, etc.)
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-install-project
 
+# Source code is bind-mounted via docker-compose volumes,
+# but we copy it here so the image works standalone too.
 COPY . .
 
 EXPOSE 8000 5678
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["uv", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]

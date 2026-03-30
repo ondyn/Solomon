@@ -4,20 +4,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('buildings', '0002_building_common_area_rental_building_common_rooms_and_more'),
+        ("buildings", "0002_building_common_area_rental_building_common_rooms_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='building',
-            name='cuzk_building_id',
-            field=models.BigIntegerField(blank=True, help_text='Unikátní identifikátor stavby v ISKN (ČÚZK)', null=True, unique=True, verbose_name='CUZK building ID'),
+            model_name="building",
+            name="cuzk_building_id",
+            field=models.BigIntegerField(
+                blank=True,
+                help_text="Unikátní identifikátor stavby v ISKN (ČÚZK)",
+                null=True,
+                unique=True,
+                verbose_name="CUZK building ID",
+            ),
         ),
         migrations.AddField(
-            model_name='building',
-            name='cuzk_lv_number',
-            field=models.PositiveIntegerField(blank=True, help_text='Číslo listu vlastnictví (LV) z ČÚZK', null=True, verbose_name='Title deed number'),
+            model_name="building",
+            name="cuzk_lv_number",
+            field=models.PositiveIntegerField(
+                blank=True, help_text="Číslo listu vlastnictví (LV) z ČÚZK", null=True, verbose_name="Title deed number"
+            ),
         ),
     ]

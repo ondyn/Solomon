@@ -14,6 +14,7 @@
      - Error:          #cf6679
      - Success:        #66bb6a
      - Warning:        #ffa726
+   Typography: Inter (body) + Roboto Mono (code) — matching NetBox
    ============================================================ */
 
 :root {
@@ -40,16 +41,28 @@
   --sidebar-width: 18rem;
 }
 
+/* ---- Global: disable ligatures for data clarity (NetBox pattern) ---- */
+* {
+  font-feature-settings: "liga" 0;
+  font-variant-ligatures: none;
+}
+
 /* ---- Base ---- */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   height: 100%;
+}
+
+@media (min-width: 992px) {
+  :root, :host {
+    scrollbar-gutter: stable;
+  }
 }
 
 body {
   background-color: var(--md-bg) !important;
   color: var(--md-on-surface) !important;
-  font-family: 'Roboto', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   height: 100%;
   overflow: hidden;
@@ -99,6 +112,11 @@ code {
   background: var(--md-surface-alt);
   padding: 2px 6px;
   border-radius: 4px;
+  font-family: 'Roboto Mono', 'Consolas', monospace;
+}
+pre code {
+  padding: unset;
+  background-color: transparent;
 }
 
 /* ============================================================
@@ -400,6 +418,7 @@ code {
 }
 .dropdown-divider {
   border-color: var(--md-border);
+  margin: 0.25rem 0;
 }
 
 /* ---- Cards ---- */
@@ -422,6 +441,10 @@ code {
   padding: 0.75rem;
   font-weight: 500;
   font-size: 0.875rem;
+}
+.card-header h5 {
+  font-size: 0.875rem;
+  margin-bottom: 0;
 }
 .card-body {
   color: var(--md-on-surface);
@@ -518,6 +541,14 @@ code {
 }
 .table > tbody > tr:hover {
   background: rgba(3, 169, 244, 0.06) !important;
+}
+/* Hide border on last row (NetBox pattern) */
+.table > tbody > tr:last-child > td {
+  border-bottom-width: 0;
+}
+/* Remove bottom margin from <pre> in table cells */
+td pre {
+  margin-bottom: 0;
 }
 
 .table-dark {
@@ -659,6 +690,14 @@ code {
   font-weight: 500;
   font-size: 0.8125rem;
   margin-bottom: 0.25rem;
+}
+/* Required field label (NetBox pattern) */
+.form-label.required {
+  font-weight: 600;
+}
+.form-label.required::after {
+  content: " *";
+  color: var(--md-error);
 }
 .form-text {
   color: var(--md-on-surface-dim) !important;
@@ -853,6 +892,22 @@ dd {
 .login-icon {
   color: var(--md-primary);
   font-size: 64px;
+}
+
+/* ---- Mark (highlight) ---- */
+mark {
+  padding: 0;
+  background-color: rgba(255, 167, 38, 0.25);
+  color: inherit;
+}
+
+/* ---- Progress Bars ---- */
+.progress {
+  background-color: var(--md-surface-alt);
+  border-radius: var(--md-radius-sm);
+}
+.progress-bar {
+  min-width: 80px;
 }
 
 /* ---- Utility ---- */

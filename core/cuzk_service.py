@@ -82,6 +82,26 @@ class CUZKUnitRef:
 
 
 @dataclass
+class CUZKCityPart:
+    """Part of a city (část obce) from CUZK."""
+
+    code: int
+    name: str
+    municipality_code: int | None = None
+    municipality_name: str = ""
+
+    @classmethod
+    def from_api(cls, data: dict) -> CUZKCityPart:
+        obec = data.get("obec") or {}
+        return cls(
+            code=int(data.get("kod", 0)),
+            name=data.get("nazev", ""),
+            municipality_code=obec.get("kod"),
+            municipality_name=obec.get("nazev", ""),
+        )
+
+
+@dataclass
 class CUZKUnit:
     """Full unit (jednotka) from CUZK."""
 
@@ -111,6 +131,30 @@ class CUZKUnit:
             lv=CUZKTitleDeed.from_api(data.get("lv")),
             building_id=int(stavba["id"]) if stavba.get("id") else None,
         )
+
+    @property
+    def house_number(self) -> int:
+        """
+        Extract the house number (číslo popisné) from cisloJednotky.
+
+        cisloJednotky encodes building_number + flat_number as a compound
+        integer: e.g. 19370002 means house_number=1937, flat_number=2.
+        For simple unit numbers (< 10000), this returns 0 (unknown).
+        """
+        if self.unit_number >= 10000:
+            return self.unit_number // 10000
+        return 0
+
+    @property
+    def flat_number_in_building(self) -> str:
+        """
+        Extract the flat number within the building from cisloJednotky.
+
+        e.g. 19370002 → "2", 19380015 → "15", 5 → "5"
+        """
+        if self.unit_number >= 10000:
+            return str(self.unit_number % 10000)
+        return str(self.unit_number)
 
 
 @dataclass
@@ -153,6 +197,32 @@ class CUZKBuilding:
         )
 
 
+def group_units_by_house_number(
+    units: list[CUZKUnit],
+    house_numbers: list[int],
+) -> dict[int, list[CUZKUnit]]:
+    """
+    Group units by their house number (extracted from cisloJednotky).
+
+    Each cisloJednotky encodes building_number * 10000 + flat_number,
+    e.g. 19370002 → building 1937, flat 2.
+
+    If units have simple numbers (< 10000), they are assigned to the first
+    house number.
+
+    Returns a dict mapping house_number → list of units.
+    """
+    grouped: dict[int, list[CUZKUnit]] = {hn: [] for hn in house_numbers}
+    for unit in units:
+        hn = unit.house_number
+        if hn in grouped:
+            grouped[hn].append(unit)
+        elif house_numbers:
+            # Simple unit numbers or unrecognized prefix → first building
+            grouped[house_numbers[0]].append(unit)
+    return grouped
+
+
 # ---------------------------------------------------------------------------
 #  API Client
 # ---------------------------------------------------------------------------
@@ -180,10 +250,12 @@ class CUZKClient:
         self.api_key = api_key or getattr(settings, "CUZK_API_KEY", "")
         self.base_url = base_url or CUZK_API_BASE_URL
         self.session = requests.Session()
-        self.session.headers.update({
-            "Authorization": f"Bearer {self.api_key}",
-            "Accept": "application/json",
-        })
+        self.session.headers.update(
+            {
+                "apikey": f"{self.api_key}",
+                "Accept": "application/json",
+            }
+        )
 
     def _get(self, path: str, params: dict | None = None) -> dict[str, Any]:
         """Perform a GET request and return the JSON response."""
@@ -227,13 +299,33 @@ class CUZKClient:
             house_number: Číslo popisné/evidenční
             building_type: 1 = číslo popisné, 2 = číslo evidenční
         """
-        data = self._get("/Stavby/Vyhledani", params={
-            "KodCastiObce": city_part_code,
-            "TypStavby": building_type,
-            "CisloDomovni": house_number,
-        })
+        data = self._get(
+            "/Stavby/Vyhledani",
+            params={
+                "KodCastiObce": city_part_code,
+                "TypStavby": building_type,
+                "CisloDomovni": house_number,
+            },
+        )
         results = data.get("data") or []
         return [CUZKBuilding.from_api(b) for b in results]
+
+    # ------------------------------------------------------------------
+    #  City parts (Části obcí)
+    # ------------------------------------------------------------------
+    def search_city_parts(self, query: str) -> list[CUZKCityPart]:
+        """
+        Search for city parts by name prefix.
+
+        Uses the CUZK API endpoint /CastiObci/Vyhledani?Nazev=<query>.
+        Returns a list of matching city parts.
+        """
+        data = self._get(
+            "/CastiObci/Vyhledani",
+            params={"Nazev": query},
+        )
+        results = data.get("data") or []
+        return [CUZKCityPart.from_api(item) for item in results]
 
     # ------------------------------------------------------------------
     #  Units (Jednotky)
@@ -259,12 +351,15 @@ class CUZKClient:
             unit_number: Číslo jednotky
             building_type: 1 = číslo popisné, 2 = číslo evidenční
         """
-        data = self._get("/Jednotky/Vyhledani", params={
-            "KodCastiObce": city_part_code,
-            "TypStavby": building_type,
-            "CisloDomovni": house_number,
-            "CisloJednotky": unit_number,
-        })
+        data = self._get(
+            "/Jednotky/Vyhledani",
+            params={
+                "KodCastiObce": city_part_code,
+                "TypStavby": building_type,
+                "CisloDomovni": house_number,
+                "CisloJednotky": unit_number,
+            },
+        )
         results = data.get("data") or []
         return [CUZKUnit.from_api(u) for u in results]
 

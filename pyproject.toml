@@ -21,7 +21,7 @@ dependencies = [
     "requests>=2.31",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "ruff>=0.8",
     "mypy>=1.13",
@@ -35,6 +35,7 @@ dev = [
     "django-debug-toolbar>=4.4",
     "debugpy>=1.8",
     "ipython>=8.29",
+    "types-requests>=2.33.0.20260327",
 ]
 
 # =============================================================================
@@ -44,6 +45,7 @@ dev = [
 target-version = "py312"
 line-length = 120
 src = ["solomon"]
+extend-exclude = ["support"]
 
 [tool.ruff.lint]
 select = [
@@ -86,6 +88,7 @@ strict = false
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
+exclude = ["support/"]
 
 [tool.django-stubs]
 django_settings_module = "solomon.settings.dev"
@@ -95,6 +98,7 @@ django_settings_module = "solomon.settings.dev"
 # =============================================================================
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "solomon.settings.test"
+testpaths = ["core", "buildings", "flats", "owners", "tenants", "accounts"]
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]

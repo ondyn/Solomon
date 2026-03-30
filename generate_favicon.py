@@ -2,13 +2,15 @@ import os
 import sys
 
 try:
+    import io
+
     import cairosvg
     from PIL import Image
-    import io
 except ImportError:
     print("Missing requirements! Please install them by running:")
     print("pip install cairosvg Pillow")
     sys.exit(1)
+
 
 def convert_svg_to_ico(svg_path, ico_path):
     if not os.path.exists(svg_path):
@@ -25,12 +27,13 @@ def convert_svg_to_ico(svg_path, ico_path):
 
         # Save as ICO with multiple sizes suitable for favicons
         print(f"Saving to {ico_path}...")
-        image.save(ico_path, format='ICO', sizes=[(16, 16), (32, 32), (48, 48), (64, 64)])
+        image.save(ico_path, format="ICO", sizes=[(16, 16), (32, 32), (48, 48), (64, 64)])
 
         print("Success! Favicon generated.")
     except Exception as e:
         print(f"Failed to convert: {e}")
         print("Note: cairosvg requires OS-level Cairo libraries. On macOS, run: brew install cairo")
+
 
 if __name__ == "__main__":
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))

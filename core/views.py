@@ -7,12 +7,11 @@ Provides views to browse the django-auditlog entries:
 """
 
 from auditlog.models import LogEntry
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView, ListView, TemplateView
 
-from core.permissions import Roles
 from buildings.models import Building
+from core.permissions import Roles
 from flats.models import Flat
 from owners.models import Owner
 from tenants.models import Tenant

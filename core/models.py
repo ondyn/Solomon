@@ -13,8 +13,7 @@ import uuid
 from auditlog.registry import auditlog
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from safedelete.models import SafeDeleteModel
-from safedelete.models import SOFT_DELETE_CASCADE
+from safedelete.models import SOFT_DELETE_CASCADE, SafeDeleteModel
 
 
 class BaseModel(SafeDeleteModel):

@@ -93,9 +93,8 @@ class Building(BaseModel):
     cuzk_building_id = models.BigIntegerField(
         blank=True,
         null=True,
-        unique=True,
         verbose_name=_("CUZK building ID"),
-        help_text=_("Unikátní identifikátor stavby v ISKN (ČÚZK)"),
+        help_text=_("Identifikátor stavby v ISKN (ČÚZK). Multiple buildings may share the same ID."),
     )
     cuzk_lv_number = models.PositiveIntegerField(
         blank=True,

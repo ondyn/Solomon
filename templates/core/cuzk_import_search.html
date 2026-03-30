@@ -15,7 +15,12 @@
   </h2>
 </div>
 
+{# ── Option 1: Direct CUZK Building ID ─────────────────────────────── #}
 <div class="card mb-4">
+  <div class="card-header">
+    <span class="material-icons md-18 me-1">pin</span>
+    {% trans "Import by CUZK Building ID" %}
+  </div>
   <div class="card-body">
     <p class="text-muted mb-3">
       {% trans "Enter a CUZK building ID (ISKN identifier) to fetch building and unit data from the Czech cadastral register." %}
@@ -28,7 +33,7 @@
         <div class="col-md-6">
           <label for="cuzk_building_id" class="form-label">{% trans "CUZK Building ID" %}</label>
           <input type="number" class="form-control" id="cuzk_building_id" name="cuzk_building_id"
-                 placeholder="{% trans 'e.g. 951290101' %}" required>
+                 placeholder="{% trans 'e.g. 940255101' %}" required>
           <div class="form-text">{% trans "Unikátní identifikátor stavby v ISKN. You can find this on the CUZK website." %}</div>
         </div>
 
@@ -53,6 +58,60 @@
   </div>
 </div>
 
+{# ── Option 2: Search by Address ───────────────────────────────────── #}
+<div class="card mb-4">
+  <div class="card-header">
+    <span class="material-icons md-18 me-1">location_on</span>
+    {% trans "Search by Address" %}
+  </div>
+  <div class="card-body">
+    <p class="text-muted mb-3">
+      {% trans "Search for a building by city part name and house number." %}
+    </p>
+
+    <form method="post" action="{% url 'core:cuzk-building-search' %}" id="address-search-form">
+      {% csrf_token %}
+
+      <div class="row g-3">
+        {# City part autocomplete #}
+        <div class="col-md-4">
+          <label for="city_part_name" class="form-label">{% trans "City part (Část obce)" %}</label>
+          <div class="position-relative">
+            <input type="text" class="form-control" id="city_part_name"
+                   placeholder="{% trans 'e.g. Chodov' %}"
+                   autocomplete="off" required>
+            <input type="hidden" id="city_part_code" name="city_part_code">
+            <div id="city-part-dropdown" class="dropdown-menu w-100" style="display:none;"></div>
+          </div>
+          <div class="form-text">{% trans "Start typing at least 3 characters to search." %}</div>
+        </div>
+
+        {# Building type #}
+        <div class="col-md-4">
+          <label for="building_type" class="form-label">{% trans "Building type" %}</label>
+          <select class="form-select" id="building_type" name="building_type">
+            <option value="1" selected>{% trans "Číslo popisné" %}</option>
+            <option value="2">{% trans "Číslo evidenční" %}</option>
+          </select>
+        </div>
+
+        {# House number #}
+        <div class="col-md-4">
+          <label for="house_number" class="form-label">{% trans "House number (Číslo domovní)" %}</label>
+          <input type="number" class="form-control" id="house_number" name="house_number"
+                 placeholder="{% trans 'e.g. 1937' %}" required>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary" id="address-search-btn">
+          <span class="material-icons md-18 me-1">search</span> {% trans "Search building" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 {# Quick help card #}
 <div class="card">
   <div class="card-header">
@@ -63,8 +122,117 @@
       <li>{% trans "Visit" %} <a href="https://nahlizenidokn.cuzk.cz/" target="_blank" rel="noopener">{% trans "nahlížení do KN" %} <span class="material-icons md-14">open_in_new</span></a></li>
       <li>{% trans "Search for the building by address or parcel number." %}</li>
       <li>{% trans "The building ID is shown in the detail view as 'Identifikátor stavby'." %}</li>
-      <li>{% trans "Alternatively, use the CUZK API directly with the building address." %}</li>
+      <li>{% trans "Alternatively, use the 'Search by Address' form above to find the building by city part and house number." %}</li>
     </ol>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const cityPartInput = document.getElementById('city_part_name');
+  const cityPartCode = document.getElementById('city_part_code');
+  const dropdown = document.getElementById('city-part-dropdown');
+  let debounceTimer = null;
+  let selectedIndex = -1;
+
+  cityPartInput.addEventListener('input', function() {
+    const query = this.value.trim();
+    clearTimeout(debounceTimer);
+
+    if (query.length < 3) {
+      dropdown.style.display = 'none';
+      cityPartCode.value = '';
+      return;
+    }
+
+    debounceTimer = setTimeout(function() {
+      fetch('{% url "core:cuzk-city-part-search" %}?q=' + encodeURIComponent(query))
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+          dropdown.innerHTML = '';
+          selectedIndex = -1;
+
+          if (data.length === 0) {
+            dropdown.innerHTML = '<div class="dropdown-item text-muted">{% trans "No results found" %}</div>';
+            dropdown.style.display = 'block';
+            return;
+          }
+
+          data.forEach(function(item) {
+            const el = document.createElement('a');
+            el.className = 'dropdown-item';
+            el.href = '#';
+            el.textContent = item.name + (item.municipality_name ? ' (' + item.municipality_name + ')' : '');
+            el.dataset.code = item.code;
+            el.dataset.name = item.name;
+            el.addEventListener('click', function(e) {
+              e.preventDefault();
+              cityPartInput.value = item.name + (item.municipality_name ? ' (' + item.municipality_name + ')' : '');
+              cityPartCode.value = item.code;
+              dropdown.style.display = 'none';
+            });
+            dropdown.appendChild(el);
+          });
+
+          dropdown.style.display = 'block';
+        })
+        .catch(function(err) {
+          console.error('City part search error:', err);
+          dropdown.style.display = 'none';
+        });
+    }, 300);
+  });
+
+  // Keyboard navigation
+  cityPartInput.addEventListener('keydown', function(e) {
+    const items = dropdown.querySelectorAll('.dropdown-item:not(.text-muted)');
+    if (items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+      items.forEach(function(item, idx) {
+        item.classList.toggle('active', idx === selectedIndex);
+      });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, 0);
+      items.forEach(function(item, idx) {
+        item.classList.toggle('active', idx === selectedIndex);
+      });
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      e.preventDefault();
+      items[selectedIndex].click();
+    } else if (e.key === 'Escape') {
+      dropdown.style.display = 'none';
+    }
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', function(e) {
+    if (!cityPartInput.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+  // Validate that city_part_code is set before submit
+  document.getElementById('address-search-form').addEventListener('submit', function(e) {
+    if (!cityPartCode.value) {
+      e.preventDefault();
+      cityPartInput.classList.add('is-invalid');
+      if (!document.getElementById('city-part-feedback')) {
+        const feedback = document.createElement('div');
+        feedback.id = 'city-part-feedback';
+        feedback.className = 'invalid-feedback';
+        feedback.textContent = '{% trans "Please select a city part from the dropdown." %}';
+        cityPartInput.parentNode.appendChild(feedback);
+      }
+    } else {
+      cityPartInput.classList.remove('is-invalid');
+    }
+  });
+});
+</script>
 {% endblock %}

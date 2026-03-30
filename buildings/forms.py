@@ -3,7 +3,6 @@ Solomon — Building forms.
 """
 
 from django import forms
-from django.utils.translation import gettext_lazy as _
 
 from .models import Building
 
@@ -12,11 +11,22 @@ class BuildingForm(forms.ModelForm):
     class Meta:
         model = Building
         fields = [
-            "name", "street", "house_number", "city", "postal_code",
-            "number_of_floors", "elevator", "year_built", "total_units",
-            "land_plot_number", "common_rooms", "floor_plan_url",
-            "common_area_rental", "note",
-            "cuzk_building_id", "cuzk_lv_number",
+            "name",
+            "street",
+            "house_number",
+            "city",
+            "postal_code",
+            "number_of_floors",
+            "elevator",
+            "year_built",
+            "total_units",
+            "land_plot_number",
+            "common_rooms",
+            "floor_plan_url",
+            "common_area_rental",
+            "note",
+            "cuzk_building_id",
+            "cuzk_lv_number",
         ]
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control"}),

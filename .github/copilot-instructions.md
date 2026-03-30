@@ -225,3 +225,16 @@ uv run pre-commit run --all-files  # Manual run
 7. All data changes are recorded in an immutable audit trail (django-auditlog with `@register_auditlog`).
 8. Chairman has special approval rights for contracts above a configurable monetary threshold.
 9. Individual owners can only view their own data and submit requests — they cannot edit anything directly.
+
+## Terminal Safety Rules
+
+- **Never use heredoc syntax** (`<<EOF`, `<<'EOF'`, `cat <<EOF`) in terminal commands — they cause terminal disconnects
+- **Never use `python3 -c "long code"`** or `python -c "..."` with multi-line code in terminal — use a temporary script file instead
+- When you need to run multi-line Python: create a `.py` file, run it, then delete it
+- Keep terminal commands short and single-line; chain with `&&` if needed
+
+## Excluded Folders
+
+- **`support/`** — Reference-only folder (e.g., NetBox code for inspiration). Not part of the project.
+  - Excluded from: ruff (`extend-exclude`), mypy (`exclude`), pytest (`testpaths`), and `.gitignore`
+  - Do **not** read, import, test, lint, or treat any code in `support/` as project code

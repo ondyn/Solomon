@@ -1,4 +1,15 @@
 # Solomon — Docker Compose for local development
+#
+# Usage:
+#   make up          — start all services (Django + PostgreSQL)
+#   make down        — stop all services
+#   make logs        — tail logs
+#   make debug       — start with debugpy (attach VS Code on port 5678)
+#
+# File watching:
+#   Django's runserver auto-reloads on .py changes.
+#   The source tree is bind-mounted into the container, so every saved
+#   file is immediately visible inside Docker — no rebuild needed.
 
 services:
   db:
@@ -24,6 +35,8 @@ services:
     command: uv run python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
+      # Prevent container's .venv from being overwritten by host bind mount
+      - /app/.venv
     ports:
       - "8000:8000"
       - "5678:5678"  # debugpy
@@ -32,6 +45,7 @@ services:
       - DATABASE_URL=postgres://solomon:solomon_dev@db:5432/solomon
       - DJANGO_DEBUG=True
       - DJANGO_SECRET_KEY=dev-secret-key-change-in-production
+      - CUZK_API_KEY=${CUZK_API_KEY:-}
     depends_on:
       db:
         condition: service_healthy

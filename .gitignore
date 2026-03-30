@@ -55,7 +55,10 @@ coverage.xml
 # Docker
 docker-compose.override.yml
 
+# Database backups (local only)
+backups/
+
 # Misc
 *.bak
 *.tmp
-DESIGN_backup.md
+support

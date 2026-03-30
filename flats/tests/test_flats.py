@@ -31,7 +31,7 @@ class TestFlatModel:
     def test_unique_together(self):
         building = BuildingFactory()
         FlatFactory(building=building, flat_number="1")
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             FlatFactory(building=building, flat_number="1")
 
     def test_optional_fields(self):

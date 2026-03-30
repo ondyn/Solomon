@@ -2,12 +2,12 @@
 Solomon — Development settings.
 
 - DEBUG = True
-- SQLite database
 - Django Debug Toolbar enabled
 - Console email backend
+- Database from DATABASE_URL env var (PostgreSQL in Docker, SQLite fallback)
 """
 
-from .base import *  # noqa: F401, F403
+from .base import *  # noqa: F403
 
 # =============================================================================
 # Debug
@@ -22,9 +22,9 @@ MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")  # noqa:
 INTERNAL_IPS = ["127.0.0.1", "localhost"]
 
 # =============================================================================
-# Database — SQLite for easy local dev
+# Database — uses DATABASE_URL from environment (set by docker-compose.yml)
+# Falls back to SQLite if DATABASE_URL is not set (see base.py)
 # =============================================================================
-# Uses DATABASE_URL from .env, defaults to SQLite (set in base.py)
 
 # =============================================================================
 # Email — print to console

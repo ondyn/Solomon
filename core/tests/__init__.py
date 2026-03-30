@@ -19,7 +19,7 @@ def owner_user(db, django_user_model):
     """Create an owner user with proper role group and linked Owner profile."""
     user = django_user_model.objects.create_user(
         username="owner1",
-        password="testpass123",  # noqa: S106
+        password="testpass123",
     )
     group, _ = Group.objects.get_or_create(name=Roles.OWNER)
     user.groups.add(group)
@@ -39,7 +39,7 @@ def board_user(db, django_user_model):
     """Create a board member user."""
     user = django_user_model.objects.create_user(
         username="board1",
-        password="testpass123",  # noqa: S106
+        password="testpass123",
     )
     group, _ = Group.objects.get_or_create(name=Roles.BOARD_MEMBER)
     user.groups.add(group)
@@ -88,7 +88,9 @@ class TestOwnerRoleFiltering:
         resp = owner_client.get(url)
         assert resp.status_code == 200
         # Should contain the flat
-        flat_list = list(resp.context["page_obj"]) if "page_obj" in resp.context else list(resp.context.get("flats", []))
+        flat_list = (
+            list(resp.context["page_obj"]) if "page_obj" in resp.context else list(resp.context.get("flats", []))
+        )
         assert flat in flat_list or any(f.pk == flat.pk for f in flat_list)
 
     def test_owner_cannot_see_other_flats(self, owner_client, owner_user):
@@ -100,7 +102,7 @@ class TestOwnerRoleFiltering:
         assert resp.status_code == 200
 
     def test_owner_sees_only_own_profile(self, owner_client, owner_user):
-        owner = OwnerFactory(user=owner_user)
+        OwnerFactory(user=owner_user)
         OwnerFactory()  # Another owner
 
         url = reverse("owners:owner-list")

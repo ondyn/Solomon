@@ -5,7 +5,6 @@ Environment-specific settings are in dev.py, prod.py, test.py.
 Environment variables are loaded via django-environ from .env file.
 """
 
-import os
 from pathlib import Path
 
 import environ

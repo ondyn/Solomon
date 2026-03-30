@@ -1,4 +1,0 @@
-- add ruff as formatter and linter - setup, integrate it, try to run it, fix issues if found
-- use netbox-community (https://github.com/netbox-community or look at ./support/netbox) theme and layout, sizes, fonts, padding, continers, borders and all other things but only keep our colors and logo.
-- add to your instructions copilot-instructions to not use heredoc or "python3 -c  looooog code here" (it is always failing and disconnecting console), use script file aproach instead
-- check "make init" "make run" and fix errors, also test other make command if they work correctly

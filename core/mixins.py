@@ -2,8 +2,6 @@
 Solomon — View mixins for role-based data filtering.
 """
 
-from django.contrib.auth.models import Group
-
 from core.permissions import Roles
 
 

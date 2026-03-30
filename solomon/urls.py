@@ -11,6 +11,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
+
 from core.views import HomeView
 
 urlpatterns = [
@@ -18,7 +19,7 @@ urlpatterns = [
 ]
 
 # i18n-prefixed URL patterns
-urlpatterns += i18n_patterns(
+urlpatterns += i18n_patterns(  # type: ignore[arg-type]
     path("", HomeView.as_view(), name="home"),
     # Authentication
     path(
@@ -48,7 +49,7 @@ urlpatterns += i18n_patterns(
 
 # Serve media files in development
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # type: ignore[arg-type]
 
     # Django Debug Toolbar
     try:

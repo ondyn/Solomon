@@ -11,9 +11,16 @@ class TenantForm(forms.ModelForm):
     class Meta:
         model = Tenant
         fields = [
-            "flat", "first_name", "last_name", "email", "phone",
-            "permanent_address", "contact_address",
-            "effective_from", "effective_to", "note",
+            "flat",
+            "first_name",
+            "last_name",
+            "email",
+            "phone",
+            "permanent_address",
+            "contact_address",
+            "effective_from",
+            "effective_to",
+            "note",
         ]
         widgets = {
             "flat": forms.Select(attrs={"class": "form-select"}),

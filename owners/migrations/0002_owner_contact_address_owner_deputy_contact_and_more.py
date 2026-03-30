@@ -4,30 +4,51 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('owners', '0001_initial'),
+        ("owners", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='owner',
-            name='contact_address',
-            field=models.TextField(blank=True, default='', help_text='Korespondenční adresa (if different from permanent)', verbose_name='Contact address'),
+            model_name="owner",
+            name="contact_address",
+            field=models.TextField(
+                blank=True,
+                default="",
+                help_text="Korespondenční adresa (if different from permanent)",
+                verbose_name="Contact address",
+            ),
         ),
         migrations.AddField(
-            model_name='owner',
-            name='deputy_contact',
-            field=models.CharField(blank=True, default='', help_text='Phone or email of deputy', max_length=255, verbose_name='Deputy contact'),
+            model_name="owner",
+            name="deputy_contact",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Phone or email of deputy",
+                max_length=255,
+                verbose_name="Deputy contact",
+            ),
         ),
         migrations.AddField(
-            model_name='owner',
-            name='deputy_name',
-            field=models.CharField(blank=True, default='', help_text='Name of deputy / authorized representative', max_length=255, verbose_name='Deputy name'),
+            model_name="owner",
+            name="deputy_name",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Name of deputy / authorized representative",
+                max_length=255,
+                verbose_name="Deputy name",
+            ),
         ),
         migrations.AddField(
-            model_name='owner',
-            name='person_type',
-            field=models.CharField(choices=[('natural', 'Natural person'), ('legal', 'Legal person')], default='natural', max_length=10, verbose_name='Person type'),
+            model_name="owner",
+            name="person_type",
+            field=models.CharField(
+                choices=[("natural", "Natural person"), ("legal", "Legal person")],
+                default="natural",
+                max_length=10,
+                verbose_name="Person type",
+            ),
         ),
     ]

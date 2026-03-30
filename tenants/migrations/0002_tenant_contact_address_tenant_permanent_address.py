@@ -4,20 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('tenants', '0001_initial'),
+        ("tenants", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tenant',
-            name='contact_address',
-            field=models.TextField(blank=True, default='', help_text='Korespondenční adresa', verbose_name='Contact address'),
+            model_name="tenant",
+            name="contact_address",
+            field=models.TextField(
+                blank=True, default="", help_text="Korespondenční adresa", verbose_name="Contact address"
+            ),
         ),
         migrations.AddField(
-            model_name='tenant',
-            name='permanent_address',
-            field=models.TextField(blank=True, default='', help_text='Trvalé bydliště', verbose_name='Permanent address'),
+            model_name="tenant",
+            name="permanent_address",
+            field=models.TextField(
+                blank=True, default="", help_text="Trvalé bydliště", verbose_name="Permanent address"
+            ),
         ),
     ]

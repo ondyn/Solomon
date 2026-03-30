@@ -11,11 +11,24 @@ class FlatForm(forms.ModelForm):
     class Meta:
         model = Flat
         fields = [
-            "building", "flat_number", "floor", "area_m2", "disposition",
-            "number_of_rooms", "water_outlets", "waste_outlets",
-            "radiator_count", "radiator_power_kw", "gas_installed",
-            "has_balcony", "cellar_unit", "ownership_cert_number", "note",
-            "cuzk_unit_id", "cuzk_share_numerator", "cuzk_share_denominator",
+            "building",
+            "flat_number",
+            "floor",
+            "area_m2",
+            "disposition",
+            "number_of_rooms",
+            "water_outlets",
+            "waste_outlets",
+            "radiator_count",
+            "radiator_power_kw",
+            "gas_installed",
+            "has_balcony",
+            "cellar_unit",
+            "ownership_cert_number",
+            "note",
+            "cuzk_unit_id",
+            "cuzk_share_numerator",
+            "cuzk_share_denominator",
         ]
         widgets = {
             "building": forms.Select(attrs={"class": "form-select"}),

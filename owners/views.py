@@ -13,7 +13,6 @@ from core.mixins import RoleFilteredQuerysetMixin
 from .forms import FlatOwnerForm, OwnerForm
 from .models import FlatOwner, Owner
 
-
 # =============================================================================
 # Owner views
 # =============================================================================

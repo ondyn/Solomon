@@ -5,21 +5,30 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('flats', '0002_flat_cellar_unit_flat_gas_installed_flat_has_balcony_and_more'),
-        ('owners', '0002_owner_contact_address_owner_deputy_contact_and_more'),
+        ("flats", "0002_flat_cellar_unit_flat_gas_installed_flat_has_balcony_and_more"),
+        ("owners", "0002_owner_contact_address_owner_deputy_contact_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='flatowner',
-            name='flat',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='flat_owners', to='flats.flat', verbose_name='Flat'),
+            model_name="flatowner",
+            name="flat",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="flat_owners",
+                to="flats.flat",
+                verbose_name="Flat",
+            ),
         ),
         migrations.AlterField(
-            model_name='flatowner',
-            name='owner',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='flat_owners', to='owners.owner', verbose_name='Owner'),
+            model_name="flatowner",
+            name="owner",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="flat_owners",
+                to="owners.owner",
+                verbose_name="Owner",
+            ),
         ),
     ]

@@ -6,7 +6,7 @@ Solomon — Test settings.
 - SQLite for speed
 """
 
-from .base import *  # noqa: F401, F403
+from .base import *  # noqa: F403
 
 # =============================================================================
 # Debug

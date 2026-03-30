@@ -12,9 +12,17 @@ class OwnerForm(forms.ModelForm):
     class Meta:
         model = Owner
         fields = [
-            "person_type", "first_name", "last_name", "email", "phone",
-            "date_of_birth", "permanent_address", "contact_address",
-            "deputy_name", "deputy_contact", "note",
+            "person_type",
+            "first_name",
+            "last_name",
+            "email",
+            "phone",
+            "date_of_birth",
+            "permanent_address",
+            "contact_address",
+            "deputy_name",
+            "deputy_contact",
+            "note",
         ]
         widgets = {
             "person_type": forms.Select(attrs={"class": "form-select"}),
@@ -64,14 +72,11 @@ class FlatOwnerForm(forms.ModelForm):
         if self.instance and self.instance.pk:
             existing = existing.exclude(pk=self.instance.pk)
 
-        total_pct = sum(
-            fo.share_numerator / fo.share_denominator * 100
-            for fo in existing
-        )
+        total_pct = sum(fo.share_numerator / fo.share_denominator * 100 for fo in existing)
         total_pct += numerator / denominator * 100
 
         if abs(total_pct - 100.0) > 0.01:
-            return _(
-                "Warning: Total ownership shares for this flat sum to %(pct).1f%%, not 100%%."
-            ) % {"pct": total_pct}
+            return _("Warning: Total ownership shares for this flat sum to %(pct).1f%%, not 100%%.") % {
+                "pct": total_pct
+            }
         return None

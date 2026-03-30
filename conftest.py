@@ -27,5 +27,5 @@ def admin_user(db, django_user_model):
     return django_user_model.objects.create_superuser(
         username="admin",
         email="admin@test.cz",
-        password="testpass123",  # noqa: S106
+        password="testpass123",
     )

@@ -7,7 +7,7 @@ Solomon — Production settings.
 - WhiteNoise for static files
 """
 
-from .base import *  # noqa: F401, F403
+from .base import *  # noqa: F403
 
 # =============================================================================
 # Debug
