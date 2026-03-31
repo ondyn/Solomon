@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block title %}
-  {% if form.instance.pk %}{% trans "Edit tenant" %}{% else %}{% trans "New tenant" %}{% endif %} — Solomon
+  {% if form.instance.pk %}{% trans "Edit tenant" %}{% else %}{% trans "New tenant" %}{% endif %} - Solomon
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -16,34 +16,77 @@
 {% endblock %}
 
 {% block content %}
-<div class="form-centered">
-<h2 class="mb-4">
-  {% if form.instance.pk %}{% trans "Edit tenant" %}{% else %}{% trans "New tenant" %}{% endif %}
-</h2>
+<div class="form-wide">
 
-{% if form.non_field_errors %}
-  <div class="alert alert-danger">
-    {% for error in form.non_field_errors %}
-      <p class="mb-0">{{ error }}</p>
-    {% endfor %}
-  </div>
-{% endif %}
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-<div class="card">
-  <div class="card-body">
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {% include "includes/form_fields.html" %}
+  <form method="post" novalidate>
+    {% csrf_token %}
 
-      <div class="mt-3">
-        <button type="submit" class="btn btn-primary">
-          <span class="material-icons md-18">save</span>
-          {% if form.instance.pk %}{% trans "Save changes" %}{% else %}{% trans "Create tenant" %}{% endif %}
-        </button>
-        <a href="{% url 'tenants:tenant-list' %}" class="btn btn-outline-secondary ms-2">{% trans "Cancel" %}</a>
+    {# ── Tenant ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">person_outline</span>
+        {% trans "Tenant" %}
       </div>
-    </form>
-  </div>
-</div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.flat %}
+        {% include "includes/form_field.html" with field=form.first_name %}
+        {% include "includes/form_field.html" with field=form.last_name %}
+      </div>
+    </div>
+
+    {# ── Contact ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">contact_mail</span>
+        {% trans "Contact" %}
+      </div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.email %}
+        {% include "includes/form_field.html" with field=form.phone %}
+        {% include "includes/form_field.html" with field=form.permanent_address %}
+        {% include "includes/form_field.html" with field=form.contact_address %}
+      </div>
+    </div>
+
+    {# ── Tenancy Period ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">date_range</span>
+        {% trans "Tenancy Period" %}
+      </div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.effective_from %}
+        {% include "includes/form_field.html" with field=form.effective_to %}
+      </div>
+    </div>
+
+    {# ── Notes ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">notes</span>
+        {% trans "Notes" %}
+      </div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.note %}
+      </div>
+    </div>
+
+    {# ── Actions ── #}
+    <div class="form-actions d-flex gap-2">
+      <button type="submit" class="btn btn-primary">
+        <span class="material-icons md-18">save</span>
+        {% if form.instance.pk %}{% trans "Save changes" %}{% else %}{% trans "Create tenant" %}{% endif %}
+      </button>
+      <a href="{% url 'tenants:tenant-list' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+    </div>
+  </form>
 </div>
 {% endblock %}

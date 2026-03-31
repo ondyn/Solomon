@@ -365,7 +365,7 @@ pre code {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-left: 1rem;
+  padding: 0;
 }
 
 /* ---- Page footer ---- */
@@ -383,8 +383,55 @@ pre code {
 
 /* ---- Centered form layout (NetBox-style) ---- */
 .form-centered {
-  max-width: 800px;
+  max-width: 720px;
   margin: 0 auto;
+}
+
+/* ---- Wide form layout (NetBox-style horizontal forms) ---- */
+.form-wide {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* ---- Horizontal form fields (NetBox-style: label left, input right) ---- */
+.form-wide .card-body .row.mb-3 {
+  align-items: flex-start;
+}
+.form-wide .card-body .row.mb-3:last-child {
+  margin-bottom: 0 !important;
+}
+.form-wide .col-form-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--md-on-surface-dim);
+  padding-top: 0.5rem;
+}
+.form-wide .col-form-label.required {
+  font-weight: 600;
+}
+.form-wide .col-form-label.required::after {
+  content: " *";
+  color: var(--md-error);
+}
+
+/* Has-errors row styling */
+.form-wide .row.has-errors .col-form-label {
+  color: var(--md-error);
+}
+
+/* Form actions bar (bottom buttons) */
+.form-actions {
+  padding: 0.75rem 0;
+}
+
+/* Field group section titles */
+.field-group-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--md-primary-light);
+  border-bottom: 1px solid var(--md-border);
+  padding-bottom: 0.375rem;
+  margin-bottom: 0;
 }
 
 /* ---- Dropdown menu (shared) ---- */
@@ -421,37 +468,40 @@ pre code {
   margin: 0.25rem 0;
 }
 
-/* ---- Cards ---- */
+/* ---- Cards (NetBox-style: compact, no hover lift) ---- */
 .card {
   background: var(--md-surface) !important;
   border: 1px solid var(--md-border) !important;
   border-radius: var(--md-radius) !important;
-  box-shadow: var(--md-elevation-1);
-  margin-bottom: 1rem;
-  transition: box-shadow 0.3s, transform 0.2s;
-}
-.card:hover {
-  box-shadow: var(--md-elevation-2);
+  box-shadow: none;
+  margin-bottom: 0.75rem;
 }
 .card-header {
   background: var(--md-surface-alt) !important;
   border-bottom: 1px solid var(--md-border) !important;
   color: var(--md-on-surface);
   border-radius: var(--md-radius) var(--md-radius) 0 0 !important;
-  padding: 0.75rem;
+  padding: 0.5rem 0.75rem;
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 .card-header h5 {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
   margin-bottom: 0;
 }
 .card-body {
   color: var(--md-on-surface);
   padding: 0.75rem;
 }
+.card-body p:last-child {
+  margin-bottom: 0;
+}
 .card-footer {
-  padding: 0.75rem;
+  padding: 0.5rem 0.75rem;
   border-top: 1px solid var(--md-border);
 }
 .card-title {
@@ -464,7 +514,7 @@ pre code {
   color: var(--md-on-surface);
 }
 
-/* Dashboard cards */
+/* Dashboard cards (hover effects only on dashboard) */
 .dashboard-card {
   background: var(--md-surface) !important;
   border: 1px solid var(--md-border) !important;
@@ -479,17 +529,20 @@ pre code {
   border-color: var(--md-primary) !important;
 }
 .dashboard-card .card-body {
-  padding: 1.25rem;
+  padding: 1rem;
 }
 .dashboard-card .material-icons.card-icon {
-  font-size: 40px;
-  margin-bottom: 0.5rem;
+  font-size: 36px;
+  margin-bottom: 0.375rem;
   opacity: 0.9;
 }
 .dashboard-card .card-title {
   font-weight: 500;
-  font-size: 1rem;
-  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+.dashboard-card .h2 {
+  font-size: 1.75rem;
 }
 
 /* Card colors */
@@ -863,15 +916,26 @@ footer {
   color: var(--md-on-surface-dim);
 }
 
-/* ---- Description list (detail pages) ---- */
+/* ---- Description list (detail pages - NetBox-style compact) ---- */
 dt {
   color: var(--md-on-surface-dim);
   font-weight: 500;
   font-size: 0.8125rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--md-border);
 }
 dd {
   color: var(--md-on-surface);
-  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+  margin-bottom: 0;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--md-border);
+}
+.row.mb-0 > dt:last-of-type,
+.row.mb-0 > dd:last-of-type {
+  border-bottom: none;
 }
 
 /* ---- Confirm delete card ---- */
@@ -924,19 +988,52 @@ mark {
 
 .bg-dark { background-color: var(--md-surface) !important; }
 
-/* Page header */
+/* Page header (NetBox-style: compact title + controls) */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--md-border);
   min-height: 0;
 }
 .page-header h2 {
   margin-bottom: 0;
-  font-size: 1.25rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.page-header h2 .material-icons {
+  font-size: 22px;
+}
+.page-header .btn-list {
+  display: flex;
+  gap: 0.375rem;
+  align-items: center;
+}
+
+/* Section header (h4 used for sub-sections like "Flats" in detail pages) */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid var(--md-border);
+}
+.section-header h4 {
+  margin-bottom: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.section-header h4 .material-icons {
+  font-size: 18px;
 }
 
 /* Material icons alignment */
@@ -967,17 +1064,17 @@ mark {
 /* Empty state */
 .empty-state {
   text-align: center;
-  padding: 2rem 0.75rem;
+  padding: 1.5rem 0.75rem;
 }
 .empty-state .material-icons {
-  font-size: 48px;
+  font-size: 40px;
   color: var(--md-on-surface-dim);
   opacity: 0.5;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 .empty-state p {
   color: var(--md-on-surface-dim);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 /* Smooth transitions */
@@ -1049,6 +1146,9 @@ mark {
     padding: 1rem;
   }
   .form-centered {
+    max-width: 100%;
+  }
+  .form-wide {
     max-width: 100%;
   }
 }

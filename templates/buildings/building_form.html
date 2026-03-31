@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block title %}
-  {% if form.instance.pk %}{% trans "Edit building" %}{% else %}{% trans "New building" %}{% endif %} — Solomon
+  {% if form.instance.pk %}{% trans "Edit building" %}{% else %}{% trans "New building" %}{% endif %} - Solomon
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -16,34 +16,93 @@
 {% endblock %}
 
 {% block content %}
-<div class="form-centered">
-<h2 class="mb-4">
-  {% if form.instance.pk %}{% trans "Edit building" %}{% else %}{% trans "New building" %}{% endif %}
-</h2>
+<div class="form-wide">
 
-{% if form.non_field_errors %}
-  <div class="alert alert-danger">
-    {% for error in form.non_field_errors %}
-      <p class="mb-0">{{ error }}</p>
-    {% endfor %}
-  </div>
-{% endif %}
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-<div class="card">
-  <div class="card-body">
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {% include "includes/form_fields.html" %}
+  <form method="post" novalidate>
+    {% csrf_token %}
 
-      <div class="mt-3">
-        <button type="submit" class="btn btn-primary">
-          <span class="material-icons md-18">save</span>
-          {% if form.instance.pk %}{% trans "Save changes" %}{% else %}{% trans "Create building" %}{% endif %}
-        </button>
-        <a href="{% url 'buildings:building-list' %}" class="btn btn-outline-secondary ms-2">{% trans "Cancel" %}</a>
+    {# ── Building ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">apartment</span>
+        {% trans "Building" %}
       </div>
-    </form>
-  </div>
-</div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.name %}
+        {% include "includes/form_field.html" with field=form.street %}
+        {% include "includes/form_field.html" with field=form.house_number %}
+        {% include "includes/form_field.html" with field=form.city %}
+        {% include "includes/form_field.html" with field=form.postal_code %}
+      </div>
+    </div>
+
+    {# ── Details ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">info</span>
+        {% trans "Details" %}
+      </div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.number_of_floors %}
+        {% include "includes/form_field.html" with field=form.elevator %}
+        {% include "includes/form_field.html" with field=form.year_built %}
+        {% include "includes/form_field.html" with field=form.total_units %}
+        {% include "includes/form_field.html" with field=form.land_plot_number %}
+      </div>
+    </div>
+
+    {# ── Common Areas ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">meeting_room</span>
+        {% trans "Common Areas" %}
+      </div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.common_rooms %}
+        {% include "includes/form_field.html" with field=form.floor_plan_url %}
+        {% include "includes/form_field.html" with field=form.common_area_rental %}
+      </div>
+    </div>
+
+    {# ── CUZK ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">pin</span>
+        {% trans "CUZK" %}
+      </div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.cuzk_building_id %}
+        {% include "includes/form_field.html" with field=form.cuzk_lv_number %}
+      </div>
+    </div>
+
+    {# ── Notes ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">notes</span>
+        {% trans "Notes" %}
+      </div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.note %}
+      </div>
+    </div>
+
+    {# ── Actions ── #}
+    <div class="form-actions d-flex gap-2">
+      <button type="submit" class="btn btn-primary">
+        <span class="material-icons md-18">save</span>
+        {% if form.instance.pk %}{% trans "Save changes" %}{% else %}{% trans "Create building" %}{% endif %}
+      </button>
+      <a href="{% url 'buildings:building-list' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+    </div>
+  </form>
 </div>
 {% endblock %}

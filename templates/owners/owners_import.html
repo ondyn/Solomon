@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Import Owners" %} - Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'owners:owner-list' %}">{% trans "Owners" %}</a></li>
+<li class="breadcrumb-item active">{% trans "Import" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>
+    <span class="material-icons" style="color: var(--md-primary);">upload_file</span>
+    {% trans "Import Owners from Text" %}
+  </h2>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header">
+    <span class="material-icons md-18">content_paste</span> {% trans "Paste owner data" %}
+  </div>
+  <div class="card-body">
+    <p class="text-muted mb-2" style="font-size: 0.8125rem;">
+      {% trans "Paste the owner list from CUZK / property records. Each owner should be on a separate line, followed by their unit reference." %}
+    </p>
+
+    <form method="post" action="{% url 'owners:owners-import' %}">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="preview">
+
+      <div class="mb-3">
+        <label for="owners_text" class="form-label">{% trans "Owner data" %}</label>
+        <textarea class="form-control font-monospace" id="owners_text" name="owners_text"
+                  rows="20" placeholder="{% trans 'Paste owner data here...' %}"
+                  style="font-size: 0.8125rem;">{{ owners_text|default:"" }}</textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        <span class="material-icons md-18">preview</span> {% trans "Preview import" %}
+      </button>
+    </form>
+  </div>
+</div>
+
+{# Help card explaining the format #}
+<div class="card">
+  <div class="card-header">
+    <span class="material-icons md-18">help_outline</span> {% trans "Expected format" %}
+  </div>
+  <div class="card-body" style="font-size: 0.8125rem;">
+    <p>{% trans "Each owner entry consists of:" %}</p>
+    <pre class="bg-dark p-2 rounded" style="font-size: 0.75rem;">
+Bartíková Patricie Mgr., Zvěřinova 3446/3, Strašnice, 13000 Praha 3
+Jednotka: 1937/6	73/9089</pre>
+
+    <p class="mt-2">{% trans "Joint ownership (SJ — společné jmění):" %}</p>
+    <pre class="bg-dark p-2 rounded" style="font-size: 0.75rem;">
+SJ Brtna Josef Ing. a Brtnová Pavlína Ing., Severní 1072, 28522 Zruč nad Sázavou
+Jednotka: 1939/22	73/9089</pre>
+
+    <p class="mt-2">{% trans "Multiple flats per owner:" %}</p>
+    <pre class="bg-dark p-2 rounded" style="font-size: 0.75rem;">
+SJ Knap Roman Ing. a Knapová Lenka Ing., Vačkářova 297, 25101 Dobřejovice
+Jednotka: 1937/14, 1940/3	659/27267</pre>
+
+    <p class="mt-2">{% trans "Co-owners of a single flat:" %}</p>
+    <pre class="bg-dark p-2 rounded" style="font-size: 0.75rem;">
+Šubert Miloslav, Šalounova 1939/6, Chodov, 14900 Praha 4
+Jednotka: 1939/6	73/18178
+Šubertová Zdeňka, Kojetická 981, 27711 Neratovice
+Jednotka: 1939/6	73/18178</pre>
+  </div>
+</div>
+{% endblock %}

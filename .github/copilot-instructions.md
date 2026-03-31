@@ -1,8 +1,8 @@
-# Solomon — GitHub Copilot Instructions
+# Solomon - GitHub Copilot Instructions
 
 ## Project Overview
 
-Solomon is a **facility management system** for managing apartment buildings under SVJ (Společenství vlastníků jednotek — Association of Unit Owners) in the Czech Republic. It manages buildings, flats, owners, tenants, and provides a full audit trail of all changes.
+Solomon is a **facility management system** for managing apartment buildings under SVJ (Společenství vlastníků jednotek - Association of Unit Owners) in the Czech Republic. It manages buildings, flats, owners, tenants, and provides a full audit trail of all changes.
 
 - **Repository:** github.com/ondyn/Solomon
 - **Design Document:** See `DESIGN.md` for full architecture, data model, and requirements.
@@ -76,8 +76,8 @@ FM-Salounova/                # Git repository root
 │   └── includes/
 │       └── navbar.html      # Navigation bar partial
 │
-├── static/                  # Static files (CSS, JS, images) — create as needed
-└── locale/                  # Translation files — create with `django-admin makemessages`
+├── static/                  # Static files (CSS, JS, images) - create as needed
+└── locale/                  # Translation files - create with `django-admin makemessages`
 ```
 
 ## Domain Model
@@ -92,11 +92,11 @@ FM-Salounova/                # Git repository root
 ## Coding Conventions
 
 ### Python / Django
-- Follow PEP 8 — enforced by Ruff (line-length = 120, see `pyproject.toml [tool.ruff]`)
+- Follow PEP 8 - enforced by Ruff (line-length = 120, see `pyproject.toml [tool.ruff]`)
 - Use type hints for function signatures
 - Use Django class-based views (ListView, DetailView, CreateView, UpdateView)
 - Use Django ModelForm for all forms
-- Use Django ORM — no raw SQL unless absolutely necessary
+- Use Django ORM - no raw SQL unless absolutely necessary
 - Use `UUID` as primary key for all models (not auto-increment)
 - All models inherit from `BaseModel` in `core/models.py` which provides:
   - `id` (UUIDField, primary key, auto-generated uuid4)
@@ -117,17 +117,17 @@ FM-Salounova/                # Git repository root
 - Use Django template language (not Jinja2)
 - Base template at `templates/base.html` with blocks: `title`, `content`, `extra_css`, `extra_js`
 - Use HTMX attributes for dynamic behavior (hx-get, hx-post, hx-target, hx-swap)
-- Keep templates simple — logic belongs in views, not templates
+- Keep templates simple - logic belongs in views, not templates
 - Use Bootstrap 5 classes for layout and components
 - Navigation in `templates/includes/navbar.html`
 
 ### Localization
 - All user-facing strings must use Django translation: `{% trans %}` in templates, `_()` or `gettext_lazy()` in Python
 - Czech is the primary language (locale: `cs`), English secondary (`en`)
-- Date format: `d.m.Y` (Czech standard) — configured in `base.py`
+- Date format: `d.m.Y` (Czech standard) - configured in `base.py`
 - Currency: CZK (Kč)
-- Never hardcode Czech strings — always use translation functions
-- Translation files in `locale/` — generate with `django-admin makemessages -l cs`
+- Never hardcode Czech strings - always use translation functions
+- Translation files in `locale/` - generate with `django-admin makemessages -l cs`
 
 ### Database
 - PostgreSQL 16 in production and Docker dev (via `docker-compose.yml`)
@@ -136,7 +136,7 @@ FM-Salounova/                # Git repository root
 - All migrations must be committed to the repository
 - Use `effective_from` / `effective_to` date fields for temporal data (ownership, tenancy)
 - Ownership share stored as `share_numerator` / `share_denominator` (integers, not float)
-- Never hard-delete records — soft delete via django-safedelete (`SOFT_DELETE_CASCADE`)
+- Never hard-delete records - soft delete via django-safedelete (`SOFT_DELETE_CASCADE`)
 
 ## Authorization Rules
 
@@ -160,7 +160,7 @@ Four roles defined in `core/permissions.py` → `Roles` class:
 - Every create, update, and delete operation must be logged automatically via django-auditlog
 - Register models using `@register_auditlog` decorator from `core/models.py`
 - Each audit log entry records: user, timestamp, entity type, entity ID, field name, old value, new value
-- Audit log is immutable — never update or delete audit records
+- Audit log is immutable - never update or delete audit records
 - If audit logging fails, the original operation must also fail (transactional)
 - Use `effective_from` / `effective_to` fields on domain models to track when changes apply in the real world
 
@@ -169,49 +169,69 @@ Four roles defined in `core/permissions.py` → `Roles` class:
 - **Framework:** pytest + pytest-django (configured in `pyproject.toml [tool.pytest.ini_options]`)
 - **Settings:** Tests use `solomon.settings.test` (in-memory SQLite, fast password hasher)
 - **Shared fixtures:** Root-level `conftest.py` provides `client`, `admin_client`, `admin_user`
-- **Factories:** Use `factory_boy` for test data — create factories in `<app>/tests/factories.py`
+- **Factories:** Use `factory_boy` for test data - create factories in `<app>/tests/factories.py`
 - **Coverage:** pytest-cov with `fail_under = 70` (see `pyproject.toml [tool.coverage]`)
 - **Test file naming:** `test_*.py` or `*_tests.py` (in each app's `tests/` directory)
 - Test permission enforcement: verify owners cannot access other owners' data
 - Test audit trail: verify changes are logged correctly
 - Test soft delete: verify deleted records are excluded from queries but preserved in DB
 - Test ownership share validation: warn if shares don't sum to 100%
-- Run tests: `uv run pytest` (or `uv run pytest --cov` for coverage report)
+- Run tests: `docker compose exec web uv run pytest` (or `make test`)
+- Run tests with coverage: `docker compose exec web uv run pytest --cov` (or `make test-cov`)
 
 ## Development Workflow
 
-### Local Setup (without Docker)
+### Primary: Docker (always use this)
+
+**All development runs inside Docker.** There is no local `.venv` on the host machine.
+Use `docker compose exec web ...` (or `make` targets) for every command.
+
 ```bash
-uv sync                          # Creates .venv and installs all deps (incl. dev)
-cp .env.example .env             # Edit as needed
-uv run python manage.py migrate
-uv run python manage.py createsuperuser
-uv run python manage.py runserver
+# Starting / stopping
+make up                          # Start services (Django + PostgreSQL)
+make down                        # Stop services
+make logs                        # Tail logs
+
+# Django management
+docker compose exec web uv run python manage.py migrate
+docker compose exec web uv run python manage.py makemigrations
+docker compose exec web uv run python manage.py createsuperuser
+docker compose exec web uv run python manage.py shell
+
+# Testing
+docker compose exec web uv run pytest
+docker compose exec web uv run pytest --cov
+docker compose exec web uv run pytest -xvs           # verbose, stop on first fail
+docker compose exec web uv run pytest path/to/test.py  # run specific test file
+
+# Code quality
+docker compose exec web uv run ruff check --fix .
+docker compose exec web uv run ruff format .
+docker compose exec web uv run mypy .
+
+# Shell access
+docker compose exec web bash
 ```
 
-### Local Setup (with Docker)
-```bash
-docker compose up -d            # PostgreSQL + Django on localhost:8000
-docker compose exec web uv run python manage.py migrate
-docker compose exec web uv run python manage.py createsuperuser
-```
+**IMPORTANT for Copilot:** Never run `python`, `uv run`, or `pytest` directly on the host.
+Always prefix with `docker compose exec web`. The Makefile provides shortcuts (e.g. `make test`, `make migrate`).
 
 ### Debugging
 - Port 5678 is exposed in docker-compose for `debugpy` attachment
 - Django Debug Toolbar available in dev (auto-added via `settings/dev.py`)
 
-### Pre-commit
+### Pre-commit (runs inside Docker)
 ```bash
-uv run pre-commit install       # One-time setup
-uv run pre-commit run --all-files  # Manual run
+docker compose exec web uv run pre-commit install
+docker compose exec web uv run pre-commit run --all-files
 ```
 
 ## Git Conventions
 
 - Branch naming: `feature/module-name`, `fix/description`, `docs/description`
 - Commit messages: imperative mood, e.g., "Add building model", "Fix owner permission check"
-- Keep commits focused — one logical change per commit
-- Always run tests before pushing (`uv run pytest`)
+- Keep commits focused - one logical change per commit
+- Always run tests before pushing (`docker compose exec web uv run pytest` or `make test`)
 - Pre-commit hooks auto-run on `git commit` (ruff lint, ruff format, mypy)
 
 ## Key Business Rules (Reference)
@@ -221,20 +241,20 @@ uv run pre-commit run --all-files  # Manual run
 3. Ownership shares per flat should sum to 100% (warn if not, don't block).
 4. One flat can have multiple tenants. Tenants are linked to flats, not directly to owners.
 5. All ownership and tenancy changes require an effective date (`effective_from` / `effective_to`).
-6. Soft delete everywhere — never hard-delete data (django-safedelete with `SOFT_DELETE_CASCADE`).
+6. Soft delete everywhere - never hard-delete data (django-safedelete with `SOFT_DELETE_CASCADE`).
 7. All data changes are recorded in an immutable audit trail (django-auditlog with `@register_auditlog`).
 8. Chairman has special approval rights for contracts above a configurable monetary threshold.
-9. Individual owners can only view their own data and submit requests — they cannot edit anything directly.
+9. Individual owners can only view their own data and submit requests - they cannot edit anything directly.
 
 ## Terminal Safety Rules
 
-- **Never use heredoc syntax** (`<<EOF`, `<<'EOF'`, `cat <<EOF`) in terminal commands — they cause terminal disconnects
-- **Never use `python3 -c "long code"`** or `python -c "..."` with multi-line code in terminal — use a temporary script file instead
+- **Never use heredoc syntax** (`<<EOF`, `<<'EOF'`, `cat <<EOF`) in terminal commands - they cause terminal disconnects
+- **Never use `python3 -c "long code"`** or `python -c "..."` with multi-line code in terminal - use a temporary script file instead
 - When you need to run multi-line Python: create a `.py` file, run it, then delete it
 - Keep terminal commands short and single-line; chain with `&&` if needed
 
 ## Excluded Folders
 
-- **`support/`** — Reference-only folder (e.g., NetBox code for inspiration). Not part of the project.
+- **`support/`** - Reference-only folder (e.g., NetBox code for inspiration). Not part of the project.
   - Excluded from: ruff (`extend-exclude`), mypy (`exclude`), pytest (`testpaths`), and `.gitignore`
   - Do **not** read, import, test, lint, or treat any code in `support/` as project code

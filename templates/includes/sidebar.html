@@ -72,6 +72,12 @@
             <span class="nav-text">{% trans "CUZK Import" %}</span>
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'owners-import' %}active{% endif %}" href="{% url 'owners:owners-import' %}">
+            <span class="material-icons">upload_file</span>
+            <span class="nav-text">{% trans "Owners Import" %}</span>
+          </a>
+        </li>
         {% if user.is_staff %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'admin:index' %}">

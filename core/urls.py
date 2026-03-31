@@ -10,6 +10,7 @@ from .cuzk_import import (
     CUZKCityPartSearchView,
     CUZKImportPreviewView,
     CUZKImportSearchView,
+    CUZKMunicipalitySearchView,
 )
 
 app_name = "core"
@@ -21,4 +22,5 @@ urlpatterns = [
     path("cuzk-import/preview/", CUZKImportPreviewView.as_view(), name="cuzk-import-preview"),
     path("cuzk-import/search-building/", CUZKBuildingSearchView.as_view(), name="cuzk-building-search"),
     path("cuzk-import/search-city-parts/", CUZKCityPartSearchView.as_view(), name="cuzk-city-part-search"),
+    path("cuzk-import/search-municipalities/", CUZKMunicipalitySearchView.as_view(), name="cuzk-municipality-search"),
 ]

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "CUZK Import — Preview" %} — Solomon{% endblock %}
+{% block title %}{% trans "CUZK Import - Preview" %} - Solomon{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><a href="{% url 'core:cuzk-import-search' %}">{% trans "CUZK Import" %}</a></li>
@@ -11,36 +11,36 @@
 {% block content %}
 <div class="page-header">
   <h2>
-    <span class="material-icons md-36 me-2" style="color: var(--md-primary);">preview</span>
+    <span class="material-icons" style="color: var(--md-primary);">preview</span>
     {% trans "Import Preview" %}
   </h2>
 </div>
 
-{# ── CUZK Stavba summary ──────────────────────────────────────────── #}
-<div class="alert alert-info mb-4">
+{# CUZK Stavba summary #}
+<div class="alert alert-info mb-3" style="font-size: 0.8125rem;">
   <span class="material-icons md-18 me-1">info</span>
   {% trans "CUZK Stavba" %}: <strong>{{ cuzk_building.municipality_name }}</strong>
-  — {{ cuzk_building.city_part_name }}
-  — {% trans "House numbers" %}: {{ cuzk_building.house_numbers|join:", " }}
+  - {{ cuzk_building.city_part_name }}
+  - {% trans "House numbers" %}: {{ cuzk_building.house_numbers|join:", " }}
   <span class="text-muted ms-2">(CUZK ID: {{ cuzk_building.id }})</span>
   {% if cuzk_building.lv %}
     <br><small>{% trans "Title deed (LV)" %}: {{ cuzk_building.lv.number }} ({{ cuzk_building.lv.cadastral_territory_name }})</small>
   {% endif %}
-  <br><small>{% trans "Building type" %}: {{ cuzk_building.building_type_name|default:"—" }} | {% trans "Usage" %}: {{ cuzk_building.usage_name|default:"—" }}</small>
+  <br><small>{% trans "Building type" %}: {{ cuzk_building.building_type_name|default:"-" }} | {% trans "Usage" %}: {{ cuzk_building.usage_name|default:"-" }}</small>
   <br><small>{% trans "Total units" %}: {{ unit_diffs|length }} {% trans "across" %} {{ building_diffs|length }} {% trans "building(s)" %}</small>
 </div>
 
 <form method="post" action="{% url 'core:cuzk-import-preview' %}">
   {% csrf_token %}
 
-  {# ── Per-building sections ─────────────────────────────────────── #}
+  {# Per-building sections #}
   {% for bdiff in building_diffs %}
-  <div class="card mb-4">
+  <div class="card mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
       <span>
-        <span class="material-icons md-18 me-1">business</span>
+        <span class="material-icons md-18">business</span>
         {% trans "Building" %} č.p. <strong>{{ bdiff.house_number }}</strong>
-        — {{ bdiff.cuzk_building.city_part_name }}, {{ bdiff.cuzk_building.municipality_name }}
+        - {{ bdiff.cuzk_building.city_part_name }}, {{ bdiff.cuzk_building.municipality_name }}
       </span>
       <span>
         {% if bdiff.suggested_action == "create" %}
@@ -54,14 +54,14 @@
     </div>
     <div class="card-body">
       {% if bdiff.existing_building %}
-        <p class="text-muted mb-2">
+        <p class="text-muted mb-2" style="font-size: 0.8125rem;">
           {% trans "Matching existing building:" %}
           <a href="{% url 'buildings:building-detail' bdiff.existing_building.pk %}">
             {{ bdiff.existing_building }}
           </a>
         </p>
       {% else %}
-        <p class="text-muted mb-2">{% trans "No matching building found in database. A new building will be created." %}</p>
+        <p class="text-muted mb-2" style="font-size: 0.8125rem;">{% trans "No matching building found in database. A new building will be created." %}</p>
       {% endif %}
 
       <div class="table-responsive">
@@ -78,8 +78,8 @@
             {% for diff in bdiff.field_diffs %}
             <tr{% if diff.is_changed %} class="table-warning"{% endif %}>
               <td>{{ diff.field_label }}</td>
-              <td>{{ diff.current_value|default:"—" }}</td>
-              <td><strong>{{ diff.new_value|default:"—" }}</strong></td>
+              <td>{{ diff.current_value|default:"-" }}</td>
+              <td><strong>{{ diff.new_value|default:"-" }}</strong></td>
               <td>
                 {% if diff.is_changed %}
                   <span class="material-icons md-18 text-warning">change_circle</span>
@@ -96,7 +96,7 @@
       <div class="row">
         <div class="col-md-4">
           <label class="form-label fw-bold">{% trans "Action for building" %} č.p. {{ bdiff.house_number }}:</label>
-          <select name="building_action_{{ bdiff.house_number }}" class="form-select">
+          <select name="building_action_{{ bdiff.house_number }}" class="form-select form-select-sm">
             {% for value, label in action_choices %}
               <option value="{{ value }}" {% if value == bdiff.suggested_action %}selected{% endif %}>
                 {{ label }}
@@ -106,25 +106,27 @@
         </div>
       </div>
 
-      {# ── Units for this building ─────────────────────────────────── #}
+      {# Units for this building #}
       {% with hn_units=units_by_hn %}
       {% for hn, unit_list in hn_units.items %}
         {% if hn == bdiff.house_number %}
           {% if unit_list %}
-          <div class="mt-4">
-            <h6>
-              <span class="material-icons md-18 me-1">door_front</span>
-              {% trans "Units" %}
-              <span class="badge bg-secondary ms-1">{{ unit_list|length }}</span>
-            </h6>
+          <div class="mt-3">
+            <div class="section-header">
+              <h4>
+                <span class="material-icons md-18">door_front</span>
+                {% trans "Units" %}
+                <span class="badge bg-secondary ms-1">{{ unit_list|length }}</span>
+              </h4>
+            </div>
             {% for udiff in unit_list %}
-            <div class="border rounded p-3 mb-2 {% if udiff.suggested_action == 'create' %}border-success{% elif udiff.suggested_action == 'update' %}border-warning{% else %}border-secondary{% endif %}">
+            <div class="border rounded p-2 mb-2 {% if udiff.suggested_action == 'create' %}border-success{% elif udiff.suggested_action == 'update' %}border-warning{% else %}border-secondary{% endif %}">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <span>
                   <strong>{% trans "Flat" %} {{ udiff.cuzk_unit.flat_number_in_building }}</strong>
                   <span class="text-muted small">(cisloJednotky: {{ udiff.cuzk_unit.unit_number }}, CUZK ID: {{ udiff.cuzk_unit.id }})</span>
                   {% if udiff.cuzk_unit.unit_type_name %}
-                    <span class="text-muted small ms-1">— {{ udiff.cuzk_unit.unit_type_name }}</span>
+                    <span class="text-muted small ms-1">- {{ udiff.cuzk_unit.unit_type_name }}</span>
                   {% endif %}
                 </span>
                 <span>
@@ -159,8 +161,8 @@
                     {% for diff in udiff.field_diffs %}
                     <tr{% if diff.is_changed %} class="table-warning"{% endif %}>
                       <td>{{ diff.field_label }}</td>
-                      <td>{{ diff.current_value|default:"—" }}</td>
-                      <td><strong>{{ diff.new_value|default:"—" }}</strong></td>
+                      <td>{{ diff.current_value|default:"-" }}</td>
+                      <td><strong>{{ diff.new_value|default:"-" }}</strong></td>
                       <td>
                         {% if diff.is_changed %}
                           <span class="material-icons md-18 text-warning">change_circle</span>
@@ -195,8 +197,8 @@
             {% endfor %}
           </div>
           {% else %}
-          <div class="mt-4">
-            <p class="text-muted">{% trans "No units found for this building." %}</p>
+          <div class="mt-3">
+            <p class="text-muted" style="font-size: 0.8125rem;">{% trans "No units found for this building." %}</p>
           </div>
           {% endif %}
         {% endif %}
@@ -206,13 +208,13 @@
   </div>
   {% endfor %}
 
-  {# ── Action buttons ──────────────────────────────────────────────── #}
-  <div class="d-flex justify-content-between mb-4">
-    <a href="{% url 'core:cuzk-import-search' %}" class="btn btn-outline-secondary">
-      <span class="material-icons md-18 me-1">arrow_back</span> {% trans "Back to search" %}
+  {# Action buttons #}
+  <div class="d-flex justify-content-between mb-3">
+    <a href="{% url 'core:cuzk-import-search' %}" class="btn btn-sm btn-outline-secondary">
+      <span class="material-icons md-18">arrow_back</span> {% trans "Back to search" %}
     </a>
-    <button type="submit" class="btn btn-success">
-      <span class="material-icons md-18 me-1">save</span> {% trans "Execute Import" %}
+    <button type="submit" class="btn btn-sm btn-success">
+      <span class="material-icons md-18">save</span> {% trans "Execute Import" %}
     </button>
   </div>
 </form>

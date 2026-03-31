@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Audit Log Entry" %} — Solomon{% endblock %}
+{% block title %}{% trans "Audit Log Entry" %} - Solomon{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item"><a href="{% url 'core:auditlog-list' %}">{% trans "Audit Log" %}</a></li>
@@ -10,10 +10,16 @@
 
 {% block content %}
 <div class="page-header">
-  <h2><span class="material-icons md-36 me-2" style="color: var(--md-primary);">history</span>{% trans "Audit Log Entry" %} #{{ entry.pk }}</h2>
+  <h2>
+    <span class="material-icons" style="color: var(--md-primary);">history</span>
+    {% trans "Audit Log Entry" %} #{{ entry.pk }}
+  </h2>
 </div>
 
-<div class="card mb-4">
+<div class="card mb-3">
+  <div class="card-header">
+    <span class="material-icons md-18">info</span> {% trans "Entry details" %}
+  </div>
   <div class="card-body">
     <div class="row">
       <div class="col-md-6">
@@ -47,9 +53,9 @@
 {% if entry.changes_dict %}
 <div class="card">
   <div class="card-header">
-    <span class="material-icons md-18 me-1">compare_arrows</span> {% trans "Changes" %}
+    <span class="material-icons md-18">compare_arrows</span> {% trans "Changes" %}
   </div>
-  <div class="card-body p-0">
+  <div class="table-responsive">
     <table class="table table-sm mb-0">
       <thead>
         <tr>
@@ -62,8 +68,8 @@
         {% for field, values in entry.changes_dict.items %}
         <tr>
           <td><strong>{{ field }}</strong></td>
-          <td>{{ values.0|default:"—" }}</td>
-          <td>{{ values.1|default:"—" }}</td>
+          <td>{{ values.0|default:"-" }}</td>
+          <td>{{ values.1|default:"-" }}</td>
         </tr>
         {% endfor %}
       </tbody>

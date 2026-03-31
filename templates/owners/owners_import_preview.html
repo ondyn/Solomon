@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Import Owners - Preview" %} - Solomon{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{% url 'owners:owner-list' %}">{% trans "Owners" %}</a></li>
+<li class="breadcrumb-item"><a href="{% url 'owners:owners-import' %}">{% trans "Import" %}</a></li>
+<li class="breadcrumb-item active">{% trans "Preview" %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>
+    <span class="material-icons" style="color: var(--md-primary);">preview</span>
+    {% trans "Import Preview" %}
+  </h2>
+</div>
+
+{# Summary #}
+<div class="alert alert-info">
+  <span class="material-icons md-18">info</span>
+  {% blocktrans with owners=total_owners units=total_units %}
+    Parsed {{ owners }} owner(s) with {{ units }} flat reference(s).
+  {% endblocktrans %}
+</div>
+
+<form method="post" action="{% url 'owners:owners-import' %}">
+  {% csrf_token %}
+  <input type="hidden" name="action" value="execute">
+  <textarea name="owners_text" style="display:none;">{{ owners_text }}</textarea>
+
+  <div class="mb-3">
+    <label for="effective_date" class="form-label">{% trans "Effective date" %}</label>
+    <input type="date" class="form-control form-control-sm" id="effective_date" name="effective_date"
+           value="{% now 'Y-m-d' %}" style="max-width: 200px;">
+    <div class="form-text">{% trans "Date from which the ownership is effective." %}</div>
+  </div>
+
+  {# Owners table #}
+  <div class="card mb-3">
+    <div class="card-header">
+      <span class="material-icons md-18">groups</span> {% trans "Owners to import" %}
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+          <thead>
+            <tr>
+              <th style="width: 30px;">#</th>
+              <th>{% trans "Name" %}</th>
+              <th>{% trans "Address" %}</th>
+              <th>{% trans "Status" %}</th>
+              <th>{% trans "Flat(s)" %}</th>
+              <th>{% trans "Share" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in preview_data %}
+            <tr>
+              <td class="text-muted">{{ forloop.counter }}</td>
+              <td>
+                <strong>{{ item.owner.last_name }} {{ item.owner.first_name }}</strong>
+                {% if item.owner.is_joint %}
+                  <span class="badge bg-info ms-1">SJ</span>
+                {% endif %}
+                {% if item.owner.person_type == "legal" %}
+                  <span class="badge bg-warning ms-1">{% trans "Legal" %}</span>
+                {% endif %}
+              </td>
+              <td style="font-size: 0.8125rem;">{{ item.owner.address|default:"—" }}</td>
+              <td>
+                {% if item.is_new %}
+                  <span class="badge bg-success">{% trans "New" %}</span>
+                {% else %}
+                  <span class="badge bg-secondary">{% trans "Exists" %}</span>
+                {% endif %}
+              </td>
+              <td>
+                {% for unit in item.units %}
+                  <span class="{% if unit.flat_found %}text-success{% else %}text-danger{% endif %}"
+                        style="font-size: 0.8125rem;">
+                    {{ unit.ref }}
+                    {% if not unit.flat_found %}
+                      <span class="material-icons md-14" title="{% trans 'Flat not found' %}">warning</span>
+                    {% endif %}
+                  </span>
+                  {% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              </td>
+              <td style="font-size: 0.8125rem;">
+                {% for unit in item.units %}
+                  {{ unit.share }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {# Actions #}
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-success">
+      <span class="material-icons md-18">check</span> {% trans "Execute import" %}
+    </button>
+    <a href="{% url 'owners:owners-import' %}" class="btn btn-outline-secondary">
+      <span class="material-icons md-18">arrow_back</span> {% trans "Back to edit" %}
+    </a>
+  </div>
+</form>
+{% endblock %}

@@ -94,6 +94,14 @@ class Owner(BaseModel):
         verbose_name=_("Note"),
     )
 
+    # CUZK integration — not visible to end users, used for linking
+    cuzk_owner_id = models.BigIntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_("CUZK owner ID"),
+        help_text=_("Identifikátor vlastníka v ISKN (ČÚZK)"),
+    )
+
     class Meta(BaseModel.Meta):
         verbose_name = _("Owner")
         verbose_name_plural = _("Owners")

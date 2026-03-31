@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Audit Log" %} — Solomon{% endblock %}
+{% block title %}{% trans "Audit Log" %} - Solomon{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item active">{% trans "Audit Log" %}</li>
@@ -9,20 +9,26 @@
 
 {% block content %}
 <div class="page-header">
-  <h2><span class="material-icons md-36 me-2" style="color: var(--md-primary);">history</span>{% trans "Audit Log" %}</h2>
+  <h2>
+    <span class="material-icons" style="color: var(--md-primary);">history</span>
+    {% trans "Audit Log" %}
+  </h2>
 </div>
 
 {# Filters #}
-<div class="card mb-4">
+<div class="card mb-3">
+  <div class="card-header">
+    <span class="material-icons md-18">filter_alt</span> {% trans "Filters" %}
+  </div>
   <div class="card-body">
-    <form method="get" class="row g-3">
+    <form method="get" class="row g-2 align-items-end">
       <div class="col-md-3">
         <label class="form-label">{% trans "User" %}</label>
-        <input type="text" name="actor" value="{{ request.GET.actor|default:'' }}" class="form-control" placeholder="{% trans 'Username' %}">
+        <input type="text" name="actor" value="{{ request.GET.actor|default:'' }}" class="form-control form-control-sm" placeholder="{% trans 'Username' %}">
       </div>
       <div class="col-md-3">
         <label class="form-label">{% trans "Action" %}</label>
-        <select name="action" class="form-select">
+        <select name="action" class="form-select form-select-sm">
           <option value="">{% trans "All" %}</option>
           {% for val, label in action_choices %}
             <option value="{{ val }}" {% if request.GET.action == val|stringformat:"d" %}selected{% endif %}>{{ label }}</option>
@@ -31,22 +37,24 @@
       </div>
       <div class="col-md-3">
         <label class="form-label">{% trans "Object ID" %}</label>
-        <input type="text" name="object_id" value="{{ request.GET.object_id|default:'' }}" class="form-control" placeholder="UUID">
+        <input type="text" name="object_id" value="{{ request.GET.object_id|default:'' }}" class="form-control form-control-sm" placeholder="UUID">
       </div>
-      <div class="col-md-3 d-flex align-items-end">
-        <button type="submit" class="btn btn-primary me-2">
-          <span class="material-icons md-18">filter_alt</span> {% trans "Filter" %}
-        </button>
-        <a href="{% url 'core:auditlog-list' %}" class="btn btn-secondary">
-          <span class="material-icons md-18">clear</span> {% trans "Clear" %}
-        </a>
+      <div class="col-md-3">
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-sm btn-primary">
+            <span class="material-icons md-18">filter_alt</span> {% trans "Filter" %}
+          </button>
+          <a href="{% url 'core:auditlog-list' %}" class="btn btn-sm btn-outline-secondary">
+            <span class="material-icons md-18">clear</span> {% trans "Clear" %}
+          </a>
+        </div>
       </div>
     </form>
   </div>
 </div>
 
 {% if entries %}
-  <div class="table-card">
+  <div class="card">
     <div class="table-responsive">
       <table class="table table-striped table-hover table-sm mb-0">
         <thead>
@@ -63,7 +71,7 @@
           {% for entry in entries %}
           <tr>
             <td>{{ entry.timestamp }}</td>
-            <td>{{ entry.actor.username|default:"—" }}</td>
+            <td>{{ entry.actor.username|default:"-" }}</td>
             <td>
               {% if entry.action == 0 %}
                 <span class="badge badge-action-create">{% trans "Create" %}</span>

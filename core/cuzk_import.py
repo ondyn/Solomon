@@ -35,6 +35,10 @@ from .cuzk_service import (
 
 logger = logging.getLogger(__name__)
 
+# In-memory cache for municipality/city-part lists (they rarely change)
+_municipality_cache: list | None = None
+_city_parts_cache: list | None = None
+
 
 # ---------------------------------------------------------------------------
 #  Import diff data structures
@@ -454,16 +458,54 @@ class CUZKBuildingSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 
 class CUZKCityPartSearchView(LoginRequiredMixin, View):
-    """JSON endpoint: search city parts by name (autocomplete)."""
+    """JSON endpoint: search city parts by name (autocomplete).
+
+    Two modes:
+    - ?q=<text> — search city parts by name prefix
+    - ?municipality_code=<int> — get city parts for a specific municipality
+    """
 
     def get(self, request):
+        global _city_parts_cache  # noqa: PLW0603
+
+        municipality_code_str = request.GET.get("municipality_code", "").strip()
         query = request.GET.get("q", "").strip()
+
+        client = CUZKClient()
+
+        # Mode 1: Get city parts for a specific municipality
+        if municipality_code_str:
+            try:
+                municipality_code = int(municipality_code_str)
+            except (ValueError, TypeError):
+                return JsonResponse([], safe=False)
+
+            try:
+                if _city_parts_cache is None:
+                    _city_parts_cache = client.list_city_parts()
+                parts = [p for p in _city_parts_cache if p.municipality_code == municipality_code]
+            except CUZKApiError:
+                return JsonResponse([], safe=False)
+
+            data = [
+                {
+                    "code": r.code,
+                    "name": r.name,
+                    "municipality_code": r.municipality_code or 0,
+                }
+                for r in parts[:50]
+            ]
+            return JsonResponse(data, safe=False)
+
+        # Mode 2: Search by name prefix
         if len(query) < 3:
             return JsonResponse([], safe=False)
 
-        client = CUZKClient()
         try:
-            results = client.search_city_parts(query)
+            if _city_parts_cache is None:
+                _city_parts_cache = client.list_city_parts()
+            q = query.lower()
+            results = [p for p in _city_parts_cache if p.name.lower().startswith(q)]
         except CUZKApiError:
             return JsonResponse([], safe=False)
 
@@ -471,9 +513,38 @@ class CUZKCityPartSearchView(LoginRequiredMixin, View):
             {
                 "code": r.code,
                 "name": r.name,
-                "municipality_name": r.municipality_name or "",
+                "municipality_code": r.municipality_code or 0,
             }
             for r in results[:20]
+        ]
+        return JsonResponse(data, safe=False)
+
+
+class CUZKMunicipalitySearchView(LoginRequiredMixin, View):
+    """JSON endpoint: search municipalities by name (autocomplete)."""
+
+    def get(self, request):
+        global _municipality_cache  # noqa: PLW0603
+
+        query = request.GET.get("q", "").strip()
+        if len(query) < 2:
+            return JsonResponse([], safe=False)
+
+        client = CUZKClient()
+        try:
+            if _municipality_cache is None:
+                _municipality_cache = client.list_municipalities()
+            q = query.lower()
+            results = [m for m in _municipality_cache if m.name.lower().startswith(q)]
+        except CUZKApiError:
+            return JsonResponse([], safe=False)
+
+        data = [
+            {
+                "code": m.code,
+                "name": m.name,
+            }
+            for m in results[:20]
         ]
         return JsonResponse(data, safe=False)
 

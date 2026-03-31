@@ -5,6 +5,7 @@ Solomon — Owner URL configuration.
 from django.urls import path
 
 from . import views
+from .import_owners import OwnersImportView
 
 app_name = "owners"
 
@@ -12,6 +13,7 @@ urlpatterns = [
     # Owner CRUD
     path("", views.OwnerListView.as_view(), name="owner-list"),
     path("new/", views.OwnerCreateView.as_view(), name="owner-create"),
+    path("import/", OwnersImportView.as_view(), name="owners-import"),
     path("<uuid:pk>/", views.OwnerDetailView.as_view(), name="owner-detail"),
     path("<uuid:pk>/edit/", views.OwnerUpdateView.as_view(), name="owner-update"),
     path("<uuid:pk>/delete/", views.OwnerDeleteView.as_view(), name="owner-delete"),

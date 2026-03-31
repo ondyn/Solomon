@@ -1,0 +1,17 @@
+{% load i18n %}
+{# Form field group — renders a section with a header and horizontal fields #}
+{# Usage: {% include "includes/form_fieldgroup.html" with title="Section" fields=field_list %} #}
+
+<div class="field-group mb-4">
+  {% if title %}
+    <div class="row mb-2">
+      <div class="col-sm-9 offset-sm-3">
+        <h5 class="field-group-title">{{ title }}</h5>
+      </div>
+    </div>
+  {% endif %}
+
+  {% for field in fields %}
+    {% include "includes/form_field.html" with field=field %}
+  {% endfor %}
+</div>

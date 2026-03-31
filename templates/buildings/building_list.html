@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Buildings" %} — Solomon{% endblock %}
+{% block title %}{% trans "Buildings" %} - Solomon{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item active">{% trans "Buildings" %}</li>
@@ -9,16 +9,21 @@
 
 {% block content %}
 <div class="page-header">
-  <h2><span class="material-icons md-36 me-2" style="color: var(--md-primary);">business</span>{% trans "Buildings" %}</h2>
-  {% if perms.buildings.add_building %}
-    <a href="{% url 'buildings:building-create' %}" class="btn btn-primary">
-      <span class="material-icons md-18">add</span> {% trans "Add building" %}
-    </a>
-  {% endif %}
+  <h2>
+    <span class="material-icons" style="color: var(--md-primary);">business</span>
+    {% trans "Buildings" %}
+  </h2>
+  <div class="btn-list">
+    {% if perms.buildings.add_building %}
+      <a href="{% url 'buildings:building-create' %}" class="btn btn-primary">
+        <span class="material-icons md-18">add</span> {% trans "Add building" %}
+      </a>
+    {% endif %}
+  </div>
 </div>
 
 {% if buildings %}
-  <div class="table-card">
+  <div class="card">
     <div class="table-responsive">
       <table class="table table-striped table-hover mb-0">
         <thead>
@@ -35,9 +40,7 @@
         <tbody>
           {% for building in buildings %}
           <tr>
-            <td>
-              <a href="{% url 'buildings:building-detail' building.pk %}">{{ building.name }}</a>
-            </td>
+            <td><a href="{% url 'buildings:building-detail' building.pk %}">{{ building.name }}</a></td>
             <td>{{ building.street }}</td>
             <td>{{ building.house_number }}</td>
             <td>{{ building.city }}</td>

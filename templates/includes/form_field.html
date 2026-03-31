@@ -1,0 +1,47 @@
+{% load i18n %}
+{# Single form field — horizontal layout (NetBox-inspired) #}
+{# Uses Bootstrap row: label col-sm-3 right-aligned, input col-sm-9 #}
+
+<div class="row mb-3{% if field.errors %} has-errors{% endif %}">
+
+  {# Label — right-aligned on desktop, except for checkboxes #}
+  {% if field.field.widget.input_type != 'checkbox' %}
+    <div class="col-sm-3 text-sm-end">
+      <label for="{{ field.id_for_label }}"
+             class="col-form-label{% if field.field.required %} required{% endif %}">
+        {{ field.label }}
+      </label>
+    </div>
+  {% endif %}
+
+  {# Field input #}
+  <div class="col-sm-9{% if field.field.widget.input_type == 'checkbox' %} offset-sm-3{% endif %}">
+
+    {% if field.field.widget.input_type == 'checkbox' %}
+      <div class="form-check mt-2">
+        {{ field }}
+        <label for="{{ field.id_for_label }}" class="form-check-label">
+          {{ field.label }}
+        </label>
+      </div>
+    {% else %}
+      {{ field }}
+    {% endif %}
+
+    {# Errors #}
+    {% if field.errors %}
+      <div class="form-text text-danger">
+        {% for error in field.errors %}
+          {{ error }}{% if not forloop.last %}<br>{% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {# Help text #}
+    {% if field.help_text %}
+      <span class="form-text">{{ field.help_text }}</span>
+    {% endif %}
+
+  </div>
+
+</div>

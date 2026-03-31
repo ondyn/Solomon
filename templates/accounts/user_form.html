@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block title %}
-  {% if user_obj %}{% trans "Edit user" %}{% else %}{% trans "New user" %}{% endif %} — Solomon
+  {% if user_obj %}{% trans "Edit user" %}{% else %}{% trans "New user" %}{% endif %} - Solomon
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -13,44 +13,37 @@
 {% endblock %}
 
 {% block content %}
-<div class="form-centered">
-<h2 class="mb-4">{% if user_obj %}{% trans "Edit user" %}{% else %}{% trans "New user" %}{% endif %}</h2>
+<div class="form-wide">
 
-<div class="card">
-  <div class="card-body">
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {% for field in form %}
-        {% if field.name == "is_active" %}
-          <div class="mb-3 form-check">
-            {{ field }}
-            <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {% if field.help_text %}
-              <div class="form-text">{{ field.help_text }}</div>
-            {% endif %}
-            {% for error in field.errors %}
-              <div class="invalid-feedback d-block">{{ error }}</div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <div class="mb-3">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-            {{ field }}
-            {% if field.help_text %}
-              <div class="form-text">{{ field.help_text }}</div>
-            {% endif %}
-            {% for error in field.errors %}
-              <div class="invalid-feedback d-block">{{ error }}</div>
-            {% endfor %}
-          </div>
-        {% endif %}
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
       {% endfor %}
-      <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary"><span class="material-icons md-18">save</span> {% trans "Save" %}</button>
-        <a href="{% url 'accounts:user-list' %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+    </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {# ── User ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">{% if user_obj %}edit{% else %}person_add{% endif %}</span>
+        {% if user_obj %}{% trans "Edit user" %}{% else %}{% trans "New user" %}{% endif %}
       </div>
-    </form>
-  </div>
-</div>
+      <div class="card-body">
+        {% include "includes/form_fields.html" %}
+      </div>
+    </div>
+
+    {# ── Actions ── #}
+    <div class="form-actions d-flex gap-2">
+      <button type="submit" class="btn btn-primary">
+        <span class="material-icons md-18">save</span> {% trans "Save" %}
+      </button>
+      <a href="{% url 'accounts:user-list' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+    </div>
+  </form>
 </div>
 {% endblock %}

@@ -96,8 +96,25 @@ class CUZKCityPart:
         return cls(
             code=int(data.get("kod", 0)),
             name=data.get("nazev", ""),
-            municipality_code=obec.get("kod"),
+            municipality_code=obec.get("kod") or data.get("kodObce"),
             municipality_name=obec.get("nazev", ""),
+        )
+
+
+@dataclass
+class CUZKMunicipality:
+    """Municipality (obec) from CUZK."""
+
+    code: int
+    name: str
+    district_code: int | None = None
+
+    @classmethod
+    def from_api(cls, data: dict) -> CUZKMunicipality:
+        return cls(
+            code=int(data.get("kod", 0)),
+            name=data.get("nazev", ""),
+            district_code=data.get("kodOkresu"),
         )
 
 
@@ -311,21 +328,63 @@ class CUZKClient:
         return [CUZKBuilding.from_api(b) for b in results]
 
     # ------------------------------------------------------------------
-    #  City parts (Části obcí)
+    #  City parts (Části obcí) — via enumeration endpoints
     # ------------------------------------------------------------------
-    def search_city_parts(self, query: str) -> list[CUZKCityPart]:
+    def list_municipalities(self) -> list[CUZKMunicipality]:
         """
-        Search for city parts by name prefix.
+        Fetch the full list of municipalities (obce) from CUZK.
 
-        Uses the CUZK API endpoint /CastiObci/Vyhledani?Nazev=<query>.
-        Returns a list of matching city parts.
+        Uses /CiselnikyUzemnichJednotek/Obce.
         """
-        data = self._get(
-            "/CastiObci/Vyhledani",
-            params={"Nazev": query},
-        )
+        data = self._get("/CiselnikyUzemnichJednotek/Obce")
+        results = data.get("data") or []
+        return [CUZKMunicipality.from_api(item) for item in results]
+
+    def search_municipalities(self, query: str) -> list[CUZKMunicipality]:
+        """
+        Fetch all municipalities and filter by name prefix (case-insensitive).
+
+        The CUZK API does not provide a search endpoint for municipalities,
+        so we fetch all and filter client-side.
+        """
+        all_municipalities = self.list_municipalities()
+        q = query.lower()
+        return [m for m in all_municipalities if m.name.lower().startswith(q)]
+
+    def list_city_parts(self) -> list[CUZKCityPart]:
+        """
+        Fetch the full list of city parts (části obcí) from CUZK.
+
+        Uses /CiselnikyUzemnichJednotek/CastiObci.
+        """
+        data = self._get("/CiselnikyUzemnichJednotek/CastiObci")
         results = data.get("data") or []
         return [CUZKCityPart.from_api(item) for item in results]
+
+    def get_city_part(self, code: int) -> CUZKCityPart:
+        """Fetch a single city part by its code."""
+        data = self._get(f"/CiselnikyUzemnichJednotek/CastiObci/{code}")
+        return CUZKCityPart.from_api(data.get("data", {}))
+
+    def search_city_parts(self, query: str) -> list[CUZKCityPart]:
+        """
+        Search city parts by name prefix (case-insensitive).
+
+        Fetches all city parts and filters client-side because the CUZK API
+        does not provide a search endpoint for city parts.
+        """
+        all_parts = self.list_city_parts()
+        q = query.lower()
+        return [p for p in all_parts if p.name.lower().startswith(q)]
+
+    def get_city_parts_for_municipality(self, municipality_code: int) -> list[CUZKCityPart]:
+        """
+        Get city parts belonging to a specific municipality.
+
+        Fetches all city parts and filters by kodObce.
+        """
+        all_parts = self.list_city_parts()
+        return [p for p in all_parts if p.municipality_code == municipality_code]
 
     # ------------------------------------------------------------------
     #  Units (Jednotky)

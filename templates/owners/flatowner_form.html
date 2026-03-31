@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block title %}
-  {% if form.instance.pk %}{% trans "Edit ownership" %}{% else %}{% trans "Assign ownership" %}{% endif %} — Solomon
+  {% if form.instance.pk %}{% trans "Edit ownership" %}{% else %}{% trans "Assign ownership" %}{% endif %} - Solomon
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -15,34 +15,63 @@
 {% endblock %}
 
 {% block content %}
-<div class="form-centered">
-<h2 class="mb-4">
-  {% if form.instance.pk %}{% trans "Edit ownership" %}{% else %}{% trans "Assign flat ownership" %}{% endif %}
-</h2>
+<div class="form-wide">
 
-{% if form.non_field_errors %}
-  <div class="alert alert-danger">
-    {% for error in form.non_field_errors %}
-      <p class="mb-0">{{ error }}</p>
-    {% endfor %}
-  </div>
-{% endif %}
+  {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {% for error in form.non_field_errors %}
+        <p class="mb-0">{{ error }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-<div class="card">
-  <div class="card-body">
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {% include "includes/form_fields.html" %}
+  <form method="post" novalidate>
+    {% csrf_token %}
 
-      <div class="mt-3">
-        <button type="submit" class="btn btn-primary">
-          <span class="material-icons md-18">save</span>
-          {% if form.instance.pk %}{% trans "Save changes" %}{% else %}{% trans "Assign ownership" %}{% endif %}
-        </button>
-        <a href="javascript:history.back()" class="btn btn-outline-secondary ms-2">{% trans "Cancel" %}</a>
+    {# ── Assignment ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">link</span>
+        {% trans "Assignment" %}
       </div>
-    </form>
-  </div>
-</div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.flat %}
+        {% include "includes/form_field.html" with field=form.owner %}
+      </div>
+    </div>
+
+    {# ── Ownership Share ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">pie_chart</span>
+        {% trans "Ownership Share" %}
+      </div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.share_numerator %}
+        {% include "includes/form_field.html" with field=form.share_denominator %}
+      </div>
+    </div>
+
+    {# ── Effective Dates ── #}
+    <div class="card mb-3">
+      <div class="card-header">
+        <span class="material-icons md-18">date_range</span>
+        {% trans "Effective Dates" %}
+      </div>
+      <div class="card-body">
+        {% include "includes/form_field.html" with field=form.effective_from %}
+        {% include "includes/form_field.html" with field=form.effective_to %}
+      </div>
+    </div>
+
+    {# ── Actions ── #}
+    <div class="form-actions d-flex gap-2">
+      <button type="submit" class="btn btn-primary">
+        <span class="material-icons md-18">save</span>
+        {% if form.instance.pk %}{% trans "Save changes" %}{% else %}{% trans "Assign ownership" %}{% endif %}
+      </button>
+      <a href="javascript:history.back()" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+    </div>
+  </form>
 </div>
 {% endblock %}

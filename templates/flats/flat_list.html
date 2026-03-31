@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Flats" %} — Solomon{% endblock %}
+{% block title %}{% trans "Flats" %} - Solomon{% endblock %}
 
 {% block breadcrumbs %}
 <li class="breadcrumb-item active">{% trans "Flats" %}</li>
@@ -9,16 +9,21 @@
 
 {% block content %}
 <div class="page-header">
-  <h2><span class="material-icons md-36 me-2" style="color: var(--md-success);">door_front</span>{% trans "Flats" %}</h2>
-  {% if perms.flats.add_flat %}
-    <a href="{% url 'flats:flat-create' %}" class="btn btn-primary">
-      <span class="material-icons md-18">add</span> {% trans "Add flat" %}
-    </a>
-  {% endif %}
+  <h2>
+    <span class="material-icons" style="color: var(--md-success);">door_front</span>
+    {% trans "Flats" %}
+  </h2>
+  <div class="btn-list">
+    {% if perms.flats.add_flat %}
+      <a href="{% url 'flats:flat-create' %}" class="btn btn-primary">
+        <span class="material-icons md-18">add</span> {% trans "Add flat" %}
+      </a>
+    {% endif %}
+  </div>
 </div>
 
 {% if flats %}
-  <div class="table-card">
+  <div class="card">
     <div class="table-responsive">
       <table class="table table-striped table-hover mb-0">
         <thead>
@@ -26,7 +31,7 @@
             <th>{% trans "Flat number" %}</th>
             <th>{% trans "Building" %}</th>
             <th>{% trans "Floor" %}</th>
-            <th>{% trans "Area (m²)" %}</th>
+            <th>{% trans "Area (m2)" %}</th>
             <th>{% trans "Disposition" %}</th>
             <th>{% trans "Owners" %}</th>
             <th>{% trans "Tenants" %}</th>
@@ -38,9 +43,9 @@
           <tr>
             <td><a href="{% url 'flats:flat-detail' flat.pk %}">{{ flat.flat_number }}</a></td>
             <td><a href="{% url 'buildings:building-detail' flat.building.pk %}">{{ flat.building.name }}</a></td>
-            <td>{{ flat.floor|default:"—" }}</td>
-            <td>{{ flat.area_m2|default:"—" }}</td>
-            <td>{{ flat.disposition|default:"—" }}</td>
+            <td>{{ flat.floor|default:"-" }}</td>
+            <td>{{ flat.area_m2|default:"-" }}</td>
+            <td>{{ flat.disposition|default:"-" }}</td>
             <td><span class="badge bg-secondary">{{ flat.flat_owners.count }}</span></td>
             <td><span class="badge bg-secondary">{{ flat.tenants.count }}</span></td>
             <td class="text-end action-buttons">
