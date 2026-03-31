@@ -1,0 +1,16 @@
+####
+## Solomon - Third-Party NetBox Plugins
+##
+## Add PyPI plugin packages here (one per line).
+## These are installed via `uv pip install` during Docker image build.
+##
+## After adding a plugin here:
+##   1. Rebuild: docker compose build netbox
+##   2. Register in docker/configuration/plugins.py
+##   3. Restart: docker compose up -d
+##
+## Examples:
+##   netbox-bgp>=0.14.0
+##   netbox-topology-views
+##   netbox-documents
+####

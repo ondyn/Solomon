@@ -1,0 +1,28 @@
+####
+## Solomon Theme Plugin
+##
+## A NetBox plugin that applies a hardcoded dark Material Design theme
+## using the Solomon color palette. No UI — the theme is baked in.
+## Located in ./plugins/solomon_theme/
+####
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solomon-theme"
+version = "0.1.0"
+description = "Hardcoded dark Material Design theme for Solomon / NetBox"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [
+    {name = "Solomon Dev"},
+]
+
+[project.urls]
+Homepage = "https://github.com/ondyn/Solomon"
+
+[tool.setuptools.packages.find]
+include = ["solomon_theme*"]

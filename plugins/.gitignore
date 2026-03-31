@@ -1,0 +1,6 @@
+# Python build artifacts (created by editable installs)
+**/*.egg-info/
+**/__pycache__/
+**/build/
+**/dist/
+**/*.egg

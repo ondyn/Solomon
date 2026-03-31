@@ -1,54 +1,101 @@
-# Solomon — Docker Compose for local development
-#
-# Usage:
-#   make up          — start all services (Django + PostgreSQL)
-#   make down        — stop all services
-#   make logs        — tail logs
-#   make debug       — start with debugpy (attach VS Code on port 5678)
-#
-# File watching:
-#   Django's runserver auto-reloads on .py changes.
-#   The source tree is bind-mounted into the container, so every saved
-#   file is immediately visible inside Docker — no rebuild needed.
+# Solomon - NetBox Docker Compose
+# Usage: Copy .env.example to .env, fill in values, then run:
+#   docker compose up -d
 
 services:
-  db:
-    image: postgres:16-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: solomon
-      POSTGRES_USER: solomon
-      POSTGRES_PASSWORD: solomon_dev
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U solomon"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  web:
-    build:
-      context: .
-      target: development
-    command: uv run python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
-      # Prevent container's .venv from being overwritten by host bind mount
-      - /app/.venv
-    ports:
-      - "8000:8000"
-      - "5678:5678"  # debugpy
-    environment:
-      - DJANGO_SETTINGS_MODULE=solomon.settings.dev
-      - DATABASE_URL=postgres://solomon:solomon_dev@db:5432/solomon
-      - DJANGO_DEBUG=True
-      - DJANGO_SECRET_KEY=dev-secret-key-change-in-production
-      - CUZK_API_KEY=${CUZK_API_KEY:-}
+  # ─── NetBox (main web app) ────────────────────────────────────
+  netbox: &netbox
+    image: docker.io/netboxcommunity/netbox:${NETBOX_VERSION:?Set NETBOX_VERSION in .env}
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+    env_file: .env
+    user: "netbox:root"
+    ports:
+      - "${NETBOX_PORT:-8000}:8080"
+    healthcheck:
+      test: curl -f http://localhost:8080/login/ || exit 1
+      start_period: ${NETBOX_START_PERIOD:-120s}
+      timeout: 3s
+      interval: 15s
+    volumes:
+      - ./docker/configuration:/etc/netbox/config:z,ro
+      - netbox-media-files:/opt/netbox/netbox/media:rw
+      - netbox-reports-files:/opt/netbox/netbox/reports:rw
+      - netbox-scripts-files:/opt/netbox/netbox/scripts:rw
+
+  # ─── NetBox background worker (rqworker) ─────────────────────
+  netbox-worker:
+    <<: *netbox
+    ports: []
+    depends_on:
+      netbox:
+        condition: service_healthy
+    command:
+      - /opt/netbox/venv/bin/python
+      - /opt/netbox/netbox/manage.py
+      - rqworker
+    healthcheck:
+      test: ps -aux | grep -v grep | grep -q rqworker || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+
+  # ─── PostgreSQL ───────────────────────────────────────────────
+  postgres:
+    image: docker.io/postgres:16-alpine
+    healthcheck:
+      test: pg_isready -q -t 2 -d $$POSTGRES_DB -U $$POSTGRES_USER
+      start_period: 20s
+      timeout: 30s
+      interval: 10s
+      retries: 5
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - netbox-postgres-data:/var/lib/postgresql/data
+
+  # ─── Redis (task queue) ──────────────────────────────────────
+  redis:
+    image: docker.io/valkey/valkey:8-alpine
+    command:
+      - sh
+      - -c
+      - valkey-server --appendonly yes --requirepass $$REDIS_PASSWORD
+    healthcheck: &redis-healthcheck
+      test: '[ $$(valkey-cli --pass "$${REDIS_PASSWORD}" ping) = ''PONG'' ]'
+      start_period: 5s
+      timeout: 3s
+      interval: 1s
+      retries: 5
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - netbox-redis-data:/data
+
+  # ─── Redis (cache) ──────────────────────────────────────────
+  redis-cache:
+    image: docker.io/valkey/valkey:8-alpine
+    command:
+      - sh
+      - -c
+      - valkey-server --requirepass $$REDIS_PASSWORD
+    healthcheck: *redis-healthcheck
+    environment:
+      REDIS_PASSWORD: ${REDIS_CACHE_PASSWORD}
+    volumes:
+      - netbox-redis-cache-data:/data
 
 volumes:
-  postgres_data:
+  netbox-media-files:
+  netbox-postgres-data:
+  netbox-redis-data:
+  netbox-redis-cache-data:
+  netbox-reports-files:
+  netbox-scripts-files:

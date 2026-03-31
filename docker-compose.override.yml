@@ -1,0 +1,74 @@
+####
+## Solomon - Docker Compose Override for Plugin Development
+##
+## This file is automatically loaded by `docker compose` alongside docker-compose.yml.
+## It extends the NetBox services with:
+##   - Custom image built from Dockerfile.plugins (dev tools + third-party plugins)
+##   - Volume mount for local plugins (./plugins/ → container)
+##   - Granian hot-reload (instant restart on Python file changes)
+##   - debugpy remote debugging on port 5678
+##
+## Usage:
+##   docker compose build netbox          # Build custom image with plugins
+##   docker compose up -d                 # Start with plugin support
+##   docker compose logs -f netbox        # Watch for reload/plugin messages
+##
+## To add a third-party plugin:
+##   1. Add it to plugin-requirements.txt
+##   2. docker compose build netbox
+##   3. Register in docker/configuration/plugins.py
+##   4. docker compose up -d
+##
+## To develop a local plugin:
+##   1. Create plugin package in ./plugins/my_plugin/
+##   2. Register in docker/configuration/plugins.py
+##   3. docker compose up -d  (auto-installed in editable mode at startup)
+##   4. Edit code → granian reloads instantly
+####
+
+services:
+  netbox: &netbox
+    build:
+      context: .
+      dockerfile: Dockerfile.plugins
+      args:
+        NETBOX_VERSION: ${NETBOX_VERSION:?Set NETBOX_VERSION in .env}
+    # image: is intentionally omitted so build takes precedence
+    image: solomon-netbox-dev:${NETBOX_VERSION}
+    volumes:
+      - ./docker/configuration:/etc/netbox/config:z,ro
+      - netbox-media-files:/opt/netbox/netbox/media:rw
+      - netbox-reports-files:/opt/netbox/netbox/reports:rw
+      - netbox-scripts-files:/opt/netbox/netbox/scripts:rw
+      # ── Plugin development: mount local plugins into container ──
+      # rw is required for editable installs (.egg-info / .pth files)
+      - ./plugins:/opt/netbox/plugins_dev:z
+    ports:
+      - "${NETBOX_PORT:-8000}:8080"
+      # ── debugpy remote debugging port ──
+      - "${DEBUGPY_PORT:-5678}:5678"
+    environment:
+      - DEBUGPY_ENABLE=${DEBUGPY_ENABLE:-false}
+      - DEBUGPY_PORT=${DEBUGPY_PORT:-5678}
+      # Use single worker for dev (required for reload + debugpy)
+      - GRANIAN_WORKERS=1
+      - GRANIAN_BACKPRESSURE=1
+
+  netbox-worker:
+    <<: *netbox
+    ports: []
+    depends_on:
+      netbox:
+        condition: service_healthy
+    command:
+      - /opt/netbox/plugin-entrypoint.sh
+      - /opt/netbox/venv/bin/python
+      - /opt/netbox/netbox/manage.py
+      - rqworker
+    healthcheck:
+      test: ps -aux | grep -v grep | grep -q rqworker || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+    environment:
+      - DEBUGPY_ENABLE=false

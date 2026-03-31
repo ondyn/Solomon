@@ -1,0 +1,47 @@
+####
+## Solomon - Plugin Development Dockerfile
+##
+## Extends the official NetBox Docker image with:
+##   1. Third-party plugins from plugin-requirements.txt (via uv)
+##   2. Dev tools: debugpy (remote debugging), watchfiles (granian hot-reload)
+##
+## Usage: Built automatically via docker-compose.override.yml
+####
+
+ARG NETBOX_VERSION=latest
+FROM docker.io/netboxcommunity/netbox:${NETBOX_VERSION}
+
+USER root
+
+# Install dev tools: debugpy for remote debugging, watchfiles for granian --reload
+RUN /usr/local/bin/uv pip install --python /opt/netbox/venv/bin/python \
+    debugpy \
+    watchfiles
+
+# Install third-party plugins from requirements file
+COPY plugin-requirements.txt /opt/netbox/plugin-requirements.txt
+RUN if [ -s /opt/netbox/plugin-requirements.txt ]; then \
+        /usr/local/bin/uv pip install --python /opt/netbox/venv/bin/python \
+            -r /opt/netbox/plugin-requirements.txt; \
+    fi
+
+# Make venv site-packages writable by group root (gid 0) so netbox user
+# (which runs as netbox:root) can install editable plugins at startup
+RUN chmod -R g+w /opt/netbox/venv/lib/python*/site-packages/
+
+# Copy the plugin entrypoint that installs local (editable) plugins at startup
+COPY docker/plugin-entrypoint.sh /opt/netbox/plugin-entrypoint.sh
+RUN chmod +x /opt/netbox/plugin-entrypoint.sh
+
+# Copy the dev launch script with reload support
+COPY docker/launch-netbox-dev.sh /opt/netbox/launch-netbox-dev.sh
+RUN chmod +x /opt/netbox/launch-netbox-dev.sh
+
+USER netbox
+
+# The actual entrypoint chain:
+# 1. plugin-entrypoint.sh: installs local plugins (runs as root via sudo-like setup)
+# 2. docker-entrypoint.sh: runs migrations, creates superuser
+# 3. launch-netbox-dev.sh: starts granian with --reload
+ENTRYPOINT [ "/usr/bin/tini", "--" ]
+CMD [ "/opt/netbox/plugin-entrypoint.sh", "/opt/netbox/launch-netbox-dev.sh" ]
