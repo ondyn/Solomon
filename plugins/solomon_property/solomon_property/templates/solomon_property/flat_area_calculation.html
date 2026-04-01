@@ -1,0 +1,114 @@
+{% extends 'generic/_base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Calculate Flat Areas" %}{% endblock %}
+
+{% block control-buttons %}
+  <a href="{% url 'plugins:solomon_property:flat_list' %}" class="btn btn-outline-secondary">
+    <i class="mdi mdi-arrow-left"></i> {% trans "Back to Flats" %}
+  </a>
+{% endblock %}
+
+{% block content %}
+
+{% if not rows %}
+  <div class="alert alert-warning">
+    <i class="mdi mdi-alert"></i>
+    {% trans "No flats with CUZK share data (numerator and denominator) found. Import CUZK data first." %}
+  </div>
+{% else %}
+
+{# ── Info card ────────────────────────────────────────────────────────── #}
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0">
+      <i class="mdi mdi-calculator-variant"></i>
+      {% trans "Area Calculation Preview" %}
+    </h5>
+  </div>
+  <div class="card-body">
+    <p class="mb-1">
+      {% blocktrans with denom=max_denominator %}
+        Largest share denominator in the database: <strong>{{ denom }}</strong>
+      {% endblocktrans %}
+    </p>
+    <p class="text-muted small mb-0">
+      {% trans "Formula: area = max_denominator / denominator * numerator * 10, rounded to 1 decimal place" %}
+    </p>
+  </div>
+</div>
+
+{# ── Preview table ────────────────────────────────────────────────────── #}
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h6 class="mb-0">
+      <i class="mdi mdi-home-floor-a"></i>
+      {% trans "Flats" %}
+      <span class="badge bg-secondary ms-1">{{ rows|length }}</span>
+    </h6>
+    <span class="text-muted small">
+      {% with changes=rows|length %}
+        {% for row in rows %}{% if row.will_change %}{% with n=forloop.counter %}{% endwith %}{% endif %}{% endfor %}
+      {% endwith %}
+      {% trans "Highlighted rows will be updated." %}
+    </span>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover table-sm mb-0">
+      <thead>
+        <tr>
+          <th>{% trans "Flat" %}</th>
+          <th>{% trans "Building" %}</th>
+          <th>{% trans "CUZK Share" %}</th>
+          <th>{% trans "Current Area (m2)" %}</th>
+          <th>{% trans "Calculated Area (m2)" %}</th>
+          <th>{% trans "Change?" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr {% if row.will_change %}class="table-warning"{% endif %}>
+          <td>
+            <a href="{{ row.flat.get_absolute_url }}">{{ row.flat.flat_number }}</a>
+          </td>
+          <td>{{ row.flat.building.name }}</td>
+          <td class="font-monospace">{{ row.share }}</td>
+          <td>
+            {% if row.current_area is not None %}
+              {{ row.current_area }}
+            {% else %}
+              <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+          <td><strong>{{ row.calculated_area }}</strong></td>
+          <td>
+            {% if row.will_change %}
+              <span class="badge bg-warning text-dark">{% trans "Yes" %}</span>
+            {% else %}
+              <span class="badge bg-secondary">{% trans "No change" %}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{# ── Action buttons ───────────────────────────────────────────────────── #}
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="action" value="apply">
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary">
+      <i class="mdi mdi-content-save-all"></i>
+      {% trans "Apply Areas to All Flats" %}
+    </button>
+    <a href="{% url 'plugins:solomon_property:flat_list' %}" class="btn btn-outline-secondary">
+      {% trans "Cancel" %}
+    </a>
+  </div>
+</form>
+
+{% endif %}
+{% endblock %}

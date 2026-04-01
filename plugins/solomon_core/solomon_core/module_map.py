@@ -1,5 +1,5 @@
 """
-Solomon Core — mapping of config keys to NetBox menu labels and URL prefixes.
+Solomon Core - mapping of config keys to NetBox menu labels and URL prefixes.
 
 Each entry maps a solomon_core config key to:
   - menu_labels: the navigation Menu.label values to hide

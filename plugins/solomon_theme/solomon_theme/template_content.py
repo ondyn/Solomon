@@ -29,7 +29,7 @@ class SolomonThemeExtension(PluginTemplateExtension):
 THEME_CSS = """
 <style>
 /* ═══════════════════════════════════════════════════════════════════
-   Solomon Theme — Hardcoded dark Material Design theme
+   Solomon Theme - Hardcoded dark Material Design theme
    ═══════════════════════════════════════════════════════════════════ */
 
 /*
@@ -84,7 +84,14 @@ html[data-bs-theme="dark"] {
   --tblr-bg-surface-inverted:     #e0e0e0;
   --tblr-bg-forms:                #1e1e1e;
   --tblr-secondary-bg:            #1e1e1e;
-  --tblr-tertiary-bg:             #181818;
+  --tblr-tertiary-bg:             #2c2c2c;
+
+  /* Bootstrap 5 uses --bs-tertiary-bg for bg-body-tertiary (default dark: #17212f).
+     Override it to match our Surface alt color. */
+  --bs-secondary-bg:              #1e1e1e;
+  --bs-secondary-bg-rgb:          30, 30, 30;
+  --bs-tertiary-bg:               #2c2c2c;
+  --bs-tertiary-bg-rgb:           44, 44, 44;
 
   /* Text */
   --tblr-emphasis-color:          #ffffff;
@@ -95,6 +102,8 @@ html[data-bs-theme="dark"] {
   /* Primary */
   --tblr-primary:                 #03a9f4 !important;
   --tblr-primary-rgb:             3, 169, 244 !important;
+  --tblr-primary-fg:              #121212;
+  --tblr-btn-active-color:        #121212;
 
   /* Links */
   --tblr-link-color:              #4fc3f7 !important;
@@ -172,7 +181,7 @@ html[data-bs-theme=dark] .navbar-vertical.navbar-expand-lg .dropdown-item:hover 
   background-color: rgba(3, 169, 244, 0.10) !important;
 }
 
-/* Light theme sidebar — also override in case setmode hasn't fired yet */
+/* Light theme sidebar - also override in case setmode hasn't fired yet */
 html[data-bs-theme=light] .navbar-vertical.navbar-expand-lg {
   background: linear-gradient(
     180deg,
@@ -192,8 +201,15 @@ html[data-bs-theme=light] .navbar-vertical.navbar-expand-lg .text-secondary {
 
 /* ── Page background ──
    NetBox sets .page { background-color: var(--tblr-bg-surface-secondary) }
-   which we override via the variable above, but add explicit backup:
+   which we override via the variable above, but add explicit backup.
+   Also override html[data-bs-theme=dark] { background-color: #001423 } on the root.
 */
+html[data-bs-theme=dark],
+html[data-bs-theme=dark] body,
+html[data-bs-theme=light] body {
+  background-color: #121212 !important;
+}
+
 html[data-bs-theme=dark] .page,
 html[data-bs-theme=light] .page {
   background-color: #121212 !important;
@@ -212,8 +228,20 @@ html[data-bs-theme=light] .page {
 }
 
 /* ── Tables ── */
+/* Fix: NetBox hardcodes #001423 for thead th background in dark mode */
+html[data-bs-theme=dark] .table thead th,
+html[data-bs-theme=dark] .markdown > table thead th {
+  background-color: #1e1e1e !important;
+}
+
+/* Fix: object-list-tab (page-tabs nav) active link uses bg-surface-secondary (#081b2a) */
+html[data-bs-theme=dark] .page-tabs .nav-tabs .nav-link.active,
+html[data-bs-theme=dark] .page-tabs .nav-tabs .nav-link:active {
+  background-color: #1e1e1e !important;
+}
+
 html[data-bs-theme=dark] .table > thead {
-  background-color: #2c2c2c;
+  background-color: #1e1e1e;
 }
 
 html[data-bs-theme=dark] .table {
@@ -225,8 +253,10 @@ html[data-bs-theme=dark] .table {
 }
 
 /* ── Cards ── */
+/* NetBox compiled CSS: html[data-bs-theme=dark] .card { background: #001423 !important } */
 html[data-bs-theme=dark] .card {
-  background-color: #1e1e1e;
+  background: #1e1e1e !important;
+  background-color: #1e1e1e !important;
   border-color: #2c2c2c;
 }
 
@@ -242,7 +272,8 @@ html[data-bs-theme=dark] .btn-primary {
   --tblr-btn-hover-bg: #0288d1;
   --tblr-btn-hover-border-color: #0288d1;
   --tblr-btn-active-bg: #0288d1;
-  color: #121212;
+  --tblr-btn-active-color: #121212;
+  color: #121212 !important;
 }
 
 html[data-bs-theme=dark] .btn-outline-primary {
@@ -253,10 +284,31 @@ html[data-bs-theme=dark] .btn-outline-primary {
   --tblr-btn-hover-color: #121212;
 }
 
+/* ── Primary-background text color overrides ──
+   NetBox compiled CSS: html[data-bs-theme=dark] .text-bg-primary,
+   .bg-primary .card-title/a/i { color: #001423 !important }
+   We keep dark text on primary bg, but use #121212 (our dark background).
+*/
+html[data-bs-theme=dark] .text-bg-primary,
+html[data-bs-theme=dark] .bg-primary .card-title,
+html[data-bs-theme=dark] .bg-primary a,
+html[data-bs-theme=dark] .bg-primary i {
+  color: #121212 !important;
+}
+
 /* ── Badges ── */
 html[data-bs-theme=dark] .badge.bg-primary {
   background-color: #03a9f4 !important;
   color: #121212 !important;
+}
+html[data-bs-theme=dark] .badge.bg-secondary {
+  background-color: #424242 !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #616161;
+}
+html[data-bs-theme=dark] .badge.bg-info {
+  background-color: #006064 !important;
+  color: #e0f7fa !important;
 }
 
 /* ── Form controls ── */
@@ -330,11 +382,14 @@ html[data-bs-theme=dark] .list-group-item {
   border-color: #2c2c2c;
   color: #e0e0e0;
 }
-
-/* ── Hide color mode toggle ── */
-.color-mode-toggle {
-  display: none !important;
+html[data-bs-theme=dark] .list-group-item-action:hover,
+html[data-bs-theme=dark] .list-group-item-action:focus {
+  background-color: #2c2c2c !important;
+  color: #4fc3f7 !important;
 }
+
+/* ── Color mode toggle: show it, we support both modes now ── */
+/* .color-mode-toggle is visible (we removed the display:none) */
 
 /* ── Login page ── */
 html[data-bs-theme=dark] .page-center,
@@ -388,6 +443,16 @@ html[data-bs-theme=light] .bg-body {
   background-color: #121212 !important;
 }
 
+/* ── Bootstrap bg-body-tertiary (uses --bs-tertiary-bg, default dark: #17212f) ── */
+html[data-bs-theme=dark] .bg-body-tertiary {
+  background-color: #2c2c2c !important;
+}
+
+/* ── Bootstrap bg-body-secondary (uses --bs-secondary-bg) ── */
+html[data-bs-theme=dark] .bg-body-secondary {
+  background-color: #1e1e1e !important;
+}
+
 /* ── text-bg-light badge ── */
 html[data-bs-theme=dark] .text-bg-light {
   background-color: #2c2c2c !important;
@@ -405,10 +470,12 @@ html[data-bs-theme=dark] .page-link {
   border-color: #2c2c2c;
   color: #4fc3f7;
 }
-html[data-bs-theme=dark] .page-item.active .page-link {
+html[data-bs-theme=dark] .page-item.active .page-link,
+html[data-bs-theme=dark] .page-link.active,
+html[data-bs-theme=dark] .active > .page-link {
   background-color: #03a9f4;
   border-color: #03a9f4;
-  color: #121212;
+  color: #121212 !important;
 }
 html[data-bs-theme=dark] .page-item.disabled .page-link {
   background-color: #1e1e1e;
@@ -457,15 +524,389 @@ html[data-bs-theme=dark] .ts-control {
   border-color: rgba(255, 255, 255, 0.1);
   color: #e0e0e0;
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   LIGHT MODE - full palette mirrored from dark, using light tones
+   Triggered by [data-bs-theme="light"] which NetBox sets on toggle.
+   ══════════════════════════════════════════════════════════════════ */
+
+/*
+ * Solomon Light Palette:
+ *   Background:    #f5f5f5    Surface:       #ffffff
+ *   Surface alt:   #eeeeee    Primary:       #0288d1
+ *   Primary light: #03a9f4    Primary dark:  #01579b
+ *   On surface:    #212121    On surface dim:#616161
+ *   Error:         #c62828    Success:       #2e7d32
+ *   Warning:       #e65100
+ */
+
+html[data-bs-theme="light"] {
+  color-scheme: light !important;
+}
+
+[data-bs-theme="light"] {
+  /* Tabler gray scale → light palette */
+  --tblr-gray-50:   #eeeeee;
+  --tblr-gray-100:  #212121;
+  --tblr-gray-200:  #212121;
+  --tblr-gray-300:  #424242;
+  --tblr-gray-400:  #616161;
+  --tblr-gray-500:  #757575;
+  --tblr-gray-600:  #9e9e9e;
+  --tblr-gray-700:  #eeeeee;
+  --tblr-gray-800:  #ffffff;
+  --tblr-gray-900:  #f5f5f5;
+  --tblr-gray-900-rgb: 245, 245, 245;
+
+  /* Body */
+  --tblr-body-bg:                 #f5f5f5 !important;
+  --tblr-body-bg-rgb:             245, 245, 245;
+  --tblr-body-color:              #212121 !important;
+  --tblr-body-color-rgb:          33, 33, 33;
+
+  /* Surfaces */
+  --tblr-bg-surface:              #ffffff !important;
+  --tblr-bg-surface-secondary:    #f5f5f5 !important;
+  --tblr-bg-surface-tertiary:     #eeeeee !important;
+  --tblr-bg-surface-inverted:     #212121;
+  --tblr-bg-forms:                #ffffff;
+  --tblr-secondary-bg:            #ffffff;
+  --tblr-tertiary-bg:             #eeeeee;
+
+  /* Bootstrap 5 --bs-tertiary-bg for bg-body-tertiary */
+  --bs-secondary-bg:              #f5f5f5;
+  --bs-secondary-bg-rgb:          245, 245, 245;
+  --bs-tertiary-bg:               #eeeeee;
+  --bs-tertiary-bg-rgb:           238, 238, 238;
+
+  /* Text */
+  --tblr-emphasis-color:          #000000;
+  --tblr-secondary-color:         rgba(33, 33, 33, 0.65);
+  --tblr-muted:                   #757575;
+  --tblr-heading-color:           inherit;
+
+  /* Primary */
+  --tblr-primary:                 #0288d1 !important;
+  --tblr-primary-rgb:             2, 136, 209 !important;
+
+  /* Links */
+  --tblr-link-color:              #0288d1 !important;
+  --tblr-link-hover-color:        #01579b !important;
+  --tblr-link-color-rgb:          2, 136, 209;
+  --tblr-link-hover-color-rgb:    1, 87, 155;
+
+  /* Borders */
+  --tblr-border-color:            #e0e0e0 !important;
+  --tblr-border-color-translucent: rgba(0, 0, 0, 0.1);
+  --tblr-border-dark-color:       #bdbdbd;
+
+  /* Cards */
+  --tblr-card-bg:                 #ffffff;
+  --tblr-card-cap-bg:             #f5f5f5;
+
+  /* Status */
+  --tblr-danger:                  #c62828;
+  --tblr-success:                 #2e7d32;
+  --tblr-warning:                 #e65100;
+  --tblr-info:                    #0288d1;
+
+  /* Navbar */
+  --tblr-navbar-bg:               #ffffff;
+  --tblr-navbar-active-bg:        rgba(2, 136, 209, 0.10);
+  --tblr-navbar-active-border-color: #0288d1;
+  --tblr-navbar-border-color:     #e0e0e0;
+
+  /* Active/hover bg */
+  --tblr-active-bg:               #eeeeee;
+
+  /* Code */
+  --tblr-code-color:              #0288d1;
+  --tblr-highlight-bg:            rgba(2, 136, 209, 0.12);
+}
+
+/* ── Light: body + page backgrounds ── */
+html[data-bs-theme="light"] body,
+html[data-bs-theme="light"] .page {
+  background-color: #f5f5f5 !important;
+}
+
+/* ── Light: page-header + top navbar ── */
+html[data-bs-theme="light"] .page-header {
+  background-color: #ffffff !important;
+}
+html[data-bs-theme="light"] .navbar {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+/* ── Light: sidebar ── */
+html[data-bs-theme="light"] .navbar-vertical.navbar-expand-lg {
+  background: linear-gradient(
+    180deg,
+    rgba(2, 136, 209, 0.00) 0%,
+    rgba(2, 136, 209, 0.07) 100%
+  ), #ffffff !important;
+  border-right: 1px solid #e0e0e0 !important;
+}
+html[data-bs-theme="light"] .navbar-vertical.navbar-expand-lg .nav-link-title,
+html[data-bs-theme="light"] .navbar-vertical.navbar-expand-lg .nav-link-icon {
+  color: #212121 !important;
+}
+html[data-bs-theme="light"] .navbar-vertical.navbar-expand-lg .text-secondary {
+  color: #0288d1 !important;
+}
+html[data-bs-theme="light"] .navbar-vertical.navbar-expand-lg .nav-item.dropdown.active::after {
+  border-color: #0288d1 !important;
+}
+html[data-bs-theme="light"] .navbar-vertical.navbar-expand-lg .dropdown-item a {
+  color: #212121 !important;
+}
+html[data-bs-theme="light"] .navbar-vertical.navbar-expand-lg .dropdown-item.active,
+html[data-bs-theme="light"] .navbar-vertical.navbar-expand-lg .dropdown-item:hover {
+  background-color: rgba(2, 136, 209, 0.08) !important;
+}
+
+/* ── Light: cards ── */
+html[data-bs-theme="light"] .card {
+  background-color: #ffffff;
+  border-color: #e0e0e0;
+}
+html[data-bs-theme="light"] .card-header {
+  background-color: #f5f5f5;
+  border-bottom-color: #e0e0e0;
+}
+
+/* ── Light: tables ── */
+html[data-bs-theme="light"] .table thead th,
+html[data-bs-theme="light"] .markdown > table thead th {
+  background-color: #eeeeee !important;
+  color: #616161;
+}
+html[data-bs-theme="light"] .table {
+  --tblr-table-bg:           #ffffff;
+  --tblr-table-striped-bg:   #fafafa;
+  --tblr-table-hover-bg:     #f5f5f5;
+  --tblr-table-border-color: #e0e0e0;
+  color: #212121;
+}
+
+/* ── Light: page-tabs ── */
+html[data-bs-theme="light"] .page-tabs .nav-tabs .nav-link.active,
+html[data-bs-theme="light"] .page-tabs .nav-tabs .nav-link:active {
+  background-color: #ffffff !important;
+}
+
+/* ── Light: form controls ── */
+html[data-bs-theme="light"] .form-control,
+html[data-bs-theme="light"] .form-select {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #212121;
+}
+html[data-bs-theme="light"] .form-control:focus,
+html[data-bs-theme="light"] .form-select:focus {
+  border-color: #0288d1;
+  box-shadow: 0 0 0 0.25rem rgba(2, 136, 209, 0.25);
+}
+
+/* ── Light: buttons ── */
+html[data-bs-theme="light"] .btn-primary {
+  --tblr-btn-bg: #0288d1;
+  --tblr-btn-border-color: #0288d1;
+  --tblr-btn-hover-bg: #01579b;
+  --tblr-btn-hover-border-color: #01579b;
+  color: #ffffff;
+}
+html[data-bs-theme="light"] .btn-outline-primary {
+  --tblr-btn-color: #0288d1;
+  --tblr-btn-border-color: #0288d1;
+  --tblr-btn-hover-bg: #0288d1;
+  --tblr-btn-hover-color: #ffffff;
+}
+
+/* ── Light: pagination ── */
+html[data-bs-theme="light"] .page-link {
+  background-color: #ffffff;
+  border-color: #e0e0e0;
+  color: #0288d1;
+}
+html[data-bs-theme="light"] .page-item.active .page-link {
+  background-color: #0288d1;
+  border-color: #0288d1;
+  color: #ffffff;
+}
+
+/* ── Light: nav-tabs ── */
+html[data-bs-theme="light"] .nav-tabs .nav-link.active {
+  background-color: #ffffff;
+  border-color: #e0e0e0 #e0e0e0 #ffffff;
+  color: #212121;
+}
+html[data-bs-theme="light"] .nav-tabs .nav-link {
+  color: #757575;
+}
+html[data-bs-theme="light"] .nav-tabs .nav-link:hover {
+  color: #0288d1;
+}
+
+/* ── Light: dropdown menus ── */
+html[data-bs-theme="light"] .dropdown-menu {
+  background-color: #ffffff;
+  border-color: #e0e0e0;
+}
+html[data-bs-theme="light"] .dropdown-item:hover,
+html[data-bs-theme="light"] .dropdown-item:focus {
+  background-color: #f5f5f5;
+  color: #212121;
+}
+
+/* ── Light: list groups ── */
+html[data-bs-theme="light"] .list-group-item {
+  background-color: #ffffff;
+  border-color: #e0e0e0;
+  color: #212121;
+}
+html[data-bs-theme="light"] .list-group-item-action:hover,
+html[data-bs-theme="light"] .list-group-item-action:focus {
+  background-color: #e3f2fd !important;
+  color: #0288d1 !important;
+}
+
+/* ── Light: badges ── */
+html[data-bs-theme="light"] .badge.bg-primary {
+  background-color: #0288d1 !important;
+  color: #ffffff !important;
+}
+html[data-bs-theme="light"] .badge.bg-secondary {
+  background-color: #e0e0e0 !important;
+  color: #424242 !important;
+}
+html[data-bs-theme="light"] .badge.bg-info {
+  background-color: #006064 !important;
+  color: #e0f7fa !important;
+}
+
+/* ── Light: modals ── */
+html[data-bs-theme="light"] .modal-content {
+  background-color: #ffffff;
+  border-color: #e0e0e0;
+}
+
+/* ── Light: tom-select ── */
+html[data-bs-theme="light"] .ts-dropdown {
+  background-color: #ffffff;
+  border-color: #e0e0e0;
+}
+html[data-bs-theme="light"] .ts-dropdown .active {
+  background-color: rgba(2, 136, 209, 0.10);
+  color: #0288d1;
+}
+html[data-bs-theme="light"] .ts-control {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #212121;
+}
+
+/* ── Light: breadcrumbs ── */
+html[data-bs-theme="light"] .breadcrumb-item a {
+  color: #0288d1;
+}
+html[data-bs-theme="light"] .breadcrumb-item.active {
+  color: #757575;
+}
+
+/* ── Light: alerts ── */
+html[data-bs-theme="light"] .alert-danger {
+  --tblr-alert-bg: rgba(198, 40, 40, 0.10);
+  --tblr-alert-color: #c62828;
+  --tblr-alert-border-color: rgba(198, 40, 40, 0.3);
+}
+html[data-bs-theme="light"] .alert-success {
+  --tblr-alert-bg: rgba(46, 125, 50, 0.10);
+  --tblr-alert-color: #2e7d32;
+  --tblr-alert-border-color: rgba(46, 125, 50, 0.3);
+}
+html[data-bs-theme="light"] .alert-warning {
+  --tblr-alert-bg: rgba(230, 81, 0, 0.10);
+  --tblr-alert-color: #e65100;
+  --tblr-alert-border-color: rgba(230, 81, 0, 0.3);
+}
+
+/* ── Light: offcanvas ── */
+html[data-bs-theme="light"] .offcanvas {
+  background-color: #ffffff !important;
+}
+
+/* ── Light: bg-light / bg-white utility overrides ── */
+html[data-bs-theme="light"] .bg-light {
+  background-color: #eeeeee !important;
+}
+html[data-bs-theme="light"] .bg-white {
+  background-color: #ffffff !important;
+}
+html[data-bs-theme="light"] .bg-body {
+  background-color: #f5f5f5 !important;
+}
+
+/* ── Light: login page ── */
+html[data-bs-theme="light"] .page-center {
+  background-color: #f5f5f5 !important;
+}
+html[data-bs-theme="light"] .page-center .card {
+  background-color: #ffffff !important;
+  border-color: #e0e0e0 !important;
+}
+html[data-bs-theme="light"] .page-center .card .card-body {
+  background-color: #ffffff !important;
+}
+
+/* ── Light: scrollbar ── */
+html[data-bs-theme="light"] ::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+html[data-bs-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #bdbdbd;
+}
+html[data-bs-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #757575;
+}
+
+/* ── Footer links: hide commercial / cloud / community sections ── */
+/* JS in DOMContentLoaded handles hiding individual links.
+   CSS provides a safety net for known external link patterns. */
+.footer a[href*="netboxlabs.com"],
+.footer a[href*="netdev.chat"] {
+  display: none !important;
+}
+/* Hide the <li> wrapping the hidden link */
+.footer li:has(a[href*="netboxlabs.com"]),
+.footer li:has(a[href*="netdev.chat"]),
+.footer li:has(a[href*="github.com/netbox-community"]) {
+  display: none !important;
+}
+/* Hide "Get Cloud / Get Enterprise" text in sidebar */
+.navbar-collapse a[href*="netboxlabs.com/netbox-cloud"],
+.navbar-collapse a[href*="netboxlabs.com/netbox-enterprise"] {
+  display: none !important;
+}
+
 /* ── Logo alt-text: override NetBox alt to Solomon ── */
 /* (Actual SVG files are replaced at the static root level by the entrypoint) */
 </style>
 
 <script>
-/* Force dark mode — runs early in <head> before paint */
+/* Solomon theme init - runs early in <head> before paint.
+ * Respects user preference stored in localStorage.
+ * Default: dark mode.
+ */
 (function() {
-  localStorage.setItem("netbox-color-mode", "dark");
-  document.documentElement.setAttribute("data-bs-theme", "dark");
+  var stored = localStorage.getItem("netbox-color-mode");
+  var mode = (stored === "light") ? "light" : "dark";
+  if (!stored) {
+    localStorage.setItem("netbox-color-mode", "dark");
+  }
+  document.documentElement.setAttribute("data-bs-theme", mode);
+  document.documentElement.style.colorScheme = mode;
 })();
 </script>
 
@@ -480,7 +921,8 @@ html[data-bs-theme=dark] .ts-control {
  *   - Edition label ("NetBox" → "Solomon")
  *   - Page title
  *   - Favicon <link> tag (point to SVG)
- *   - Hide duplicate light/dark logo (we force dark mode)
+ *   - Hide duplicate light/dark logo
+ *   - Hide commercial footer links
  */
 document.addEventListener("DOMContentLoaded", function() {
   var LOGO_LOGIN = "/static/solomon_theme/img/logo_login.svg";
@@ -496,7 +938,7 @@ document.addEventListener("DOMContentLoaded", function() {
     img.src = LOGO_LOGIN;
   });
 
-  /* Hide duplicate logos in navbar (light/dark pairs) — keep only the first */
+  /* Hide duplicate logos in navbar (light/dark pairs) - keep only the first */
   var navBrand = document.querySelector(".navbar-brand");
   if (navBrand) {
     var imgs = navBrand.querySelectorAll("img");
@@ -505,7 +947,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  /* Hide duplicate logos on login page (light/dark pairs) — keep only the first */
+  /* Hide duplicate logos on login page (light/dark pairs) - keep only the first */
   document.querySelectorAll(".page-center .text-center").forEach(function(container) {
     var imgs = container.querySelectorAll("img.logo, img.hide-theme-dark, img.hide-theme-light");
     for (var i = 1; i < imgs.length; i++) {
@@ -536,6 +978,46 @@ document.addEventListener("DOMContentLoaded", function() {
   if (document.title.indexOf("NetBox") !== -1) {
     document.title = document.title.replace(/NetBox/g, "Solomon");
   }
+
+  /* ── Hide commercial footer links ── */
+  /* Hide all anchors in .footer pointing to NetBox commercial/community sites */
+  var footerLinkHrefs = [
+    "netboxlabs.com",
+    "netbox.dev",
+    "netdev.chat",
+    "github.com/netbox-community",
+    "mailto:support@netboxlabs.com",
+  ];
+  var footerLinks = document.querySelectorAll(".footer a");
+  footerLinks.forEach(function(anchor) {
+    var href = anchor.getAttribute("href") || "";
+    var matched = footerLinkHrefs.some(function(pattern) {
+      return href.indexOf(pattern) !== -1;
+    });
+    if (matched) {
+      /* Walk up to <li> container and hide it */
+      var li = anchor.closest("li");
+      if (li) {
+        li.style.display = "none";
+      } else {
+        anchor.style.display = "none";
+      }
+    }
+  });
+
+  /* ── Hide "Get Cloud | Get Enterprise" in the sidebar ── */
+  /* This is in .collapse.navbar-collapse > div.text-muted.text-center */
+  var sidebarLinks = document.querySelectorAll(".navbar-collapse .text-muted a");
+  sidebarLinks.forEach(function(anchor) {
+    var href = anchor.getAttribute("href") || "";
+    if (href.indexOf("netboxlabs.com") !== -1) {
+      /* Hide the entire parent div (contains both links + the pipe) */
+      var parentDiv = anchor.closest("div");
+      if (parentDiv) {
+        parentDiv.style.display = "none";
+      }
+    }
+  });
 });
 </script>
 """

@@ -6,7 +6,7 @@ Solomon is a **facility management system** for managing apartment buildings und
 
 ## Reference-Only Directories
 
-- **`./netbox/`** and **`./netbox-docker/`** are reference directories only — used for understanding NetBox internals, API definitions, and containerization examples.
+- **`./netbox/`** and **`./netbox-docker/`** are reference directories only - used for understanding NetBox internals, API definitions, and containerization examples.
 - **Never import, reference, or include files from `./netbox/` or `./netbox-docker/` in Solomon application code, Docker configs, or any project files.**
 - Solomon's own Docker/configuration files live at the project root (e.g., `docker-compose.yml`, `docker/`).
 
@@ -16,3 +16,7 @@ Solomon is a **facility management system** for managing apartment buildings und
 - **Never use `python3 -c "long code"`** or `python -c "..."` with multi-line code in terminal - use a temporary script file instead
 - When you need to run multi-line Python: create a `.py` file, run it, then delete it
 - Keep terminal commands short and single-line; chain with `&&` if needed
+
+## Code Style Rules
+
+- **Never use em dashes (`—`) anywhere in code** - use a plain hyphen (`-`) instead, in comments, docstrings, strings, and templates

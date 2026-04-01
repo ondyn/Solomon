@@ -1,0 +1,230 @@
+{% extends 'generic/_base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Import Contacts from Google CSV" %}{% endblock %}
+
+{% block content %}
+
+{% if preview %}
+{# -- Preview mode: show matched contacts -------------------------------- #}
+<div class="card mb-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">
+      <i class="mdi mdi-eye"></i>
+      {% trans "Preview" %} -
+      <span class="badge text-bg-success">{{ matched_count }} {% trans "matched" %}</span>
+      {% if ambiguous_count %}
+        <span class="badge text-bg-warning">{{ ambiguous_count }} {% trans "ambiguous" %}</span>
+      {% endif %}
+      <span class="text-muted small">{% trans "of" %} {{ total_with_data }} {% trans "contacts with data" %} ({{ total_rows }} {% trans "total" %})</span>
+    </h5>
+  </div>
+  <div class="card-body p-0">
+    <form method="post" id="import-form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="import" />
+
+      {# Merge mode selector #}
+      <div class="px-3 py-2 bg-body-tertiary border-bottom d-flex align-items-center gap-3">
+        <span class="fw-semibold">{% trans "Merge mode" %}:</span>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="merge_mode" id="mode_append" value="append" checked>
+          <label class="form-check-label" for="mode_append">
+            {% trans "Append (add new emails/phones, keep existing)" %}
+          </label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="merge_mode" id="mode_replace" value="replace">
+          <label class="form-check-label" for="mode_replace">
+            {% trans "Replace (overwrite existing emails/phones)" %}
+          </label>
+        </div>
+      </div>
+
+      {# Select all #}
+      <div class="px-3 py-2 border-bottom">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="select-all" checked>
+          <label class="form-check-label fw-semibold" for="select-all">
+            {% trans "Select / deselect all" %}
+          </label>
+        </div>
+      </div>
+
+      <table class="table table-hover table-sm mb-0">
+        <thead>
+          <tr>
+            <th style="width:40px;">
+              <i class="mdi mdi-checkbox-marked-outline"></i>
+            </th>
+            <th>{% trans "CSV Name" %}</th>
+            <th>{% trans "Match" %}</th>
+            <th>{% trans "Matched Person" %}</th>
+            <th>{% trans "Emails (CSV)" %}</th>
+            <th>{% trans "Phones (CSV)" %}</th>
+            <th>{% trans "Current Emails" %}</th>
+            <th>{% trans "Current Phones" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          <tr class="{% if row.match_status == 'ambiguous' %}table-warning{% endif %}">
+            <td>
+              {% if row.match_status == 'matched' %}
+                <input type="checkbox" class="form-check-input row-select" name="select_{{ row.list_index }}" value="1" checked>
+              {% elif row.match_status == 'ambiguous' %}
+                <input type="checkbox" class="form-check-input row-select" name="select_{{ row.list_index }}" value="1">
+              {% else %}
+                <span class="text-muted">-</span>
+              {% endif %}
+            </td>
+            <td>
+              <strong>{{ row.display_name }}</strong>
+              {% if row.organization %}
+                <br><small class="text-muted">{{ row.organization }}</small>
+              {% endif %}
+            </td>
+            <td>
+              {% if row.match_status == 'matched' %}
+                <span class="badge text-bg-success">{% trans "Matched" %}</span>
+                {% if row.match_note == 'fuzzy' %}
+                  <br><small class="text-muted">{% trans "fuzzy" %}</small>
+                {% endif %}
+              {% elif row.match_status == 'ambiguous' %}
+                <span class="badge text-bg-warning">{% trans "Ambiguous" %}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if row.match_status == 'matched' %}
+                <a href="{{ row.matched_person.get_absolute_url }}">
+                  {{ row.matched_person }}
+                </a>
+              {% elif row.match_status == 'ambiguous' %}
+                <select name="person_{{ row.list_index }}" class="form-select form-select-sm">
+                  <option value="">-- {% trans "Select person" %} --</option>
+                  {% for c in row.candidates %}
+                    <option value="{{ c.pk }}">{{ c }} ({{ c.permanent_address|truncatechars:30 }})</option>
+                  {% endfor %}
+                </select>
+              {% endif %}
+            </td>
+            <td class="small">
+              {% for e in row.emails %}
+                <div>{{ e }}</div>
+              {% empty %}
+                <span class="text-muted">-</span>
+              {% endfor %}
+            </td>
+            <td class="small">
+              {% for p in row.phones %}
+                <div>{{ p }}</div>
+              {% empty %}
+                <span class="text-muted">-</span>
+              {% endfor %}
+            </td>
+            <td class="small">
+              {% if row.matched_person %}
+                {% for e in row.matched_person.emails %}
+                  <div>{{ e }}</div>
+                {% empty %}
+                  <span class="text-muted">-</span>
+                {% endfor %}
+              {% endif %}
+            </td>
+            <td class="small">
+              {% if row.matched_person %}
+                {% for p in row.matched_person.phones %}
+                  <div>{{ p }}</div>
+                {% empty %}
+                  <span class="text-muted">-</span>
+                {% endfor %}
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="card-footer d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="mdi mdi-database-import"></i> {% trans "Import Selected" %}
+        </button>
+        <button type="submit" name="action" value="cancel" class="btn btn-outline-secondary">
+          {% trans "Cancel" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.row-select');
+
+    selectAll.addEventListener('change', function() {
+      checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    });
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', function() {
+        selectAll.checked = [...checkboxes].every(c => c.checked);
+      });
+    });
+  });
+</script>
+
+{% else %}
+{# -- Upload mode: file input -------------------------------------------- #}
+<div class="row">
+  <div class="col-md-8 col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="mdi mdi-file-upload"></i>
+          {% trans "Upload Google Contacts CSV" %}
+        </h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted">
+          {% trans "Export your contacts from Google Contacts as CSV, then upload the file here. Contacts will be matched to existing persons by first and last name." %}
+        </p>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="upload" />
+          <div class="mb-3">
+            <label for="csv_file" class="form-label">{% trans "CSV File" %}</label>
+            <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="mdi mdi-magnify"></i> {% trans "Parse & Preview" %}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="mdi mdi-information"></i>
+          {% trans "How it works" %}
+        </h5>
+      </div>
+      <div class="card-body">
+        <ol>
+          <li>{% trans "Go to Google Contacts and export as Google CSV" %}</li>
+          <li>{% trans "Upload the CSV file here" %}</li>
+          <li>{% trans "Review matched contacts in the preview" %}</li>
+          <li>{% trans "Select which contacts to import and click Import" %}</li>
+        </ol>
+        <p class="text-muted small mb-0">
+          {% trans "Only emails and phone numbers will be imported for persons that already exist in the system. Matching is done by first and last name." %}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

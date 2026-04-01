@@ -1,9 +1,8 @@
 ####
-## Solomon Theme Plugin
+## Solomon Property Plugin
 ##
-## A NetBox plugin that applies a hardcoded dark Material Design theme
-## using the Solomon color palette. No UI - the theme is baked in.
-## Located in ./plugins/solomon_theme/
+## Property inventory management: Buildings, Flats, Persons, Owners, Tenants.
+## NetBox plugin for the Solomon facility management system.
 ####
 
 [build-system]
@@ -11,9 +10,9 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "solomon-theme"
+name = "solomon-property"
 version = "0.1.0"
-description = "Hardcoded dark Material Design theme for Solomon / NetBox"
+description = "Solomon property inventory plugin - buildings, flats, persons, owners, tenants"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
@@ -25,4 +24,4 @@ authors = [
 Homepage = "https://github.com/ondyn/Solomon"
 
 [tool.setuptools.packages.find]
-include = ["solomon_theme*"]
+include = ["solomon_property*"]

@@ -36,7 +36,7 @@ class SolomonCoreConfig(PluginConfig):
 
     def ready(self):
         super().ready()
-        from . import patches  # noqa: F401 — apply monkey-patches on startup
+        from . import patches  # noqa: F401 - apply monkey-patches on startup
 
 
 config = SolomonCoreConfig

@@ -1,0 +1,178 @@
+{% extends 'generic/_base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Export Contacts to Google CSV" %}{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="mdi mdi-export"></i>
+          {% trans "Export Contacts to Google CSV" %}
+        </h5>
+      </div>
+      <div class="card-body">
+
+        <p class="text-muted">
+          {% trans "Select which persons to include in the exported CSV file. You can combine multiple options." %}
+          {% trans "Ownership and tenancy details will be included in the Notes field of each contact." %}
+        </p>
+
+        <form method="post">
+          {% csrf_token %}
+
+          {# ── Building filter ──────────────────────────────────────────── #}
+          <div class="mb-4">
+            <label class="form-label fw-semibold">
+              <i class="mdi mdi-office-building"></i>
+              {% trans "Filter by building" %}
+              <span class="text-muted fw-normal small">({% trans "leave empty to include all buildings" %})</span>
+            </label>
+            <div class="border rounded p-3 bg-body-tertiary">
+              {% if buildings %}
+                <div class="row row-cols-1 row-cols-md-2 g-2">
+                  {% for building in buildings %}
+                  <div class="col">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input building-check"
+                        type="checkbox"
+                        name="buildings"
+                        value="{{ building.pk }}"
+                        id="building_{{ building.pk }}"
+                        {% if building.pk|stringformat:"s" in selected_buildings %}checked{% endif %}
+                      >
+                      <label class="form-check-label" for="building_{{ building.pk }}">
+                        {{ building.name }}
+                        <span class="text-muted small">{{ building.street }} {{ building.house_number }}</span>
+                      </label>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+                <div class="mt-2">
+                  <a href="#" class="small me-3" id="select-all-buildings">{% trans "Select all" %}</a>
+                  <a href="#" class="small" id="deselect-all-buildings">{% trans "Deselect all" %}</a>
+                </div>
+              {% else %}
+                <p class="text-muted mb-0">{% trans "No buildings found." %}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          {# ── Role filter ──────────────────────────────────────────────── #}
+          <div class="mb-4">
+            <label class="form-label fw-semibold">
+              <i class="mdi mdi-account-group"></i>
+              {% trans "Include persons by role" %}
+              <span class="text-danger">*</span>
+            </label>
+            <div class="border rounded p-3 bg-body-tertiary">
+              <div class="form-check mb-2">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="include_owners"
+                  id="include_owners"
+                  value="1"
+                  {% if include_owners %}checked{% endif %}
+                >
+                <label class="form-check-label" for="include_owners">
+                  <i class="mdi mdi-home-account text-primary"></i>
+                  {% trans "Persons with ownership" %}
+                  <span class="text-muted small">{% trans "- linked to a flat as owners (via PropertyOwner)" %}</span>
+                </label>
+              </div>
+              <div class="form-check mb-2">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="include_tenants"
+                  id="include_tenants"
+                  value="1"
+                  {% if include_tenants %}checked{% endif %}
+                >
+                <label class="form-check-label" for="include_tenants">
+                  <i class="mdi mdi-home-city text-success"></i>
+                  {% trans "Persons with tenancy" %}
+                  <span class="text-muted small">{% trans "- linked to a flat as tenants" %}</span>
+                </label>
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="include_others"
+                  id="include_others"
+                  value="1"
+                  {% if include_others %}checked{% endif %}
+                >
+                <label class="form-check-label" for="include_others">
+                  <i class="mdi mdi-account text-secondary"></i>
+                  {% trans "Other persons" %}
+                  <span class="text-muted small">{% trans "- not linked to any flat (standalone contacts)" %}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {# ── Info box ─────────────────────────────────────────────────── #}
+          <div class="alert alert-info d-flex gap-2 align-items-start">
+            <i class="mdi mdi-information-outline mt-1"></i>
+            <div>
+              <strong>{% trans "About the export" %}</strong><br>
+              {% trans "The downloaded file is a Google Contacts CSV. You can import it directly into Google Contacts." %}
+              {% trans "Each contact's Notes field will contain their ownership/tenancy details (building and flat number)." %}
+              {% trans "If a building filter is selected, only persons linked to those buildings are exported." %}
+            </div>
+          </div>
+
+          {# ── Actions ──────────────────────────────────────────────────── #}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="mdi mdi-download"></i>
+              {% trans "Download CSV" %}
+            </button>
+            <a href="{% url 'plugins:solomon_property:person_list' %}" class="btn btn-outline-secondary">
+              {% trans "Cancel" %}
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script>
+(function () {
+  // Building select/deselect all
+  var allBuildings = document.querySelectorAll('.building-check');
+
+  var selectAll = document.getElementById('select-all-buildings');
+  if (selectAll) {
+    selectAll.addEventListener('click', function (e) {
+      e.preventDefault();
+      allBuildings.forEach(function (cb) { cb.checked = true; });
+    });
+  }
+
+  var deselectAll = document.getElementById('deselect-all-buildings');
+  if (deselectAll) {
+    deselectAll.addEventListener('click', function (e) {
+      e.preventDefault();
+      allBuildings.forEach(function (cb) { cb.checked = false; });
+    });
+  }
+})();
+</script>
+{% endblock %}

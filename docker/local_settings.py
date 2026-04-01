@@ -11,7 +11,16 @@
 ## Use only for settings that cannot be set through official config.
 ####
 
-## ─── Disable migrations for unused NetBox modules ─────────────────────────
+## ─── Test runner ──────────────────────────────────────────────────────────────
+## Custom test runner that pre-creates users_ownergroup / users_owner tables in
+## the test DB before Django syncs unmigrated apps (circuits, dcim …).
+## Required because NetBox v4.3 added users.Owner as a migrated model while
+## unmigrated apps still have FK references to it, causing a sync ordering issue.
+import sys as _sys
+if "test" in _sys.argv:
+    TEST_RUNNER = "solomon_property.tests.runner.SolomonTestRunner"
+
+
 ## These apps remain in INSTALLED_APPS (runtime imports work) but their
 ## database tables will NOT be created.
 ##

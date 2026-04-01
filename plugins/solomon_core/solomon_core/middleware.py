@@ -1,5 +1,5 @@
 """
-Solomon Core — middleware to block URL routes for disabled modules.
+Solomon Core - middleware to block URL routes for disabled modules.
 
 Returns HTTP 404 for any request whose path matches a blocked prefix.
 This effectively hides disabled modules from both the UI and API.

@@ -1,0 +1,178 @@
+{% extends 'generic/_base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "CUZK Import - Search" %}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 col-lg-6">
+
+    {# ── Search by CUZK Building ID ───────────────────────────────────── #}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="mdi mdi-identifier"></i> {% trans "Import by CUZK Building ID" %}</h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted small">
+          {% trans "Enter the numeric ID of the stavba from the CUZK cadastral register (e.g. 940255101)." %}
+        </p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="input-group">
+            <input
+              type="number"
+              name="cuzk_building_id"
+              class="form-control"
+              placeholder="{% trans "CUZK building ID" %}"
+              required
+              autofocus
+            />
+            <button class="btn btn-primary" type="submit">
+              <i class="mdi mdi-cloud-download"></i> {% trans "Load from CUZK" %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {# ── Search by Address (autocomplete) ─────────────────────────────── #}
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="mdi mdi-map-search"></i> {% trans "Search by Address" %}</h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted small">
+          {% trans "Type a city part / district name to autocomplete, then enter the house number (číslo popisné)." %}
+        </p>
+
+        <div class="mb-3">
+          <label class="form-label">{% trans "City part (část obce)" %}</label>
+          <input
+            type="text"
+            id="city-part-search"
+            class="form-control"
+            placeholder="{% trans "Start typing, e.g. Chodov…" %}"
+            autocomplete="off"
+          />
+          <input type="hidden" id="city-part-code" />
+          <div id="city-part-results" class="list-group mt-1" style="display:none; position:absolute; z-index:1000; width:100%"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{% trans "House number (číslo popisné)" %}</label>
+          <input type="number" id="house-number" class="form-control" placeholder="1937" />
+        </div>
+
+        <button id="address-search-btn" class="btn btn-outline-primary">
+          <i class="mdi mdi-magnify"></i> {% trans "Search CUZK" %}
+        </button>
+
+        <div id="address-results" class="mt-3" style="display:none">
+          <h6>{% trans "Results" %}</h6>
+          <div id="address-results-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const cityPartUrl = "{% url 'plugins:solomon_property:cuzk-citypart-autocomplete' %}";
+const addressSearchUrl = "{% url 'plugins:solomon_property:cuzk-address-search' %}";
+const previewUrl = "{% url 'plugins:solomon_property:cuzk-import-preview' %}";
+const csrfToken = "{{ csrf_token }}";
+
+// ── City part autocomplete ────────────────────────────────────────────────
+const cityPartInput = document.getElementById('city-part-search');
+const cityPartCode = document.getElementById('city-part-code');
+const cityPartResults = document.getElementById('city-part-results');
+
+let autocompleteTimer = null;
+cityPartInput.addEventListener('input', () => {
+  clearTimeout(autocompleteTimer);
+  const q = cityPartInput.value.trim();
+  if (q.length < 2) { cityPartResults.style.display = 'none'; return; }
+  autocompleteTimer = setTimeout(() => {
+    fetch(`${cityPartUrl}?q=${encodeURIComponent(q)}`)
+      .then(r => r.json())
+      .then(data => {
+        cityPartResults.innerHTML = '';
+        if (!data.length) { cityPartResults.style.display = 'none'; return; }
+        data.forEach(item => {
+          const a = document.createElement('a');
+          a.href = '#';
+          a.className = 'list-group-item list-group-item-action';
+          let label = item.name;
+          if (item.municipality) label += ` - ${item.municipality}`;
+          if (item.district && item.district !== item.municipality) label += ` (${item.district})`;
+          a.textContent = label;
+          a.addEventListener('click', e => {
+            e.preventDefault();
+            cityPartInput.value = label;
+            cityPartCode.value = item.code;
+            cityPartResults.style.display = 'none';
+          });
+          cityPartResults.appendChild(a);
+        });
+        cityPartResults.style.display = 'block';
+      });
+  }, 300);
+});
+document.addEventListener('click', e => {
+  if (!cityPartResults.contains(e.target) && e.target !== cityPartInput) {
+    cityPartResults.style.display = 'none';
+  }
+});
+
+// ── Address search → load building + redirect to preview ─────────────────
+document.getElementById('address-search-btn').addEventListener('click', () => {
+  const code = cityPartCode.value;
+  const hn = document.getElementById('house-number').value;
+  if (!code || !hn) {
+    alert("{% trans "Please select a city part and enter a house number." %}");
+    return;
+  }
+  const body = new FormData();
+  body.append('city_part_code', code);
+  body.append('house_number', hn);
+  body.append('csrfmiddlewaretoken', csrfToken);
+
+  fetch(addressSearchUrl, { method: 'POST', body })
+    .then(r => r.json())
+    .then(data => {
+      const list = document.getElementById('address-results-list');
+      list.innerHTML = '';
+      if (!data.length) {
+        list.innerHTML = '<p class="text-warning">{% trans "No buildings found." %}</p>';
+        document.getElementById('address-results').style.display = 'block';
+        return;
+      }
+      data.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-sm btn-outline-primary me-2 mb-2';
+        btn.textContent = `ID ${item.id} - ${item.city_part_name} ${item.house_numbers.join('/')} (${item.unit_count} units)`;
+        btn.addEventListener('click', () => {
+          // Submit as form to trigger session set + redirect
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = '';
+          const csrf = document.createElement('input');
+          csrf.type = 'hidden'; csrf.name = 'csrfmiddlewaretoken'; csrf.value = csrfToken;
+          const idInput = document.createElement('input');
+          idInput.type = 'hidden'; idInput.name = 'cuzk_building_id'; idInput.value = item.id;
+          form.appendChild(csrf); form.appendChild(idInput);
+          document.body.appendChild(form); form.submit();
+        });
+        list.appendChild(btn);
+      });
+      document.getElementById('address-results').style.display = 'block';
+    })
+    .catch(() => {
+      document.getElementById('address-results-list').innerHTML =
+        '<p class="text-danger">{% trans "Error communicating with CUZK API." %}</p>';
+      document.getElementById('address-results').style.display = 'block';
+    });
+});
+</script>
+{% endblock %}

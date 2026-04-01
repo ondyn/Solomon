@@ -1,0 +1,128 @@
+{% extends 'generic/_base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Import Owners from Text" %}{% endblock %}
+
+{% block content %}
+
+{% if preview %}
+{# ── Preview mode: show parsed records ─────────────────────────────────── #}
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0">
+      <i class="mdi mdi-eye"></i>
+      {% trans "Preview" %} - {{ records|length }} {% trans "owner records parsed" %}
+    </h5>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover table-sm mb-0">
+      <thead>
+        <tr>
+          <th>{% trans "Owner (display name)" %}</th>
+          <th>{% trans "Type" %}</th>
+          <th>{% trans "Persons" %}</th>
+          <th>{% trans "Flats" %}</th>
+          <th>{% trans "Share" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rec in records %}
+        <tr>
+          <td>{{ rec.display_name }}</td>
+          <td>
+            {% if rec.person_type == 'sjm' %}
+              <span class="badge bg-info">SJM</span>
+            {% elif rec.person_type == 'legal' %}
+              <span class="badge bg-warning text-dark">{% trans "Legal" %}</span>
+            {% else %}
+              <span class="badge bg-secondary">{% trans "Natural" %}</span>
+            {% endif %}
+          </td>
+          <td>
+            {% for p in rec.persons %}
+              <div class="small">{{ p.title_before }} {{ p.first_name }} {{ p.last_name }} {{ p.title_after }}</div>
+            {% empty %}
+              <span class="text-muted small">-</span>
+            {% endfor %}
+          </td>
+          <td>
+            {% for fn in rec.flat_numbers %}
+              <span class="badge bg-primary">{{ fn }}</span>
+            {% endfor %}
+          </td>
+          <td class="small">
+            {% if rec.share_numerator %}
+              {{ rec.share_numerator }}/{{ rec.share_denominator }}
+            {% else %}-{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted">{% trans "No records parsed." %}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<form method="post" class="d-flex gap-2">
+  {% csrf_token %}
+  <input type="hidden" name="action" value="import" />
+  <button type="submit" class="btn btn-primary">
+    <i class="mdi mdi-database-import"></i> {% trans "Import All" %}
+  </button>
+  <button type="submit" name="action" value="cancel" class="btn btn-outline-secondary">
+    {% trans "Cancel" %}
+  </button>
+</form>
+
+{% else %}
+{# ── Input mode: paste text ─────────────────────────────────────────────── #}
+<div class="row">
+  <div class="col-md-10 col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="mdi mdi-file-import"></i> {% trans "Paste Owners Text" %}</h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted small">
+          {% trans "Paste the contents of the owners list in the standard format (one owner block per entry, followed by a Jednotka: line)." %}
+          {% trans "Flats referenced in the text must already exist in the system." %}
+        </p>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="preview" />
+
+          <div class="mb-3">
+            <label class="form-label">{% trans "Effective from (ownership start date)" %}</label>
+            <input
+              type="date"
+              name="effective_from"
+              class="form-control"
+              style="max-width: 200px"
+              value="{{ effective_from|default:'' }}"
+            />
+            <div class="form-text">{% trans "Leave blank to use today's date." %}</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">{% trans "Owners text" %}</label>
+            <textarea
+              name="owners_text"
+              class="form-control font-monospace"
+              rows="20"
+              placeholder="Novák Jan, Ulice 5, 14900 Praha 4&#10;Jednotka: 1937/6&#9;73/9089&#10;&#10;SJ Hnyk Ondřej a Hnyková Simona, Šalounova 1937/10, Chodov, 14900 Praha 4&#10;Jednotka: 1937/20&#9;779/54534"
+              required
+            >{{ raw_text|default:'' }}</textarea>
+          </div>
+
+          <button type="submit" class="btn btn-outline-primary">
+            <i class="mdi mdi-eye"></i> {% trans "Preview" %}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

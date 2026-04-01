@@ -14,7 +14,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "solomon-core"
 version = "0.1.0"
-description = "Solomon core plugin — disables unused NetBox modules from UI and API"
+description = "Solomon core plugin - disables unused NetBox modules from UI and API"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"

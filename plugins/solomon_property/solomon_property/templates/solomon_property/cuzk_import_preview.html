@@ -1,0 +1,173 @@
+{% extends 'generic/_base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "CUZK Import - Preview" %}{% endblock %}
+
+{% block control-buttons %}
+  <a href="{% url 'plugins:solomon_property:cuzk-import-search' %}" class="btn btn-outline-secondary">
+    <i class="mdi mdi-arrow-left"></i> {% trans "Back" %}
+  </a>
+{% endblock %}
+
+{% block content %}
+<form method="post">
+  {% csrf_token %}
+
+  {# ── Building summary ─────────────────────────────────────────────── #}
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">
+        <i class="mdi mdi-home-city"></i>
+        {% trans "CUZK Building" %}: ID {{ cuzk_building.id }}
+        - {{ cuzk_building.city_part_name }}, {{ cuzk_building.municipality_name }}
+        {% if cuzk_building.lv %}(LV {{ cuzk_building.lv.number }}){% endif %}
+      </h5>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover table-sm mb-0">
+        <thead>
+          <tr>
+            <th>{% trans "House number" %}</th>
+            <th>{% trans "Existing record" %}</th>
+            <th>{% trans "Action" %}</th>
+            <th>{% trans "Changes" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for bdiff in building_diffs %}
+          <tr>
+            <td><strong>{{ bdiff.house_number }}</strong></td>
+            <td>
+              {% if bdiff.existing_building %}
+                <a href="{{ bdiff.existing_building.get_absolute_url }}">{{ bdiff.existing_building }}</a>
+              {% else %}
+                <span class="text-muted">{% trans "New" %}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% for value, label in action_choices %}
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="building_action_{{ bdiff.house_number }}"
+                  value="{{ value }}"
+                  {% if value == bdiff.suggested_action %}checked{% endif %}
+                />
+                <label class="form-check-label">{{ label }}</label>
+              </div>
+              {% endfor %}
+            </td>
+            <td>
+              <ul class="list-unstyled mb-0 small">
+                {% for diff in bdiff.field_diffs %}
+                {% if diff.is_changed %}
+                <li>
+                  <span class="text-muted">{{ diff.field_label }}:</span>
+                  <del class="text-danger">{{ diff.current_value }}</del> →
+                  <span class="text-success">{{ diff.new_value }}</span>
+                </li>
+                {% endif %}
+                {% endfor %}
+              </ul>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {# ── Units per house number ───────────────────────────────────────── #}
+  {% for bdiff in building_diffs %}
+  {% with hn=bdiff.house_number units=units_by_hn|default_if_none:'' %}
+  <div class="card mb-3">
+    <div class="card-header">
+      <h6 class="mb-0">
+        <i class="mdi mdi-door"></i>
+        {% trans "Flats for house number" %} {{ hn }}
+        <span class="badge bg-secondary">{{ units_by_hn|length }} total</span>
+      </h6>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover table-sm mb-0">
+        <thead>
+          <tr>
+            <th>{% trans "Unit" %}</th>
+            <th>{% trans "Type" %}</th>
+            <th>{% trans "Share" %}</th>
+            <th>{% trans "Existing" %}</th>
+            <th>{% trans "Action" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for udiff in unit_diffs %}
+          {% if udiff.house_number == hn %}
+          <tr>
+            <td>{{ hn }}/{{ udiff.cuzk_unit.flat_number_in_building }}</td>
+            <td class="small text-muted">{{ udiff.cuzk_unit.usage_name }}</td>
+            <td>
+              {% if udiff.cuzk_unit.share %}
+                {{ udiff.cuzk_unit.share.numerator }}/{{ udiff.cuzk_unit.share.denominator }}
+              {% else %}-{% endif %}
+            </td>
+            <td>
+              {% if udiff.existing_flat %}
+                <a href="{{ udiff.existing_flat.get_absolute_url }}">{{ udiff.existing_flat }}</a>
+              {% else %}
+                <span class="text-muted">{% trans "New" %}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% for value, label in action_choices %}
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="unit_action_{{ udiff.cuzk_unit.id }}"
+                  value="{{ value }}"
+                  {% if value == udiff.suggested_action %}checked{% endif %}
+                />
+                <label class="form-check-label small">{{ label }}</label>
+              </div>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endwith %}
+  {% endfor %}
+
+  {# ── Bulk select helpers ──────────────────────────────────────────── #}
+  <div class="mb-3">
+    <button type="button" class="btn btn-sm btn-outline-success me-1" onclick="selectAllUnits('create')">
+      {% trans "All units: Create" %}
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="selectAllUnits('update')">
+      {% trans "All units: Update existing" %}
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="selectAllUnits('skip')">
+      {% trans "All units: Skip" %}
+    </button>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary">
+      <i class="mdi mdi-check"></i> {% trans "Execute Import" %}
+    </button>
+    <a href="{% url 'plugins:solomon_property:cuzk-import-search' %}" class="btn btn-outline-secondary">
+      {% trans "Cancel" %}
+    </a>
+  </div>
+</form>
+
+<script>
+function selectAllUnits(action) {
+  document.querySelectorAll(`input[name^="unit_action_"][value="${action}"]`).forEach(r => r.checked = true);
+}
+</script>
+{% endblock %}

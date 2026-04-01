@@ -1,0 +1,7 @@
+{% if value %}
+  {% for item in value %}
+    <span>{{ item }}</span>{% if not forloop.last %}, {% endif %}
+  {% endfor %}
+{% else %}
+  <span class="text-muted">&mdash;</span>
+{% endif %}

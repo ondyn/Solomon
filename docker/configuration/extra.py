@@ -31,3 +31,8 @@ if os.environ.get("DEBUGPY_ENABLE", "false").lower() == "true":
 # ]
 
 ## Custom links, validators, etc. can go here
+
+## ─── CUZK API key ──────────────────────────────────────────────────────────
+## Read from environment variable CUZK_API_KEY.
+## Set it in docker-compose.override.yml or a .env file.
+CUZK_API_KEY = os.environ.get("CUZK_API_KEY", "")

@@ -164,3 +164,7 @@ TIME_ZONE = environ.get("TIME_ZONE", "Europe/Prague")
 # Default language
 if "DEFAULT_LANGUAGE" in environ:
     DEFAULT_LANGUAGE = environ.get("DEFAULT_LANGUAGE")
+
+# NetBox Copilot AI agent
+if "COPILOT_ENABLED" in environ:
+    COPILOT_ENABLED = _environ_get_and_map("COPILOT_ENABLED", "false", _AS_BOOL)

@@ -1,5 +1,5 @@
 """
-Solomon Core — monkey-patches applied at plugin ready().
+Solomon Core - monkey-patches applied at plugin ready().
 
 Patches the `get_menus()` function in NetBox navigation to filter out
 disabled modules based on solomon_core configuration.
