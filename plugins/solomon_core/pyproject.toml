@@ -1,0 +1,29 @@
+####
+## Solomon Core Plugin
+##
+## Disables default NetBox modules that are not relevant for
+## facility management (Racks, Devices, IPAM, VPN, etc.).
+## Hides them from the navigation UI and blocks their API endpoints.
+## Located in ./plugins/solomon_core/
+####
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solomon-core"
+version = "0.1.0"
+description = "Solomon core plugin — disables unused NetBox modules from UI and API"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [
+    {name = "Solomon Dev"},
+]
+
+[project.urls]
+Homepage = "https://github.com/ondyn/Solomon"
+
+[tool.setuptools.packages.find]
+include = ["solomon_core*"]

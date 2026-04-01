@@ -26,8 +26,15 @@ RUN if [ -s /opt/netbox/plugin-requirements.txt ]; then \
     fi
 
 # Make venv site-packages writable by group root (gid 0) so netbox user
-# (which runs as netbox:root) can install editable plugins at startup
-RUN chmod -R g+w /opt/netbox/venv/lib/python*/site-packages/
+# (which runs as netbox:root) can create editable install artifacts (.pth, .egg-info)
+# Only the directory itself and one level deep need group write — NOT recursive.
+RUN for sp in /opt/netbox/venv/lib/python*/site-packages; do \
+        chmod g+w "$sp" && \
+        find "$sp" -maxdepth 1 -type d -exec chmod g+w {} + ; \
+    done
+
+# Make static directory writable so collectstatic can add plugin static files
+RUN chmod -R g+w /opt/netbox/netbox/static/
 
 # Copy the plugin entrypoint that installs local (editable) plugins at startup
 COPY docker/plugin-entrypoint.sh /opt/netbox/plugin-entrypoint.sh

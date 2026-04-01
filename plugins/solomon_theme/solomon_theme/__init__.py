@@ -1,12 +1,16 @@
+from importlib.metadata import metadata
+
 from netbox.plugins import PluginConfig
+
+_meta = metadata("solomon-theme")
 
 
 class SolomonThemeConfig(PluginConfig):
     name = "solomon_theme"
     verbose_name = "Solomon Theme"
-    version = "0.1.0"
-    author = "Solomon Dev"
-    description = "Hardcoded dark Material Design theme for Solomon / NetBox"
+    version = _meta["Version"]
+    author = _meta["Author"]
+    description = _meta["Summary"]
     base_url = "solomon-theme"
     min_version = "4.0.0"
 

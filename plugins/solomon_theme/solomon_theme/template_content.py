@@ -335,6 +335,130 @@ html[data-bs-theme=dark] .list-group-item {
 .color-mode-toggle {
   display: none !important;
 }
+
+/* ── Login page ── */
+html[data-bs-theme=dark] .page-center,
+html[data-bs-theme=light] .page-center {
+  background-color: #121212 !important;
+}
+
+html[data-bs-theme=dark] .page-center .card,
+html[data-bs-theme=light] .page-center .card {
+  background-color: #1e1e1e !important;
+  border-color: #2c2c2c !important;
+}
+
+html[data-bs-theme=dark] .page-center .card .card-body,
+html[data-bs-theme=light] .page-center .card .card-body {
+  background-color: #1e1e1e !important;
+}
+
+html[data-bs-theme=dark] .page-center .card .hr-text::after,
+html[data-bs-theme=light] .page-center .card .hr-text::after {
+  color: #9e9e9e;
+}
+
+html[data-bs-theme=dark] .page-center .card .hr-text::before,
+html[data-bs-theme=light] .page-center .card .hr-text::before {
+  border-color: #2c2c2c;
+}
+
+/* ── Dashboard widget card headers (text-bg-* overrides) ── */
+html[data-bs-theme=dark] .grid-stack-item .card .card-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-bs-theme=dark] .grid-stack-item .card .card-body {
+  background-color: #1e1e1e !important;
+}
+
+/* ── Bootstrap bg-light / bg-white in dark mode ── */
+html[data-bs-theme=dark] .bg-light,
+html[data-bs-theme=light] .bg-light {
+  background-color: #2c2c2c !important;
+}
+
+html[data-bs-theme=dark] .bg-white,
+html[data-bs-theme=light] .bg-white {
+  background-color: #1e1e1e !important;
+}
+
+html[data-bs-theme=dark] .bg-body,
+html[data-bs-theme=light] .bg-body {
+  background-color: #121212 !important;
+}
+
+/* ── text-bg-light badge ── */
+html[data-bs-theme=dark] .text-bg-light {
+  background-color: #2c2c2c !important;
+  color: #e0e0e0 !important;
+}
+
+/* ── Offcanvas / sidebar ── */
+html[data-bs-theme=dark] .offcanvas {
+  background-color: #1e1e1e !important;
+}
+
+/* ── Pagination ── */
+html[data-bs-theme=dark] .page-link {
+  background-color: #1e1e1e;
+  border-color: #2c2c2c;
+  color: #4fc3f7;
+}
+html[data-bs-theme=dark] .page-item.active .page-link {
+  background-color: #03a9f4;
+  border-color: #03a9f4;
+  color: #121212;
+}
+html[data-bs-theme=dark] .page-item.disabled .page-link {
+  background-color: #1e1e1e;
+  border-color: #2c2c2c;
+  color: #616161;
+}
+
+/* ── Tab content areas ── */
+html[data-bs-theme=dark] .nav-tabs .nav-link.active {
+  background-color: #1e1e1e;
+  border-color: #2c2c2c #2c2c2c #1e1e1e;
+  color: #e0e0e0;
+}
+html[data-bs-theme=dark] .nav-tabs .nav-link {
+  color: #9e9e9e;
+}
+html[data-bs-theme=dark] .nav-tabs .nav-link:hover {
+  border-color: #2c2c2c;
+  color: #4fc3f7;
+}
+
+/* ── Breadcrumb ── */
+html[data-bs-theme=dark] .breadcrumb-item a {
+  color: #4fc3f7;
+}
+html[data-bs-theme=dark] .breadcrumb-item.active {
+  color: #9e9e9e;
+}
+
+/* ── Object detail panels ── */
+html[data-bs-theme=dark] .card-body .table {
+  color: #e0e0e0;
+}
+
+/* ── Select2 / Tom-select dropdowns ── */
+html[data-bs-theme=dark] .ts-dropdown {
+  background-color: #1e1e1e;
+  border-color: #2c2c2c;
+}
+html[data-bs-theme=dark] .ts-dropdown .active {
+  background-color: rgba(3, 169, 244, 0.15);
+  color: #4fc3f7;
+}
+html[data-bs-theme=dark] .ts-control {
+  background-color: #2c2c2c;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+}
+/* ── Logo alt-text: override NetBox alt to Solomon ── */
+/* (Actual SVG files are replaced at the static root level by the entrypoint) */
 </style>
 
 <script>
@@ -343,6 +467,76 @@ html[data-bs-theme=dark] .list-group-item {
   localStorage.setItem("netbox-color-mode", "dark");
   document.documentElement.setAttribute("data-bs-theme", "dark");
 })();
+</script>
+
+<script>
+/*
+ * Solomon branding overrides.
+ *
+ * The logo SVG files are already replaced at the static-root level by the
+ * Docker entrypoint (logo_netbox_*.svg → Solomon building icon). This script
+ * handles text-level and DOM-attribute tweaks that can't be done server-side:
+ *   - alt text on logo images
+ *   - Edition label ("NetBox" → "Solomon")
+ *   - Page title
+ *   - Favicon <link> tag (point to SVG)
+ *   - Hide duplicate light/dark logo (we force dark mode)
+ */
+document.addEventListener("DOMContentLoaded", function() {
+  var LOGO_LOGIN = "/static/solomon_theme/img/logo_login.svg";
+  var FAVICON    = "/static/solomon_theme/img/favicon.svg";
+
+  /* Update alt text on all logo images */
+  document.querySelectorAll("img.navbar-brand-image, img.logo").forEach(function(img) {
+    img.alt = "Solomon";
+  });
+
+  /* On login page, swap to the brand-colored logo variant */
+  document.querySelectorAll(".page-center .text-center img.logo").forEach(function(img) {
+    img.src = LOGO_LOGIN;
+  });
+
+  /* Hide duplicate logos in navbar (light/dark pairs) — keep only the first */
+  var navBrand = document.querySelector(".navbar-brand");
+  if (navBrand) {
+    var imgs = navBrand.querySelectorAll("img");
+    for (var i = 1; i < imgs.length; i++) {
+      imgs[i].style.display = "none";
+    }
+  }
+
+  /* Hide duplicate logos on login page (light/dark pairs) — keep only the first */
+  document.querySelectorAll(".page-center .text-center").forEach(function(container) {
+    var imgs = container.querySelectorAll("img.logo, img.hide-theme-dark, img.hide-theme-light");
+    for (var i = 1; i < imgs.length; i++) {
+      imgs[i].style.display = "none";
+    }
+  });
+
+  /* Replace "NetBox" edition text with "Solomon" */
+  document.querySelectorAll(".netbox-edition").forEach(function(el) {
+    el.textContent = "Solomon";
+  });
+
+  /* Replace favicon with SVG */
+  var existingIcon = document.querySelector('link[rel="icon"]');
+  if (existingIcon) {
+    existingIcon.href = FAVICON;
+    existingIcon.type = "image/svg+xml";
+  }
+
+  /* Replace apple-touch-icon */
+  var touchIcon = document.querySelector('link[rel="apple-touch-icon"]');
+  if (touchIcon) {
+    touchIcon.href = FAVICON;
+    touchIcon.type = "image/svg+xml";
+  }
+
+  /* Replace page title suffix */
+  if (document.title.indexOf("NetBox") !== -1) {
+    document.title = document.title.replace(/NetBox/g, "Solomon");
+  }
+});
 </script>
 """
 

@@ -11,6 +11,7 @@
 
 # List of enabled plugins (must be installed in the container image)
 PLUGINS = [
+    "solomon_core",
     "solomon_test_plugin",
     "solomon_theme",
     # "netbox_bgp",
@@ -20,6 +21,20 @@ PLUGINS = [
 
 # Plugin-specific configuration
 PLUGINS_CONFIG = {
+    "solomon_core": {
+        # All disabled by default — set to True to re-enable
+        "enable_organization": False,
+        "enable_racks": False,
+        "enable_devices": False,
+        "enable_connections": False,
+        "enable_wireless": False,
+        "enable_ipam": False,
+        "enable_vpn": False,
+        "enable_virtualization": False,
+        "enable_circuits": False,
+        "enable_power": False,
+        "enable_provisioning": False,
+    },
     "solomon_test_plugin": {
         "greeting": "Hello from Solomon!",
     },

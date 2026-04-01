@@ -52,7 +52,9 @@ services:
       - DEBUGPY_PORT=${DEBUGPY_PORT:-5678}
       # Use single worker for dev (required for reload + debugpy)
       - GRANIAN_WORKERS=1
-      - GRANIAN_BACKPRESSURE=1
+      # Allow up to 16 concurrent requests (static files are served by Rust,
+      # so higher backpressure doesn't overload the Python worker)
+      - GRANIAN_BACKPRESSURE=16
 
   netbox-worker:
     <<: *netbox

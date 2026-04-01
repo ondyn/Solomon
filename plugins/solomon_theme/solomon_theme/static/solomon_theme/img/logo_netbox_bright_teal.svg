@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Solomon logo — replaces NetBox bright teal logo (shown in dark mode) -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e3e3e3">
+  <path d="m 120,-120 v -720 h 520 v 320 h 200 v 400 H 400 v -160 h -80 v 160 z m 80,-240 h 80 v -80 h -80 z m 0,-160 h 80 v -80 h -80 z m 0,-160 h 80 v -80 h -80 z m 480,480 h 80 v -80 h -80 z m 0,-160 h 80 v -80 H 680 Z M 440,-680 h 120 v -80 H 440 Z m 0,160 h 120 v -80 H 440 Z m 0,160 h 120 v -80 H 440 Z M 320,-680 h 80 v -80 h -80 z m 0,160 h 80 v -80 h -80 z m 0,160 h 80 v -80 h -80 z"/>
+</svg>
