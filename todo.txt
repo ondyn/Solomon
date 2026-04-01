@@ -15,4 +15,13 @@ COMPLETED:
   → Reduced reload-tick from 500ms to 2000ms. Stopped watching entire netbox core dir (only watches plugins_dev now). Added WATCH_NETBOX_CORE env var opt-in. Added collectstatic in plugin-entrypoint. First load latency (~14s) is Granian's lazy WSGI init — subsequent requests are ~400ms.
 
 - [DONE] create new plugin, which will disable default NetBox parts  - Organization, Racks,  Devices, Connections, Wireless, IPAM, VPN, Virtualization, Circuits, Power, Provisioning. Those parts will be not visible in UI, API and even not  apply migrations for them. Is it possible? Could overriding DJANGO_SETTINGS_MODULE help? Implement and test it.
-  → Created solomon_core plugin. Hides disabled modules from UI (monkey-patches get_menus), blocks API endpoints (middleware returns 404). Configurable via PLUGINS_CONFIG. Note: migrations cannot be fully disabled without modifying NetBox core, but the modules are invisible to users.
+  → Created solomon_core plugin. Hides disabled modules from UI (monkey-patches get_menus), blocks API endpoints (middleware returns 404). Configurable via PLUGINS_CONFIG.
+  → Migrations CANNOT be skipped: NetBox apps have hard FK dependencies in migrations:
+    - ipam: 30 cross-references from dcim/circuits (dcim.Interface → ipam.VLAN, etc.)
+    - wireless: 2 refs from dcim (dcim.Interface → wireless.WirelessLAN/Link)
+    - virtualization: 5 refs from dcim/extras (dcim.Device → virtualization.Cluster)
+    - vpn: depends on ipam outbound
+    - circuits: only self-contained, but still imports from dcim/ipam at runtime
+    Using MIGRATION_MODULES = {'ipam': None} would prevent table creation, causing
+    dcim migrations to crash on missing FK targets. This is a hard Django constraint.
+    The tables are created empty and stay empty — negligible cost.

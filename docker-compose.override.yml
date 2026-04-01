@@ -43,6 +43,12 @@ services:
       # ── Plugin development: mount local plugins into container ──
       # rw is required for editable installs (.egg-info / .pth files)
       - ./plugins:/opt/netbox/plugins_dev:z
+      # ── Django local_settings override (for MIGRATION_MODULES etc.) ──
+      - ./docker/local_settings.py:/opt/netbox/netbox/netbox/local_settings.py:z,ro
+      # ── Solomon entrypoint (skips trace_paths for disabled DCIM) ──
+      - ./docker/docker-entrypoint.sh:/opt/netbox/solomon-entrypoint.sh:z,ro
+      # ── Plugin entrypoint (chains to solomon-entrypoint.sh) ──
+      - ./docker/plugin-entrypoint.sh:/opt/netbox/plugin-entrypoint.sh:z,ro
     ports:
       - "${NETBOX_PORT:-8000}:8080"
       # ── debugpy remote debugging port ──

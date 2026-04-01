@@ -59,5 +59,10 @@ if [ -d "$THEME_IMG" ]; then
     echo "🎨 Solomon branding applied to static root"
 fi
 
-# Hand off to the original NetBox entrypoint + our dev launch script
-exec /opt/netbox/docker-entrypoint.sh "$@"
+# Hand off to the Solomon entrypoint (skips trace_paths for disabled DCIM)
+# Falls back to upstream entrypoint if Solomon version is not mounted
+if [ -f /opt/netbox/solomon-entrypoint.sh ]; then
+  exec /opt/netbox/solomon-entrypoint.sh "$@"
+else
+  exec /opt/netbox/docker-entrypoint.sh "$@"
+fi
