@@ -1,0 +1,29 @@
+Plugins:
+- common property management - list of common spaces/rooms, its identification, tenancy/rent to Person
+- technical equipment management - evidence of water, gas, heating main valves, elevators, fire extinguishers - serial number, track of repair/changes, location/position. Overview of numbers of types of device as a whole or per building, floor, location. Schedule end of life and notify in Dashboard widget. Warranty.
+- equipment inspection manager - set repetitve schedules, track inspections, attach audit report, notify of upcomming inspections at Dashboard specific widget. 
+- access management - manage  which persons can access to which building and which common spaces/rooms, physical key/access tag management
+- energy consumption manager - upload annual statements, show consumption in charts - global, per building, per set of flats, per flat for differrent energy types (cold water, hot water, heating, gas, electricity, ...) There will be consumption for common spaces (electricity for lights on the coridors, in cellar, for elevators,... or water used for cleanup poured from service rooms in cellar)
+- publicly accessible simple CMS - show mandatory disclosure information, sign up for email newsletters, posting messages (meeting, repair, general information), making available mandatory disclosure information (financial statements). Can be some opensource CMS integrated into NetBox/Django?
+- meeting management, invitation management, definition of points to be discussed, voting management, calculation of participation and voting results based on various algorithms (number of votes, weight of vote according to the share of property owned). Changing the quorum during the meeting. Meeting minutes. Recording minutes in CMS.
+- task/bug/issue tracking system, different sets (eg. repair, planned, tasks from the board meeting), exporting or reports, actual status
+- support for tenders - bid management, communication records, list of companies and craftsmen management
+- plugin eshop
+
+Self app related plugins:
+- system backup/restore managemen
+- app bug reporting
+- contact information (sales department, technical department)
+- plugin eshop - payments, license management, plugin activation/deactivation
+
+General:
+- create Dasboard widget, where it make sense
+- do not harcode lists, device types, systems, .... Make it dynamic to be able to add eg. new type of device for inspection, new type of energy, new type of commonly shared object
+- clean the database from removed content types and other items that were left from core Netbox (dcim, ipam, devices,....). Make script for this so that it can be repeated when upgrading versions 
+
+Future plugins:
+- video plugin - integration of DVR system
+- financial management
+
+?
+homeowners association vs housing cooperative - how to suuprt both, how to switch

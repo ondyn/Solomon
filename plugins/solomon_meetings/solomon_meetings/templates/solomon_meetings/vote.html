@@ -1,0 +1,33 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+	<div class="col col-md-6">
+		<div class="card">
+			<h5 class="card-header">{% trans "Vote" %}</h5>
+			<div class="card-body">
+				<table class="table table-hover attr-table mb-0">
+					<tr>
+						<th scope="row">{% trans "Agenda item" %}</th>
+						<td>{{ object.agenda_item|linkify }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Attendance" %}</th>
+						<td>{{ object.attendance|linkify }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Vote" %}</th>
+						<td>{{ object.get_vote_display }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Vote weight" %}</th>
+						<td>{{ object.vote_weight }}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}

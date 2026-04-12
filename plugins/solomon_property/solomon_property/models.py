@@ -15,6 +15,7 @@ Design notes:
 """
 
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.urls import reverse
@@ -186,12 +187,55 @@ class Flat(NetBoxModel):
     def get_absolute_url(self):
         return reverse("plugins:solomon_property:flat", kwargs={"pk": self.pk})
 
+    def clean(self):
+        super().clean()
+
+        has_numerator = self.cuzk_share_numerator is not None
+        has_denominator = self.cuzk_share_denominator is not None
+
+        if has_numerator != has_denominator:
+            raise ValidationError(
+                {
+                    "cuzk_share_numerator": _("Both CUZK share values must be set together."),
+                    "cuzk_share_denominator": _("Both CUZK share values must be set together."),
+                }
+            )
+
+        if has_numerator and has_denominator:
+            if self.cuzk_share_numerator <= 0:
+                raise ValidationError(
+                    {"cuzk_share_numerator": _("CUZK share numerator must be greater than zero.")}
+                )
+            if self.cuzk_share_denominator <= 0:
+                raise ValidationError(
+                    {"cuzk_share_denominator": _("CUZK share denominator must be greater than zero.")}
+                )
+            if self.cuzk_share_numerator > self.cuzk_share_denominator:
+                raise ValidationError(
+                    {"cuzk_share_numerator": _("CUZK share numerator cannot be greater than denominator.")}
+                )
+
     @property
     def cuzk_share(self) -> str | None:
         """Return formatted share string, e.g. '73/9089'."""
         if self.cuzk_share_numerator and self.cuzk_share_denominator:
             return f"{self.cuzk_share_numerator}/{self.cuzk_share_denominator}"
         return None
+
+    @property
+    def current_ownership_share_total(self) -> float:
+        """Return the summed ownership share for currently active ownership records."""
+        current_owners = self.flat_owners.filter(effective_to__isnull=True)
+        return sum(
+            record.share_numerator / record.share_denominator
+            for record in current_owners
+            if record.share_denominator
+        )
+
+    @property
+    def has_complete_current_ownership(self) -> bool:
+        """Return True when active ownership shares sum to 100%."""
+        return abs(self.current_ownership_share_total - 1.0) < 1e-9
 
 
 # ---------------------------------------------------------------------------
@@ -414,6 +458,37 @@ class FlatOwner(NetBoxModel):
     def get_absolute_url(self):
         return reverse("plugins:solomon_property:flatowner", kwargs={"pk": self.pk})
 
+    def clean(self):
+        super().clean()
+
+        if self.effective_to and self.effective_to < self.effective_from:
+            raise ValidationError(
+                {"effective_to": _("Effective to cannot be before effective from.")}
+            )
+
+        if self.share_numerator > self.share_denominator:
+            raise ValidationError(
+                {"share_numerator": _("Share numerator cannot be greater than denominator.")}
+            )
+
+        period_end = self.effective_to
+        overlapping = FlatOwner.objects.filter(flat=self.flat, owner=self.owner).exclude(pk=self.pk)
+
+        if period_end is None:
+            overlapping = overlapping.filter(
+                models.Q(effective_to__isnull=True) | models.Q(effective_to__gte=self.effective_from)
+            )
+        else:
+            overlapping = overlapping.filter(
+                models.Q(effective_to__isnull=True) | models.Q(effective_to__gte=self.effective_from),
+                effective_from__lte=period_end,
+            )
+
+        if overlapping.exists():
+            raise ValidationError(
+                _("Overlapping ownership period exists for this flat and owner.")
+            )
+
     @property
     def share(self) -> str:
         return f"{self.share_numerator}/{self.share_denominator}"
@@ -468,6 +543,32 @@ class PropertyTenant(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse("plugins:solomon_property:propertytenant", kwargs={"pk": self.pk})
+
+    def clean(self):
+        super().clean()
+
+        if self.effective_to and self.effective_to < self.effective_from:
+            raise ValidationError(
+                {"effective_to": _("Effective to cannot be before effective from.")}
+            )
+
+        period_end = self.effective_to
+        overlapping = PropertyTenant.objects.filter(flat=self.flat, person=self.person).exclude(pk=self.pk)
+
+        if period_end is None:
+            overlapping = overlapping.filter(
+                models.Q(effective_to__isnull=True) | models.Q(effective_to__gte=self.effective_from)
+            )
+        else:
+            overlapping = overlapping.filter(
+                models.Q(effective_to__isnull=True) | models.Q(effective_to__gte=self.effective_from),
+                effective_from__lte=period_end,
+            )
+
+        if overlapping.exists():
+            raise ValidationError(
+                _("Overlapping tenancy period exists for this flat and person.")
+            )
 
     @property
     def is_current(self) -> bool:

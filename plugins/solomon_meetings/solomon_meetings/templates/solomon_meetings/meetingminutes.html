@@ -1,0 +1,47 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+	<div class="col col-md-6">
+		<div class="card mb-3">
+			<h5 class="card-header">{% trans "Minutes metadata" %}</h5>
+			<div class="card-body">
+				<table class="table table-hover attr-table mb-0">
+					<tr>
+						<th scope="row">{% trans "Meeting" %}</th>
+						<td>{{ object.meeting|linkify }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Approved by" %}</th>
+						<td>{{ object.approved_by|linkify|placeholder }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Approved at" %}</th>
+						<td>{{ object.approved_at|isodatetime:"minutes"|placeholder }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "CMS published" %}</th>
+						<td>{{ object.cms_published|yesno:_('Yes,No') }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "CMS published at" %}</th>
+						<td>{{ object.cms_published_at|isodatetime:"minutes"|placeholder }}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col">
+		<div class="card">
+			<h5 class="card-header">{% trans "Content" %}</h5>
+			<div class="card-body">
+				{{ object.content|linebreaksbr }}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}

@@ -1,0 +1,62 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+	<div class="col col-md-6">
+		<div class="card">
+			<h5 class="card-header">{% trans "Attendance" %}</h5>
+			<div class="card-body">
+				<table class="table table-hover attr-table mb-0">
+					<tr>
+						<th scope="row">{% trans "Meeting" %}</th>
+						<td>{{ object.meeting|linkify }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Owner" %}</th>
+						<td>{{ object.owner|linkify }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Flat ownership" %}</th>
+						<td>{{ object.flat_owner|linkify }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Representation" %}</th>
+						<td>{{ object.get_representation_display }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Proxy name" %}</th>
+						<td>{{ object.proxy_name|placeholder }}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col col-md-6">
+		<div class="card">
+			<h5 class="card-header">{% trans "Presence window" %}</h5>
+			<div class="card-body">
+				<table class="table table-hover attr-table mb-0">
+					<tr>
+						<th scope="row">{% trans "Arrived at" %}</th>
+						<td>{{ object.arrived_at|isodatetime:"minutes"|placeholder }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Left at" %}</th>
+						<td>{{ object.left_at|isodatetime:"minutes"|placeholder }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Vote weight by units" %}</th>
+						<td>{{ object.vote_weight_by_units }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Vote weight by share" %}</th>
+						<td>{{ object.vote_weight_by_share }}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}

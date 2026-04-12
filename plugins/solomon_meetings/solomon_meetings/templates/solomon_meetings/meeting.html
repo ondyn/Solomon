@@ -1,0 +1,116 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+	<div class="col col-md-6">
+		<div class="card mb-3">
+			<h5 class="card-header">{% trans "General" %}</h5>
+			<div class="card-body">
+				<table class="table table-hover attr-table mb-0">
+					<tr>
+						<th scope="row">{% trans "Meeting type" %}</th>
+						<td>{{ object.meeting_type|linkify }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Title" %}</th>
+						<td>{{ object.title }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Date and time" %}</th>
+						<td>{{ object.date_time|isodatetime:"minutes" }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Location" %}</th>
+						<td>{{ object.location|placeholder }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Status" %}</th>
+						<td>{{ object.get_status_display }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Workflow phase" %}</th>
+						<td>{{ object.get_phase_display }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Moderator" %}</th>
+						<td>{{ object.moderator|linkify|placeholder }}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col col-md-6">
+		<div class="card mb-3">
+			<h5 class="card-header">{% trans "Quorum and workflow" %}</h5>
+			<div class="card-body">
+				<table class="table table-hover attr-table mb-0">
+					<tr>
+						<th scope="row">{% trans "Quorum threshold" %}</th>
+						<td>{{ object.quorum_threshold }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Quorum achieved" %}</th>
+						<td>{{ object.quorum_achieved|yesno:_('Yes,No') }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Quorum updated at" %}</th>
+						<td>{{ object.quorum_updated_at|isodatetime:"minutes"|placeholder }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Started at" %}</th>
+						<td>{{ object.started_at|isodatetime:"minutes"|placeholder }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Ended at" %}</th>
+						<td>{{ object.ended_at|isodatetime:"minutes"|placeholder }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Owner snapshot taken at" %}</th>
+						<td>{{ object.owner_snapshot_taken_at|isodatetime:"minutes"|placeholder }}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col col-md-6">
+		<div class="card mb-3">
+			<h5 class="card-header">{% trans "Invitations and publication" %}</h5>
+			<div class="card-body">
+				<table class="table table-hover attr-table mb-0">
+					<tr>
+						<th scope="row">{% trans "Invitation PDF generated at" %}</th>
+						<td>{{ object.invitation_pdf_generated_at|isodatetime:"minutes"|placeholder }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Invitation published at" %}</th>
+						<td>{{ object.invitation_published_at|isodatetime:"minutes"|placeholder }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Buildings" %}</th>
+						<td>
+							{% for building in object.buildings.all %}
+								<div>{{ building|linkify }}</div>
+							{% empty %}
+								{{ ""|placeholder }}
+							{% endfor %}
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="col col-md-6">
+		<div class="card mb-3">
+			<h5 class="card-header">{% trans "Note" %}</h5>
+			<div class="card-body">
+				{{ object.note|placeholder|linebreaksbr }}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}

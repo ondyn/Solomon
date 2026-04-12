@@ -3,6 +3,7 @@
 import datetime
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from solomon_property.models import (
@@ -97,6 +98,48 @@ class FlatModelTest(TestCase):
         flat = make_flat(self.building)
         self.assertIsNone(flat.cuzk_share_numerator)
         self.assertIsNone(flat.cuzk_share_denominator)
+
+    def test_clean_requires_both_cuzk_share_values(self):
+        flat = make_flat(self.building, cuzk_share_numerator=3, cuzk_share_denominator=None)
+        with self.assertRaises(ValidationError):
+            flat.full_clean()
+
+    def test_clean_rejects_cuzk_share_numerator_greater_than_denominator(self):
+        flat = make_flat(self.building, cuzk_share_numerator=5, cuzk_share_denominator=4)
+        with self.assertRaises(ValidationError):
+            flat.full_clean()
+
+    def test_has_complete_current_ownership_true_when_sum_is_one(self):
+        flat = make_flat(self.building, flat_number="10A")
+        owner1 = make_owner(display_name="Owner 1")
+        owner2 = make_owner(display_name="Owner 2")
+        FlatOwner.objects.create(
+            flat=flat,
+            owner=owner1,
+            share_numerator=1,
+            share_denominator=2,
+            effective_from=datetime.date(2024, 1, 1),
+        )
+        FlatOwner.objects.create(
+            flat=flat,
+            owner=owner2,
+            share_numerator=1,
+            share_denominator=2,
+            effective_from=datetime.date(2024, 1, 1),
+        )
+        self.assertTrue(flat.has_complete_current_ownership)
+
+    def test_has_complete_current_ownership_false_when_sum_not_one(self):
+        flat = make_flat(self.building, flat_number="11A")
+        owner1 = make_owner(display_name="Owner A")
+        FlatOwner.objects.create(
+            flat=flat,
+            owner=owner1,
+            share_numerator=1,
+            share_denominator=3,
+            effective_from=datetime.date(2024, 1, 1),
+        )
+        self.assertFalse(flat.has_complete_current_ownership)
 
 
 # ---------------------------------------------------------------------------
@@ -213,6 +256,47 @@ class FlatOwnerModelTest(TestCase):
         )
         self.assertEqual(self.flat.flat_owners.count(), 2)
 
+    def test_clean_rejects_effective_to_before_effective_from(self):
+        fo = FlatOwner(
+            flat=self.flat,
+            owner=self.owner,
+            share_numerator=1,
+            share_denominator=1,
+            effective_from=datetime.date(2024, 1, 2),
+            effective_to=datetime.date(2024, 1, 1),
+        )
+        with self.assertRaises(ValidationError):
+            fo.full_clean()
+
+    def test_clean_rejects_share_numerator_above_denominator(self):
+        fo = FlatOwner(
+            flat=self.flat,
+            owner=self.owner,
+            share_numerator=3,
+            share_denominator=2,
+            effective_from=datetime.date(2024, 1, 1),
+        )
+        with self.assertRaises(ValidationError):
+            fo.full_clean()
+
+    def test_clean_rejects_overlapping_ownership_periods_for_same_owner(self):
+        self._make_flat_owner(
+            share_numerator=1,
+            share_denominator=1,
+            effective_from=datetime.date(2024, 1, 1),
+            effective_to=datetime.date(2024, 6, 30),
+        )
+        overlapping = FlatOwner(
+            flat=self.flat,
+            owner=self.owner,
+            share_numerator=1,
+            share_denominator=1,
+            effective_from=datetime.date(2024, 6, 1),
+            effective_to=datetime.date(2024, 12, 31),
+        )
+        with self.assertRaises(ValidationError):
+            overlapping.full_clean()
+
 
 # ---------------------------------------------------------------------------
 # PropertyTenant tests
@@ -272,3 +356,27 @@ class PropertyTenantModelTest(TestCase):
             effective_from=datetime.date(2021, 6, 1),
         )
         self.assertEqual(self.person.tenancies.count(), 2)
+
+    def test_clean_rejects_effective_to_before_effective_from(self):
+        tenant = PropertyTenant(
+            flat=self.flat,
+            person=self.person,
+            effective_from=datetime.date(2024, 1, 10),
+            effective_to=datetime.date(2024, 1, 9),
+        )
+        with self.assertRaises(ValidationError):
+            tenant.full_clean()
+
+    def test_clean_rejects_overlapping_tenancy_periods_for_same_flat_person(self):
+        self._make_tenant(
+            effective_from=datetime.date(2024, 1, 1),
+            effective_to=datetime.date(2024, 4, 30),
+        )
+        overlapping = PropertyTenant(
+            flat=self.flat,
+            person=self.person,
+            effective_from=datetime.date(2024, 4, 15),
+            effective_to=datetime.date(2024, 12, 31),
+        )
+        with self.assertRaises(ValidationError):
+            overlapping.full_clean()

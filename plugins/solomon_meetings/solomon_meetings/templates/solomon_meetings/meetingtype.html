@@ -1,0 +1,28 @@
+{% extends 'generic/object.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+	<div class="col col-md-6">
+		<div class="card">
+			<h5 class="card-header">{% trans "Meeting type" %}</h5>
+			<div class="card-body">
+				<table class="table table-hover attr-table mb-0">
+					<tr>
+						<th scope="row">{% trans "Name" %}</th>
+						<td>{{ object.name }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Quorum type" %}</th>
+						<td>{{ object.get_quorum_type_display }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Default quorum threshold" %}</th>
+						<td>{{ object.default_quorum_threshold }}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}

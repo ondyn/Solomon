@@ -15,6 +15,7 @@ PLUGINS = [
     "solomon_test_plugin",
     "solomon_theme",
     "solomon_property",
+    "solomon_meetings",
     # "netbox_bgp",
     # "netbox_topology_views",
     # "netbox_documents",
@@ -41,6 +42,7 @@ PLUGINS_CONFIG = {
     },
     "solomon_theme": {},
     "solomon_property": {},
+    "solomon_meetings": {},
     # "netbox_bgp": {
     #     "top_level_menu": True,
     # },
