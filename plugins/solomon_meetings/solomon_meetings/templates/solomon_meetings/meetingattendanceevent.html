@@ -1,0 +1,23 @@
+{% extends 'generic/object.html' %}
+{% load helpers %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+	<div class="col col-md-8">
+		<div class="card">
+			<h5 class="card-header">{% trans "Attendance event" %}</h5>
+			<div class="card-body">
+				<table class="table table-hover attr-table mb-0">
+					<tr><th>{% trans "Meeting" %}</th><td>{{ object.snapshot.meeting|linkify }}</td></tr>
+					<tr><th>{% trans "Owner" %}</th><td>{{ object.snapshot.owner_display_name }}</td></tr>
+					<tr><th>{% trans "Type" %}</th><td>{{ object.get_event_type_display }}</td></tr>
+					<tr><th>{% trans "Time" %}</th><td>{{ object.event_time|isodatetime:"minutes" }}</td></tr>
+					<tr><th>{% trans "Source" %}</th><td>{{ object.source }}</td></tr>
+					<tr><th>{% trans "Note" %}</th><td>{{ object.note|placeholder }}</td></tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

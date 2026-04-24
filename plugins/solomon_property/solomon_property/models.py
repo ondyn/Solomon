@@ -14,6 +14,9 @@ Design notes:
   - All models use NetBoxModel (UUID pk, timestamps, audit log, journaling).
 """
 
+from decimal import Decimal
+from fractions import Fraction
+
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
@@ -397,6 +400,27 @@ class PropertyOwner(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse("plugins:solomon_property:propertyowner", kwargs={"pk": self.pk})
+
+    @property
+    def current_total_share_fraction(self) -> Fraction:
+        """Return summed ownership share from active FlatOwner rows."""
+        total = Fraction(0, 1)
+        for record in self.flat_owners.filter(effective_to__isnull=True):
+            if record.share_denominator:
+                total += Fraction(record.share_numerator, record.share_denominator)
+        return total
+
+    @property
+    def current_total_share(self) -> str:
+        total = self.current_total_share_fraction
+        return f"{total.numerator}/{total.denominator}"
+
+    @property
+    def current_total_share_decimal(self) -> Decimal:
+        total = self.current_total_share_fraction
+        if total.denominator == 0:
+            return Decimal("0")
+        return Decimal(total.numerator) / Decimal(total.denominator)
 
 
 # ---------------------------------------------------------------------------

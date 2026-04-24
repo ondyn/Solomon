@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import datetime
 import logging
+from collections import defaultdict
+from fractions import Fraction
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
@@ -37,7 +39,7 @@ from solomon_property.cuzk.import_building import (
 from solomon_property.cuzk.import_owners import import_owners
 from solomon_property.cuzk.owners_parser import parse_owners_txt
 from solomon_property.cuzk.service import CUZKApiError, CUZKClient
-from solomon_property.models import Building
+from solomon_property.models import Flat
 
 logger = logging.getLogger(__name__)
 
@@ -257,11 +259,114 @@ class CUZKImportPreviewView(LoginRequiredMixin, View):
 class OwnersImportView(LoginRequiredMixin, View):
     template_name = "solomon_property/owners_import.html"
 
+    def _annotate_preview(self, records):
+        # === Cross-record: detect co-owned flats (same flat claimed by multiple owners) ===
+        # flat_number -> list of (rec, share_fraction_or_None)
+        # fraction is None for multi-flat owners (per-flat share not known from import data)
+        flat_claimants = defaultdict(list)
+        for rec in records:
+            if len(rec.flat_numbers) == 1:
+                flat_number = rec.flat_numbers[0]
+                frac = (
+                    Fraction(rec.share_numerator, rec.share_denominator)
+                    if rec.share_numerator and rec.share_denominator
+                    else None
+                )
+                flat_claimants[flat_number].append((rec, frac))
+            else:
+                for flat_number in rec.flat_numbers:
+                    flat_claimants[flat_number].append((rec, None))
+
+        coowned_flat_checks = {}
+        for flat_number, claimants in flat_claimants.items():
+            if len(claimants) <= 1:
+                continue
+            parts = flat_number.split("/")
+            if len(parts) != 2:
+                coowned_flat_checks[flat_number] = {"error": "bad_format"}
+                continue
+            unit = Flat.objects.filter(
+                building__house_number=parts[0].strip(),
+                flat_number=parts[1].strip(),
+            ).first()
+            cuzk_frac = (
+                Fraction(unit.cuzk_share_numerator, unit.cuzk_share_denominator)
+                if unit and unit.cuzk_share_numerator and unit.cuzk_share_denominator
+                else None
+            )
+            owner_names = [rec.display_name for rec, _ in claimants]
+            all_have_share = all(frac is not None for _, frac in claimants)
+            if all_have_share:
+                total = sum((frac for _, frac in claimants), Fraction(0, 1))
+                ok = cuzk_frac is not None and total == cuzk_frac
+                coowned_flat_checks[flat_number] = {
+                    "owners": owner_names,
+                    "sum_str": f"{total.numerator}/{total.denominator}",
+                    "cuzk_str": f"{cuzk_frac.numerator}/{cuzk_frac.denominator}" if cuzk_frac else "-",
+                    "ok": ok,
+                    "mixed": False,
+                }
+            else:
+                coowned_flat_checks[flat_number] = {
+                    "owners": owner_names,
+                    "mixed": True,
+                    "cuzk_str": f"{cuzk_frac.numerator}/{cuzk_frac.denominator}" if cuzk_frac else "-",
+                }
+
+        # === Per-record annotation ===
+        for rec in records:
+            imported_fraction = None
+            if rec.share_numerator and rec.share_denominator:
+                imported_fraction = Fraction(rec.share_numerator, rec.share_denominator)
+
+            flats_fraction = Fraction(0, 1)
+            missing_flats = []
+            missing_cuzk_share = []
+            for flat_number in rec.flat_numbers:
+                parts = flat_number.split("/")
+                if len(parts) != 2:
+                    missing_flats.append(flat_number)
+                    continue
+                unit = Flat.objects.filter(
+                    building__house_number=parts[0].strip(),
+                    flat_number=parts[1].strip(),
+                ).first()
+                if not unit:
+                    missing_flats.append(flat_number)
+                    continue
+                if unit.cuzk_share_numerator and unit.cuzk_share_denominator:
+                    flats_fraction += Fraction(unit.cuzk_share_numerator, unit.cuzk_share_denominator)
+                else:
+                    missing_cuzk_share.append(flat_number)
+
+            rec.preview_imported_share = (
+                f"{imported_fraction.numerator}/{imported_fraction.denominator}"
+                if imported_fraction is not None
+                else "-"
+            )
+            rec.preview_flats_total_share = f"{flats_fraction.numerator}/{flats_fraction.denominator}"
+            rec.preview_missing_flats = missing_flats
+            rec.preview_missing_cuzk_share = missing_cuzk_share
+            rec.preview_share_matches = (
+                imported_fraction is not None
+                and not missing_flats
+                and not missing_cuzk_share
+                and imported_fraction == flats_fraction
+            )
+            rec.preview_coowned = [
+                (fn, coowned_flat_checks[fn])
+                for fn in rec.flat_numbers
+                if fn in coowned_flat_checks
+            ]
+
+        return records
+
     def get(self, request):
         # If there's parsed data in session, show preview
         parsed = request.session.get("owners_import_parsed")
         if parsed:
             records = parse_owners_txt(parsed["text"])
+            records = self._annotate_preview(records)
             return render(request, self.template_name, {
                 "title": _("Import Owners from Text"),
                 "records": records,
@@ -305,6 +410,7 @@ class OwnersImportView(LoginRequiredMixin, View):
                 effective_from = None
 
             records = parse_owners_txt(parsed["text"])
+            records = self._annotate_preview(records)
             results = import_owners(records, effective_from=effective_from)
 
             del request.session["owners_import_parsed"]
@@ -348,8 +454,6 @@ class FlatAreaCalculationView(LoginRequiredMixin, View):
 
     def _build_preview(self):
         """Return (max_denominator, rows) where rows is a list of dicts."""
-        from .models import Flat
-
         flats = Flat.objects.filter(
             cuzk_share_numerator__isnull=False,
             cuzk_share_denominator__isnull=False,

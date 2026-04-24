@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 from django.db import transaction
 
-from solomon_property.models import Building, Flat, FlatOwner, Person, PropertyOwner
+from solomon_property.models import Flat, FlatOwner, Person, PropertyOwner
 
 from .owners_parser import ParsedOwnerRecord, ParsedPerson
 
@@ -83,6 +83,29 @@ def _find_flat(flat_number_str: str) -> Flat | None:
     ).first()
 
 
+def _resolve_flat_share(rec: ParsedOwnerRecord, flat: Flat, flat_count: int) -> tuple[int, int]:
+    """
+    Resolve per-flat ownership share for FlatOwner row creation.
+
+    Parsed record share in owners.txt is owner total share. For multi-flat records,
+    individual flat shares are taken from flat.cuzk_share_* values.
+    """
+    if flat_count > 1:
+        if flat.cuzk_share_numerator and flat.cuzk_share_denominator:
+            return flat.cuzk_share_numerator, flat.cuzk_share_denominator
+        raise ValueError(
+            f"Flat {flat} is missing CUZK share and owner {rec.display_name} has multiple flats."
+        )
+
+    if rec.share_numerator and rec.share_denominator:
+        return rec.share_numerator, rec.share_denominator
+
+    if flat.cuzk_share_numerator and flat.cuzk_share_denominator:
+        return flat.cuzk_share_numerator, flat.cuzk_share_denominator
+
+    return 1, 1
+
+
 @transaction.atomic
 def import_owners(
     records: list[ParsedOwnerRecord],
@@ -132,6 +155,12 @@ def import_owners(
                     logger.warning("Flat not found for %s (owner: %s)", flat_num_str, rec.display_name)
                     continue
 
+                share_numerator, share_denominator = _resolve_flat_share(
+                    rec,
+                    flat,
+                    len(rec.flat_numbers),
+                )
+
                 # Check if FlatOwner already exists for this flat+owner+date
                 existing_fo = FlatOwner.objects.filter(
                     flat=flat,
@@ -145,8 +174,8 @@ def import_owners(
                 fo = FlatOwner.objects.create(
                     flat=flat,
                     owner=owner,
-                    share_numerator=rec.share_numerator or 1,
-                    share_denominator=rec.share_denominator or 1,
+                    share_numerator=share_numerator,
+                    share_denominator=share_denominator,
                     effective_from=effective_from,
                 )
                 result.flat_owners.append(fo)

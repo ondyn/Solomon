@@ -1,4 +1,8 @@
+from collections import defaultdict
+from functools import reduce
+from math import lcm
 from decimal import Decimal
+from fractions import Fraction
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -327,26 +331,54 @@ class Meeting(NetBoxModel):
                 effective_to__isnull=True,
             )
             .select_related("owner", "flat")
-            .order_by("owner__display_name", "flat__flat_number")
+            .order_by("flat__building__house_number", "flat__flat_number", "owner__display_name")
         )
 
+        # Group by flat: co-owners of the same flat become ONE voting unit
+        flat_to_ownerships = defaultdict(list)
         for ownership in active_ownerships:
-            share_value = Decimal(ownership.share_numerator) / Decimal(ownership.share_denominator)
+            flat_to_ownerships[ownership.flat_id].append(ownership)
+
+        for flat_id, ownerships in flat_to_ownerships.items():
+            flat = ownerships[0].flat
+            if len(ownerships) == 1:
+                # Sole owner: snapshot uses their individual FlatOwner share
+                ownership = ownerships[0]
+                share_num = ownership.share_numerator
+                share_den = ownership.share_denominator
+                primary = ownership
+                owner_display_name = str(ownership.owner)
+            else:
+                # Co-owners: one snapshot for the flat using the flat's CUZK share
+                primary = ownerships[0]  # already sorted by display_name
+                owner_display_name = " & ".join(str(o.owner) for o in ownerships)
+                if flat.cuzk_share_numerator and flat.cuzk_share_denominator:
+                    share_num = flat.cuzk_share_numerator
+                    share_den = flat.cuzk_share_denominator
+                else:
+                    total = sum(
+                        (Fraction(o.share_numerator, o.share_denominator) for o in ownerships),
+                        Fraction(0, 1),
+                    )
+                    share_num = total.numerator
+                    share_den = total.denominator
+
+            share_value = Decimal(share_num) / Decimal(share_den)
             style = VoteWeightStyle.objects.filter(
                 voting_method=QUORUM_TYPE_BY_SHARE,
                 weight_value=share_value,
             ).first()
             MeetingOwnerSnapshot.objects.create(
                 meeting=self,
-                owner=ownership.owner,
-                flat_owner=ownership,
-                owner_display_name=str(ownership.owner),
-                flat_label=str(ownership.flat),
+                owner=primary.owner,
+                flat_owner=primary,
+                owner_display_name=owner_display_name,
+                flat_label=str(flat),
                 representation=REPRESENTATION_ABSENT,
-                share_numerator=ownership.share_numerator,
-                share_denominator=ownership.share_denominator,
+                share_numerator=share_num,
+                share_denominator=share_den,
                 share_value=share_value,
-                unit_count=1,
+                unit_count=len(ownerships),
                 ballot_label=style.label if style else "",
                 ballot_color=style.color if style else "",
                 snapshot_taken_at=started_at,
@@ -356,14 +388,22 @@ class Meeting(NetBoxModel):
         self.save(update_fields=["owner_snapshot_taken_at", "last_updated"])
 
     def get_ballot_type_summary(self):
+        all_snapshots = list(self.owner_snapshots.all())
+        denominators = [s.share_denominator for s in all_snapshots if s.share_denominator]
+        common_denom = reduce(lcm, denominators, 1) if denominators else 1
+
+        # Each snapshot is one voting unit with the correct share_value set at snapshot time.
+        # Co-owned flats have ONE snapshot with the flat's CUZK share as the vote weight.
         summaries = {}
-        for snapshot in self.owner_snapshots.all():
-            key = snapshot.ballot_key
+        for snapshot in all_snapshots:
+            key = f"{snapshot.share_value}:{snapshot.ballot_label}:{snapshot.ballot_color}"
             if key not in summaries:
+                scaled_num = snapshot.share_numerator * common_denom // snapshot.share_denominator
                 summaries[key] = {
                     "label": snapshot.ballot_label,
                     "color": snapshot.ballot_color,
                     "share_value": snapshot.share_value,
+                    "share_fraction": f"{scaled_num}/{common_denom}",
                     "owner_count": 0,
                     "issued_count": 0,
                 }
@@ -579,8 +619,13 @@ class VoteWeightStyle(NetBoxModel):
         verbose_name = _("Vote weight style")
         verbose_name_plural = _("Vote weight styles")
 
+    @property
+    def weight_fraction(self):
+        frac = Fraction(self.weight_value).limit_denominator(200000)
+        return f"{frac.numerator}/{frac.denominator}"
+
     def __str__(self):
-        return f"{self.voting_method}: {self.weight_value} ({self.label})"
+        return f"{self.voting_method}: {self.weight_fraction} ({self.label})"
 
     def get_absolute_url(self):
         return reverse("plugins:solomon_meetings:voteweightstyle", kwargs={"pk": self.pk})

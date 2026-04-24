@@ -22,12 +22,14 @@
           <th>{% trans "Type" %}</th>
           <th>{% trans "Persons" %}</th>
           <th>{% trans "Flats" %}</th>
-          <th>{% trans "Share" %}</th>
+          <th>{% trans "Imported total share" %}</th>
+          <th>{% trans "Sum of flats shares" %}</th>
+          <th>{% trans "Check" %}</th>
         </tr>
       </thead>
       <tbody>
         {% for rec in records %}
-        <tr>
+        <tr{% if not rec.preview_share_matches and rec.preview_imported_share != '-' %} class="table-warning"{% endif %}>
           <td>{{ rec.display_name }}</td>
           <td>
             {% if rec.person_type == 'sjm' %}
@@ -51,13 +53,64 @@
             {% endfor %}
           </td>
           <td class="small">
-            {% if rec.share_numerator %}
-              {{ rec.share_numerator }}/{{ rec.share_denominator }}
-            {% else %}-{% endif %}
+            {{ rec.preview_imported_share }}
+          </td>
+          <td class="small">
+            {{ rec.preview_flats_total_share }}
+          </td>
+          <td class="small">
+            {% if rec.preview_missing_flats %}
+              <span class="badge bg-danger">{% trans "Missing flat" %}</span>
+            {% elif rec.preview_missing_cuzk_share %}
+              <span class="badge bg-warning text-dark">{% trans "Missing flat share" %}</span>
+            {% elif rec.preview_imported_share == '-' %}
+              <span class="badge bg-secondary">{% trans "No imported share" %}</span>
+            {% elif rec.preview_share_matches %}
+              <span class="badge bg-success">{% trans "OK" %}</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">{% trans "Mismatch" %}</span>
+            {% endif %}
           </td>
         </tr>
+        {% if rec.preview_missing_flats %}
+        <tr class="table-light">
+          <td colspan="7" class="small text-danger">
+            {% trans "Missing flats:" %} {{ rec.preview_missing_flats|join:", " }}
+          </td>
+        </tr>
+        {% endif %}
+        {% if rec.preview_missing_cuzk_share %}
+        <tr class="table-light">
+          <td colspan="7" class="small text-warning">
+            {% trans "Flats without CUZK share:" %} {{ rec.preview_missing_cuzk_share|join:", " }}
+          </td>
+        </tr>
+        {% endif %}
+        {% if rec.preview_coowned %}
+        <tr class="table-info">
+          <td colspan="7" class="small">
+            {% for flat_num, check in rec.preview_coowned %}
+            <div>
+              <strong>{% trans "Co-owned flat" %} {{ flat_num }}:</strong>
+              {{ check.owners|join:" &amp; " }}
+              {% if not check.mixed %}
+                &mdash; {% trans "sum" %} {{ check.sum_str }} {% trans "vs CUZK" %} {{ check.cuzk_str }}
+                {% if check.ok %}
+                  <span class="badge bg-success">{% trans "OK" %}</span>
+                {% else %}
+                  <span class="badge bg-danger">{% trans "Mismatch" %}</span>
+                {% endif %}
+              {% else %}
+                &mdash; {% trans "CUZK" %} {{ check.cuzk_str }}
+                <span class="badge bg-secondary">{% trans "Mixed co-ownership" %}</span>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </td>
+        </tr>
+        {% endif %}
         {% empty %}
-        <tr><td colspan="5" class="text-center text-muted">{% trans "No records parsed." %}</td></tr>
+        <tr><td colspan="7" class="text-center text-muted">{% trans "No records parsed." %}</td></tr>
         {% endfor %}
       </tbody>
     </table>

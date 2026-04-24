@@ -194,6 +194,53 @@ class PropertyOwnerModelTest(TestCase):
         self.assertEqual(owner.persons.count(), 2)
         self.assertIn(p1, owner.persons.all())
 
+    def test_current_total_share_sums_active_flat_shares(self):
+        building = make_building(name="Share House")
+        flat1 = make_flat(building, flat_number="1")
+        flat2 = make_flat(building, flat_number="2")
+        owner = make_owner(display_name="Share Owner")
+
+        FlatOwner.objects.create(
+            flat=flat1,
+            owner=owner,
+            share_numerator=1,
+            share_denominator=4,
+            effective_from=datetime.date(2024, 1, 1),
+        )
+        FlatOwner.objects.create(
+            flat=flat2,
+            owner=owner,
+            share_numerator=1,
+            share_denominator=2,
+            effective_from=datetime.date(2024, 1, 1),
+        )
+
+        self.assertEqual(owner.current_total_share, "3/4")
+
+    def test_current_total_share_ignores_inactive_records(self):
+        building = make_building(name="Inactive House")
+        flat1 = make_flat(building, flat_number="1")
+        flat2 = make_flat(building, flat_number="2")
+        owner = make_owner(display_name="Inactive Owner")
+
+        FlatOwner.objects.create(
+            flat=flat1,
+            owner=owner,
+            share_numerator=1,
+            share_denominator=3,
+            effective_from=datetime.date(2024, 1, 1),
+            effective_to=datetime.date(2024, 12, 31),
+        )
+        FlatOwner.objects.create(
+            flat=flat2,
+            owner=owner,
+            share_numerator=1,
+            share_denominator=2,
+            effective_from=datetime.date(2025, 1, 1),
+        )
+
+        self.assertEqual(owner.current_total_share, "1/2")
+
 
 # ---------------------------------------------------------------------------
 # FlatOwner tests

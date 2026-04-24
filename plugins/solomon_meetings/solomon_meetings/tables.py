@@ -1,14 +1,19 @@
 import django_tables2 as tables
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from netbox.tables import NetBoxTable, columns
 
 from .models import (
+    AgendaVoteBallot,
+    AgendaVoteSession,
     AgendaItem,
     Meeting,
     MeetingAttendance,
+    MeetingAttendanceEvent,
     MeetingInvitation,
     MeetingMinutes,
+    MeetingOwnerSnapshot,
     MeetingType,
     Vote,
     VoteWeightStyle,
@@ -121,7 +126,16 @@ class VoteTable(NetBoxTable):
 
 class VoteWeightStyleTable(NetBoxTable):
     label = tables.Column(linkify=True)
-    color = columns.ColorColumn()
+    color = tables.Column(verbose_name=_("Color"))
+
+    def render_color(self, value):
+        color = (value or "").strip() or "#000000"
+        return format_html(
+            '<span style="display:inline-block;width:1rem;height:1rem;border:1px solid #6c757d;'
+            'border-radius:0.2rem;background-color:{};vertical-align:middle;margin-right:0.4rem;"></span>{}',
+            color,
+            color,
+        )
 
     class Meta(NetBoxTable.Meta):
         model = VoteWeightStyle
@@ -160,3 +174,86 @@ class MeetingInvitationTable(NetBoxTable):
         model = MeetingInvitation
         fields = ("pk", "meeting", "owner", "sent_at", "delivery_method", "confirmed", "actions")
         default_columns = ("meeting", "owner", "sent_at", "delivery_method", "confirmed", "actions")
+
+
+class MeetingOwnerSnapshotTable(NetBoxTable):
+    owner_display_name = tables.Column()
+
+    class Meta(NetBoxTable.Meta):
+        model = MeetingOwnerSnapshot
+        fields = (
+            "pk",
+            "meeting",
+            "owner_display_name",
+            "representation",
+            "share_value",
+            "ballot_label",
+            "is_currently_present",
+        )
+        default_columns = (
+            "meeting",
+            "owner_display_name",
+            "representation",
+            "share_value",
+            "ballot_label",
+            "is_currently_present",
+        )
+
+
+class MeetingAttendanceEventTable(NetBoxTable):
+    snapshot = tables.Column()
+
+    class Meta(NetBoxTable.Meta):
+        model = MeetingAttendanceEvent
+        fields = ("pk", "snapshot", "event_type", "event_time", "source", "note", "actions")
+        default_columns = ("snapshot", "event_type", "event_time", "source", "note", "actions")
+
+
+class AgendaVoteSessionTable(NetBoxTable):
+    agenda_item = tables.Column(linkify=True)
+
+    class Meta(NetBoxTable.Meta):
+        model = AgendaVoteSession
+        fields = (
+            "pk",
+            "agenda_item",
+            "started_at",
+            "completed_at",
+            "present_weight",
+            "quorum_met",
+            "result",
+        )
+        default_columns = (
+            "agenda_item",
+            "started_at",
+            "completed_at",
+            "present_weight",
+            "quorum_met",
+            "result",
+        )
+
+
+class AgendaVoteBallotTable(NetBoxTable):
+    session = tables.Column()
+
+    class Meta(NetBoxTable.Meta):
+        model = AgendaVoteBallot
+        fields = (
+            "pk",
+            "session",
+            "label",
+            "share_value",
+            "issued_count",
+            "for_count",
+            "against_count",
+            "abstain_count",
+        )
+        default_columns = (
+            "session",
+            "label",
+            "share_value",
+            "issued_count",
+            "for_count",
+            "against_count",
+            "abstain_count",
+        )

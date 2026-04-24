@@ -22,6 +22,23 @@ urlpatterns = [
     path("meetings/add/", views.MeetingEditView.as_view(), name="meeting_add"),
     path("meetings/delete/", views.MeetingBulkDeleteView.as_view(), name="meeting_bulk_delete"),
     path("meetings/<int:pk>/", views.MeetingView.as_view(), name="meeting"),
+    path("meetings/<int:pk>/start/", views.MeetingStartView.as_view(), name="meeting_start"),
+    path("meetings/<int:pk>/finish/", views.MeetingFinishView.as_view(), name="meeting_finish"),
+    path(
+        "meetings/<int:pk>/generate-invitation/",
+        views.MeetingGenerateInvitationView.as_view(),
+        name="meeting_generate_invitation",
+    ),
+    path(
+        "meetings/<int:pk>/publish-invitation/",
+        views.MeetingPublishInvitationView.as_view(),
+        name="meeting_publish_invitation",
+    ),
+    path("meetings/<int:pk>/toggle-attendance/", views.MeetingAttendanceToggleView.as_view(), name="meeting_toggle_attendance"),
+    path("meetings/<int:pk>/agenda/add/", views.MeetingAgendaAddView.as_view(), name="meeting_agenda_add"),
+    path("meetings/<int:pk>/agenda/move/", views.MeetingAgendaMoveView.as_view(), name="meeting_agenda_move"),
+    path("meetings/<int:pk>/sync-ballot-types/", views.MeetingSyncBallotStylesView.as_view(), name="meeting_sync_ballot_types"),
+    path("meetings/<int:pk>/export/", views.MeetingExportView.as_view(), name="meeting_export"),
     path("meetings/<int:pk>/edit/", views.MeetingEditView.as_view(), name="meeting_edit"),
     path("meetings/<int:pk>/delete/", views.MeetingDeleteView.as_view(), name="meeting_delete"),
     path(
@@ -35,6 +52,7 @@ urlpatterns = [
     path("agenda-items/add/", views.AgendaItemEditView.as_view(), name="agendaitem_add"),
     path("agenda-items/delete/", views.AgendaItemBulkDeleteView.as_view(), name="agendaitem_bulk_delete"),
     path("agenda-items/<int:pk>/", views.AgendaItemView.as_view(), name="agendaitem"),
+    path("agenda-items/<int:pk>/start-voting/", views.AgendaItemStartVotingView.as_view(), name="agendaitem_start_voting"),
     path("agenda-items/<int:pk>/edit/", views.AgendaItemEditView.as_view(), name="agendaitem_edit"),
     path("agenda-items/<int:pk>/delete/", views.AgendaItemDeleteView.as_view(), name="agendaitem_delete"),
     path(
@@ -57,6 +75,22 @@ urlpatterns = [
         kwargs={"model": models.MeetingAttendance},
     ),
 
+    path("owner-snapshots/", views.MeetingOwnerSnapshotListView.as_view(), name="meetingownersnapshot_list"),
+    path("owner-snapshots/<int:pk>/", views.MeetingOwnerSnapshotView.as_view(), name="meetingownersnapshot"),
+
+    path("attendance-events/", views.MeetingAttendanceEventListView.as_view(), name="meetingattendanceevent_list"),
+    path("attendance-events/add/", views.MeetingAttendanceEventEditView.as_view(), name="meetingattendanceevent_add"),
+    path("attendance-events/delete/", views.MeetingAttendanceEventBulkDeleteView.as_view(), name="meetingattendanceevent_bulk_delete"),
+    path("attendance-events/<int:pk>/", views.MeetingAttendanceEventView.as_view(), name="meetingattendanceevent"),
+    path("attendance-events/<int:pk>/edit/", views.MeetingAttendanceEventEditView.as_view(), name="meetingattendanceevent_edit"),
+    path("attendance-events/<int:pk>/delete/", views.MeetingAttendanceEventDeleteView.as_view(), name="meetingattendanceevent_delete"),
+    path(
+        "attendance-events/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="meetingattendanceevent_changelog",
+        kwargs={"model": models.MeetingAttendanceEvent},
+    ),
+
     path("votes/", views.VoteListView.as_view(), name="vote_list"),
     path("votes/add/", views.VoteEditView.as_view(), name="vote_add"),
     path("votes/delete/", views.VoteBulkDeleteView.as_view(), name="vote_bulk_delete"),
@@ -68,6 +102,26 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="vote_changelog",
         kwargs={"model": models.Vote},
+    ),
+
+    path("vote-sessions/", views.AgendaVoteSessionListView.as_view(), name="agendavotesession_list"),
+    path("vote-sessions/<int:pk>/", views.AgendaVoteSessionView.as_view(), name="agendavotesession"),
+    path("vote-sessions/<int:pk>/delete/", views.AgendaVoteSessionDeleteView.as_view(), name="agendavotesession_delete"),
+    path(
+        "vote-sessions/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="agendavotesession_changelog",
+        kwargs={"model": models.AgendaVoteSession},
+    ),
+
+    path("vote-ballots/", views.AgendaVoteBallotListView.as_view(), name="agendavoteballot_list"),
+    path("vote-ballots/<int:pk>/", views.AgendaVoteBallotView.as_view(), name="agendavoteballot"),
+    path("vote-ballots/<int:pk>/delete/", views.AgendaVoteBallotDeleteView.as_view(), name="agendavoteballot_delete"),
+    path(
+        "vote-ballots/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="agendavoteballot_changelog",
+        kwargs={"model": models.AgendaVoteBallot},
     ),
 
     path("vote-weight-styles/", views.VoteWeightStyleListView.as_view(), name="voteweightstyle_list"),

@@ -112,6 +112,7 @@ class PersonNotesPanel(panels.ObjectAttributesPanel):
 class PropertyOwnerPanel(panels.ObjectAttributesPanel):
     display_name = attrs.TextAttr('display_name', label=_('Display name'))
     person_type = attrs.ChoiceAttr('person_type', label=_('Person type'))
+    current_total_share = attrs.TextAttr('current_total_share', label=_('Total active share'))
     email = attrs.TextAttr('email', label=_('Email'))
     phone = attrs.TextAttr('phone', label=_('Phone'))
 
