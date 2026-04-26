@@ -20,3 +20,12 @@ Solomon is a **facility management system** for managing apartment buildings und
 ## Code Style Rules
 
 - **Never use em dashes (`—`) anywhere in code** - use a plain hyphen (`-`) instead, in comments, docstrings, strings, and templates
+
+## Debugging and Logs
+
+- **App runs in Docker** - To debug or view logs, you must use Docker Compose:
+  - View logs: `docker compose logs netbox` (or add `-f` for follow mode)
+  - View specific number of logs: `docker compose logs -n 50 netbox`
+  - See only recent logs: `docker compose logs --tail=100 netbox`
+  - Execute commands in container: `docker compose exec netbox python manage.py <command>`
+  - Rebuild and restart: `docker compose down && docker compose build --no-cache netbox && docker compose up -d netbox`
