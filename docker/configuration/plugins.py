@@ -11,7 +11,7 @@
 
 # List of enabled plugins (must be installed in the container image)
 PLUGINS = [
-    "solomon_core",
+    # "solomon_core",
     "solomon_test_plugin",
     "solomon_theme",
     "solomon_property",

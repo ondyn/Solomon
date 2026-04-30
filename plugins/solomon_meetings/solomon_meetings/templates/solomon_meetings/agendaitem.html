@@ -70,4 +70,126 @@
 		</div>
 	</div>
 </div>
+
+<div class="row mt-3">
+	<div class="col col-lg-6">
+		<div class="card mb-3">
+			<h5 class="card-header">{% trans "Latest voting totals" %}</h5>
+			<div class="card-body">
+				{% if latest_vote_session %}
+				<table class="table table-hover attr-table mb-0">
+					<tr>
+						<th scope="row">{% trans "Session started" %}</th>
+						<td>{{ latest_vote_session.started_at|isodatetime:"minutes" }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Session completed" %}</th>
+						<td>{{ latest_vote_session.completed_at|isodatetime:"minutes"|placeholder }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Result" %}</th>
+						<td>{{ latest_vote_session.get_result_display }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Quorum met" %}</th>
+						<td>{{ latest_vote_session.quorum_met|yesno:_('Yes,No') }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Present weight" %}</th>
+						<td>{{ latest_vote_session.present_weight }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "For" %}</th>
+						<td>{{ latest_vote_totals.FOR|default:0 }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Against" %}</th>
+						<td>{{ latest_vote_totals.AGAINST|default:0 }}</td>
+					</tr>
+					<tr>
+						<th scope="row">{% trans "Abstain" %}</th>
+						<td>{{ latest_vote_totals.ABSTAIN|default:0 }}</td>
+					</tr>
+				</table>
+				<div class="mt-3">
+					<a class="btn btn-sm btn-warning" href="{% url 'plugins:solomon_meetings:agendaitem_start_voting' pk=object.pk %}?session={{ latest_vote_session.pk }}">{% trans "Edit voting" %}</a>
+				</div>
+				{% else %}
+					{{ ''|placeholder }}
+				{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="col col-lg-6">
+		<div class="card mb-3">
+			<h5 class="card-header">{% trans "Vote sessions" %}</h5>
+			<div class="table-responsive">
+				<table class="table table-hover mb-0">
+					<thead>
+						<tr>
+							<th>{% trans "Started" %}</th>
+							<th>{% trans "Result" %}</th>
+							<th>{% trans "Rows" %}</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for session in vote_sessions %}
+						<tr>
+							<td>{{ session.started_at|isodatetime:"minutes" }}</td>
+							<td>{{ session.get_result_display }}</td>
+							<td>{{ session.ballot_rows.count }}</td>
+						</tr>
+						{% empty %}
+						<tr><td colspan="3">{% trans "No voting sessions recorded yet." %}</td></tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% if latest_vote_session %}
+<div class="row">
+	<div class="col">
+		<div class="card">
+			<h5 class="card-header">{% trans "Ballot rows (latest session)" %}</h5>
+			<div class="table-responsive">
+				<table class="table table-hover mb-0">
+					<thead>
+						<tr>
+							<th>{% trans "Label" %}</th>
+							<th>{% trans "Color" %}</th>
+							<th>{% trans "Share" %}</th>
+							<th>{% trans "Issued" %}</th>
+							<th>{% trans "For" %}</th>
+							<th>{% trans "Against" %}</th>
+							<th>{% trans "Abstain" %}</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for row in latest_vote_session.ballot_rows.all %}
+						<tr>
+							<td>{{ row.label|default:'-' }}</td>
+							<td>
+								{% if row.color %}
+									<span style="display:inline-block;width:1rem;height:1rem;border:1px solid #6c757d;border-radius:0.2rem;background-color: {{ row.color }};vertical-align:middle;margin-right:0.4rem;"></span>{{ row.color }}
+								{% else %}
+									{{ ''|placeholder }}
+								{% endif %}
+							</td>
+							<td>{{ row.share_value }}</td>
+							<td>{{ row.issued_count }}</td>
+							<td>{{ row.for_count }}</td>
+							<td>{{ row.against_count }}</td>
+							<td>{{ row.abstain_count }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
 {% endblock content %}

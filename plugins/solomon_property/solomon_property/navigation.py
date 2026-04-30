@@ -12,6 +12,17 @@ property_menu = PluginMenu(
             _("Buildings & Flats"),
             (
                 PluginMenuItem(
+                    link="plugins:solomon_property:buildingobject_list",
+                    link_text=_("Building Objects"),
+                    buttons=(
+                        PluginMenuButton(
+                            link="plugins:solomon_property:buildingobject_add",
+                            title=_("Add"),
+                            icon_class="mdi mdi-plus-thick",
+                        ),
+                    ),
+                ),
+                PluginMenuItem(
                     link="plugins:solomon_property:building_list",
                     link_text=_("Buildings"),
                     buttons=(

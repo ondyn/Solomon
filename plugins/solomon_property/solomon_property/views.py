@@ -9,6 +9,9 @@ from netbox.views import generic
 
 from . import filtersets, filterforms, forms, models, tables
 from .ui.panels import (
+    BuildingObjectNotesPanel,
+    BuildingObjectPanel,
+    BuildingObjectTechnicalPanel,
     BuildingCuzkPanel,
     BuildingNotesPanel,
     BuildingPanel,
@@ -31,18 +34,66 @@ from .ui.panels import (
 
 
 # ---------------------------------------------------------------------------
+#  BuildingObject views
+# ---------------------------------------------------------------------------
+
+class BuildingObjectListView(generic.ObjectListView):
+    queryset = models.BuildingObject.objects.all()
+    table = tables.BuildingObjectTable
+    filterset = filtersets.BuildingObjectFilterSet
+    filterset_form = filterforms.BuildingObjectFilterForm
+
+
+class BuildingObjectView(generic.ObjectView):
+    queryset = models.BuildingObject.objects.prefetch_related("buildings")
+    layout = layout.SimpleLayout(
+        left_panels=[
+            BuildingObjectPanel(),
+            BuildingObjectNotesPanel(),
+            CustomFieldsPanel(),
+            TagsPanel(),
+        ],
+        right_panels=[
+            BuildingObjectTechnicalPanel(),
+        ],
+        bottom_panels=[
+            ContextTablePanel(table='building_table', title=_('Buildings')),
+        ],
+    )
+
+    def get_extra_context(self, request, instance):
+        building_table = tables.BuildingTable(instance.buildings.all())
+        building_table.configure(request)
+        return {"building_table": building_table, "building_count": instance.buildings.count()}
+
+
+class BuildingObjectEditView(generic.ObjectEditView):
+    queryset = models.BuildingObject.objects.all()
+    form = forms.BuildingObjectForm
+
+
+class BuildingObjectDeleteView(generic.ObjectDeleteView):
+    queryset = models.BuildingObject.objects.all()
+
+
+class BuildingObjectBulkDeleteView(generic.BulkDeleteView):
+    queryset = models.BuildingObject.objects.all()
+    table = tables.BuildingObjectTable
+
+
+# ---------------------------------------------------------------------------
 #  Building views
 # ---------------------------------------------------------------------------
 
 class BuildingListView(generic.ObjectListView):
-    queryset = models.Building.objects.all()
+    queryset = models.Building.objects.select_related("building_object")
     table = tables.BuildingTable
     filterset = filtersets.BuildingFilterSet
     filterset_form = filterforms.BuildingFilterForm
 
 
 class BuildingView(generic.ObjectView):
-    queryset = models.Building.objects.prefetch_related("flats")
+    queryset = models.Building.objects.select_related("building_object").prefetch_related("flats")
     layout = layout.SimpleLayout(
         left_panels=[
             BuildingPanel(),

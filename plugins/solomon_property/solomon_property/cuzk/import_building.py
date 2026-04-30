@@ -15,7 +15,7 @@ from typing import Any
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from solomon_property.models import Building, Flat
+from solomon_property.models import Building, BuildingObject, Flat
 
 from .service import (
     CUZKBuilding,
@@ -147,6 +147,11 @@ def build_import_preview(
         else:
             existing = Building.objects.filter(cuzk_building_id=cuzk_building.id, house_number=str(hn)).first()
             if not existing:
+                existing = Building.objects.filter(
+                    building_object__cuzk_building_id=cuzk_building.id,
+                    house_number=str(hn),
+                ).first()
+            if not existing:
                 existing = Building.objects.filter(house_number=str(hn), city=cuzk_building.municipality_name).first()
             existing_by_hn[hn] = existing
 
@@ -173,6 +178,28 @@ def build_import_preview(
 # ---------------------------------------------------------------------------
 #  Import execution
 # ---------------------------------------------------------------------------
+def _ensure_building_object(cb: CUZKBuilding, lv_number: int | None) -> BuildingObject:
+    defaults = {
+        "name": f"SO {cb.id}",
+        "building_type_name": cb.building_type_name,
+        "usage_name": cb.usage_name,
+        "municipality_name": cb.municipality_name,
+        "city_part_name": cb.city_part_name,
+        "lv_number": lv_number,
+        "cadastral_territory_name": cb.lv.cadastral_territory_name if cb.lv else "",
+        "house_numbers": cb.house_numbers,
+    }
+    building_object, created = BuildingObject.objects.get_or_create(
+        cuzk_building_id=cb.id,
+        defaults=defaults,
+    )
+    if not created:
+        for key, value in defaults.items():
+            setattr(building_object, key, value)
+        building_object.save()
+    return building_object
+
+
 @transaction.atomic
 def execute_import(
     building_diffs: list[BuildingDiff],
@@ -189,9 +216,11 @@ def execute_import(
         cb = bdiff.cuzk_building
         building = bdiff.existing_building
         lv_number = cb.lv.number if cb.lv else None
+        building_object = _ensure_building_object(cb, lv_number)
 
         if action == ACTION_CREATE:
             building = Building.objects.create(
+                building_object=building_object,
                 name=f"{cb.city_part_name} {hn}".strip() or str(hn),
                 street=cb.city_part_name,
                 house_number=str(hn),
@@ -202,6 +231,7 @@ def execute_import(
             )
             stats["buildings_created"] += 1
         elif action == ACTION_UPDATE and building:
+            building.building_object = building_object
             building.house_number = str(hn)
             building.city = cb.municipality_name
             building.cuzk_building_id = cb.id

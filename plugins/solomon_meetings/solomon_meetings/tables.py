@@ -1,8 +1,15 @@
 import django_tables2 as tables
+from collections import defaultdict
+from decimal import Decimal
+from fractions import Fraction
+from functools import reduce
+from math import gcd
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from netbox.tables import NetBoxTable, columns
+from netbox.tables import NetBoxTable
+
+from solomon_property.models import FlatOwner
 
 from .models import (
     AgendaVoteBallot,
@@ -18,6 +25,51 @@ from .models import (
     Vote,
     VoteWeightStyle,
 )
+
+
+def _lcm(a, b):
+    return abs(a * b) // gcd(a, b) if a and b else max(a, b)
+
+
+def _build_current_share_stats():
+    ownerships = FlatOwner.objects.filter(effective_to__isnull=True).select_related("flat")
+
+    flat_to_ownerships = defaultdict(list)
+    for ownership in ownerships:
+        flat_to_ownerships[ownership.flat_id].append(ownership)
+
+    holder_totals = defaultdict(lambda: Fraction(0, 1))
+
+    for flat_id, flat_ownerships in flat_to_ownerships.items():
+        if len(flat_ownerships) == 1:
+            ownership = flat_ownerships[0]
+            if not ownership.share_denominator:
+                continue
+
+            holder_key = ("owner", ownership.owner_id)
+            share_fraction = Fraction(ownership.share_numerator, ownership.share_denominator)
+        else:
+            flat = flat_ownerships[0].flat
+            holder_key = ("flat", flat_id)
+            if flat.cuzk_share_numerator and flat.cuzk_share_denominator:
+                share_fraction = Fraction(flat.cuzk_share_numerator, flat.cuzk_share_denominator)
+            else:
+                share_fraction = sum(
+                    (Fraction(o.share_numerator, o.share_denominator) for o in flat_ownerships),
+                    Fraction(0, 1),
+                )
+
+        holder_totals[holder_key] += share_fraction
+
+    share_counts = defaultdict(int)
+    denominators = []
+
+    for share_fraction in holder_totals.values():
+        share_counts[share_fraction] += 1
+        denominators.append(share_fraction.denominator)
+
+    common_denominator = reduce(_lcm, denominators, 1) if denominators else 1
+    return share_counts, common_denominator
 
 
 class MeetingTypeTable(NetBoxTable):
@@ -127,6 +179,24 @@ class VoteTable(NetBoxTable):
 class VoteWeightStyleTable(NetBoxTable):
     label = tables.Column(linkify=True)
     color = tables.Column(verbose_name=_("Color"))
+    share_count = tables.Column(verbose_name=_("Count"), orderable=False, empty_values=())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._share_counts, self._common_share_denominator = _build_current_share_stats()
+
+    def render_weight_value(self, record):
+        if record.voting_method != "BY_SHARE":
+            return record.weight_fraction
+
+        numerator, denominator = record.weight_fraction_pair
+        share_fraction = Fraction(numerator, denominator)
+        common_denominator = self._common_share_denominator or share_fraction.denominator
+        if common_denominator % share_fraction.denominator:
+            common_denominator = _lcm(common_denominator, share_fraction.denominator)
+
+        common_numerator = share_fraction.numerator * common_denominator // share_fraction.denominator
+        return f"{common_numerator}/{common_denominator}"
 
     def render_color(self, value):
         color = (value or "").strip() or "#000000"
@@ -137,10 +207,21 @@ class VoteWeightStyleTable(NetBoxTable):
             color,
         )
 
+    def render_share_count(self, value, record):
+        if record.voting_method == "BY_UNITS":
+            if Decimal(str(record.weight_value)) == Decimal("1"):
+                count = FlatOwner.objects.filter(effective_to__isnull=True).values("owner_id").distinct().count()
+            else:
+                count = 0
+        else:
+            numerator, denominator = record.weight_fraction_pair
+            count = self._share_counts.get(Fraction(numerator, denominator), 0)
+        return count
+
     class Meta(NetBoxTable.Meta):
         model = VoteWeightStyle
-        fields = ("pk", "voting_method", "weight_value", "label", "color", "actions")
-        default_columns = ("voting_method", "weight_value", "label", "color", "actions")
+        fields = ("pk", "voting_method", "weight_value", "label", "color", "share_count", "actions")
+        default_columns = ("voting_method", "weight_value", "label", "color", "share_count", "actions")
 
 
 class MeetingMinutesTable(NetBoxTable):
@@ -201,12 +282,12 @@ class MeetingOwnerSnapshotTable(NetBoxTable):
 
 
 class MeetingAttendanceEventTable(NetBoxTable):
-    snapshot = tables.Column()
+    owner_snapshot = tables.Column()
 
     class Meta(NetBoxTable.Meta):
         model = MeetingAttendanceEvent
-        fields = ("pk", "snapshot", "event_type", "event_time", "source", "note", "actions")
-        default_columns = ("snapshot", "event_type", "event_time", "source", "note", "actions")
+        fields = ("pk", "owner_snapshot", "event_type", "event_time", "source", "note", "actions")
+        default_columns = ("owner_snapshot", "event_type", "event_time", "source", "note", "actions")
 
 
 class AgendaVoteSessionTable(NetBoxTable):

@@ -6,6 +6,7 @@ from solomon_property import filtersets, models
 
 from .serializers import (
     BuildingSerializer,
+    BuildingObjectSerializer,
     FlatOwnerSerializer,
     FlatSerializer,
     PropertyOwnerSerializer,
@@ -14,8 +15,14 @@ from .serializers import (
 )
 
 
+class BuildingObjectViewSet(NetBoxModelViewSet):
+    queryset = models.BuildingObject.objects.all()
+    serializer_class = BuildingObjectSerializer
+    filterset_class = filtersets.BuildingObjectFilterSet
+
+
 class BuildingViewSet(NetBoxModelViewSet):
-    queryset = models.Building.objects.all()
+    queryset = models.Building.objects.select_related("building_object")
     serializer_class = BuildingSerializer
     filterset_class = filtersets.BuildingFilterSet
 

@@ -19,6 +19,7 @@ from .models import (
     QUORUM_TYPE_CHOICES,
     Vote,
     VoteWeightStyle,
+    quantize_weight_fraction,
 )
 
 
@@ -145,9 +146,9 @@ class VoteWeightStyleForm(NetBoxModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk and self.instance.weight_value:
-            frac = Fraction(self.instance.weight_value).limit_denominator(200000)
-            self.fields["weight_numerator"].initial = frac.numerator
-            self.fields["weight_denominator"].initial = frac.denominator
+            numerator, denominator = self.instance.weight_fraction_pair
+            self.fields["weight_numerator"].initial = numerator
+            self.fields["weight_denominator"].initial = denominator
 
     def clean(self):
         super().clean()
@@ -155,9 +156,9 @@ class VoteWeightStyleForm(NetBoxModelForm):
         num = cleaned.get("weight_numerator")
         den = cleaned.get("weight_denominator")
         if num is not None and den is not None:
-            # VoteWeightStyle.weight_value is DecimalField(..., decimal_places=6),
-            # so normalize to 6 decimals before model validation/saving.
-            cleaned["weight_value"] = (Decimal(num) / Decimal(den)).quantize(Decimal("0.000001"))
+            cleaned["weight_value"] = quantize_weight_fraction(num, den)
+            cleaned["weight_numerator"] = num
+            cleaned["weight_denominator"] = den
         return cleaned
 
 
@@ -195,11 +196,11 @@ class MeetingInvitationForm(NetBoxModelForm):
 
 
 class MeetingAttendanceEventForm(NetBoxModelForm):
-    snapshot = DynamicModelChoiceField(queryset=MeetingOwnerSnapshot.objects.all())
+    owner_snapshot = DynamicModelChoiceField(queryset=MeetingOwnerSnapshot.objects.all())
 
     class Meta:
         model = MeetingAttendanceEvent
-        fields = ["snapshot", "event_type", "event_time", "source", "note", "tags"]
+        fields = ["owner_snapshot", "event_type", "event_time", "source", "note", "tags"]
         widgets = {
             "event_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
@@ -278,9 +279,15 @@ class AgendaVoteSessionForm(forms.Form):
             row_data["against_count"] = row_data.get("against_count") or 0
             row_data["abstain_count"] = row_data.get("abstain_count") or 0
 
-            if row_data["for_count"] + row_data["against_count"] + row_data["abstain_count"] > issued:
+            total_votes = row_data["for_count"] + row_data["against_count"] + row_data["abstain_count"]
+            if total_votes > issued:
                 raise forms.ValidationError(
                     f"Row {index + 1}: vote totals cannot exceed issued ballots."
+                )
+
+            if total_votes != issued:
+                raise forms.ValidationError(
+                    f"Row {index + 1}: for + against + abstain must equal issued ballots."
                 )
 
             parsed_rows.append(row_data)

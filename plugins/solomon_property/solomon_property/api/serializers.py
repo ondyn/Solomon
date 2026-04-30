@@ -4,18 +4,35 @@ from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
 
-from solomon_property.models import Building, Flat, FlatOwner, PropertyOwner, Person, PropertyTenant
+from solomon_property.models import Building, BuildingObject, Flat, FlatOwner, PropertyOwner, Person, PropertyTenant
+
+
+class BuildingObjectSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:solomon_property-api:buildingobject-detail"
+    )
+
+    class Meta:
+        model = BuildingObject
+        fields = [
+            "id", "url", "display", "name", "cuzk_building_id",
+            "building_type_name", "usage_name", "municipality_name", "city_part_name",
+            "lv_number", "cadastral_territory_name", "house_numbers", "note",
+            "tags", "custom_fields", "created", "last_updated",
+        ]
+        brief_fields = ["id", "url", "display", "name", "cuzk_building_id"]
 
 
 class BuildingSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:solomon_property-api:building-detail"
     )
+    building_object = BuildingObjectSerializer(nested=True)
 
     class Meta:
         model = Building
         fields = [
-            "id", "url", "display", "name", "street", "house_number",
+            "id", "url", "display", "building_object", "name", "street", "house_number",
             "city", "postal_code", "number_of_floors", "elevator",
             "year_built", "total_units", "land_plot_number",
             "common_rooms", "floor_plan_url", "common_area_rental",

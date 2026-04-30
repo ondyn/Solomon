@@ -27,13 +27,15 @@ from solomon_meetings.models import (
     Vote,
     VoteWeightStyle,
 )
-from solomon_property.models import Building, Flat, FlatOwner, PropertyOwner
+from solomon_property.models import Building, BuildingObject, Flat, FlatOwner, PropertyOwner
 
 
 class MeetingModelTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="moderator")
+        self.building_object = BuildingObject.objects.create(name="SO Test")
         self.building = Building.objects.create(
+            building_object=self.building_object,
             name="Test Building",
             street="Test",
             house_number="1",
@@ -157,10 +159,81 @@ class MeetingModelTests(TestCase):
         self.assertFalse(snapshot.is_present_at(first_departure + datetime.timedelta(minutes=1)))
         self.assertTrue(snapshot.is_present_at(second_arrival + datetime.timedelta(minutes=1)))
 
+    def test_arrival_event_updates_quorum_even_if_representation_is_absent(self):
+        meeting = self._meeting(quorum_type=QUORUM_TYPE_BY_SHARE)
+        start_time = timezone.now()
+        meeting.start_meeting(started_at=start_time)
+        snapshot = MeetingOwnerSnapshot.objects.get(meeting=meeting, flat_owner=self.flat_owner)
+
+        self.assertEqual(snapshot.representation, "ABSENT")
+        self.assertEqual(meeting.calculate_quorum_ratio(), Decimal("0"))
+
+        MeetingAttendanceEvent.objects.create(
+            snapshot=snapshot,
+            event_type=ATTENDANCE_EVENT_ARRIVAL,
+            event_time=start_time + datetime.timedelta(minutes=1),
+        )
+
+        meeting.refresh_from_db()
+        self.assertEqual(meeting.calculate_quorum_ratio(), Decimal("1"))
+
+    def test_ballot_summary_aggregates_multi_flat_owner_into_single_holder_share(self):
+        meeting = self._meeting(quorum_type=QUORUM_TYPE_BY_SHARE)
+
+        owner_multi = PropertyOwner.objects.create(display_name="Owner Multi")
+        owner_single = PropertyOwner.objects.create(display_name="Owner Single")
+
+        flat_multi_a = Flat.objects.create(building=self.building, flat_number="2A")
+        flat_multi_b = Flat.objects.create(building=self.building, flat_number="2B")
+        flat_single = Flat.objects.create(building=self.building, flat_number="3A")
+
+        FlatOwner.objects.create(
+            flat=flat_multi_a,
+            owner=owner_multi,
+            share_numerator=1,
+            share_denominator=4,
+            effective_from=datetime.date(2020, 1, 1),
+        )
+        FlatOwner.objects.create(
+            flat=flat_multi_b,
+            owner=owner_multi,
+            share_numerator=1,
+            share_denominator=5,
+            effective_from=datetime.date(2020, 1, 1),
+        )
+        FlatOwner.objects.create(
+            flat=flat_single,
+            owner=owner_single,
+            share_numerator=9,
+            share_denominator=20,
+            effective_from=datetime.date(2020, 1, 1),
+        )
+
+        meeting.snapshot_owners(started_at=timezone.now())
+        meeting.owner_snapshots.update(
+            is_currently_present=True,
+            first_arrived_at=timezone.now(),
+            last_left_at=None,
+        )
+
+        summary = meeting.get_ballot_type_summary()
+        rows_by_fraction = {row["share_fraction"]: row for row in summary}
+
+        # 1/4 + 1/5 == 9/20, so both holders must collapse under one share row.
+        self.assertIn("9/20", rows_by_fraction)
+        self.assertEqual(rows_by_fraction["9/20"]["owner_count"], 2)
+        self.assertEqual(rows_by_fraction["9/20"]["issued_count"], 2)
+
+        # Component shares must not appear as separate holder rows.
+        self.assertNotIn("1/4", rows_by_fraction)
+        self.assertNotIn("1/5", rows_by_fraction)
+
 
 class VotingModelTests(TestCase):
     def setUp(self):
+        self.building_object = BuildingObject.objects.create(name="SO Vote")
         self.building = Building.objects.create(
+            building_object=self.building_object,
             name="Vote Building",
             street="Vote",
             house_number="10",

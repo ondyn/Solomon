@@ -6,7 +6,27 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.filtersets import NetBoxModelFilterSet
 
-from .models import Building, Flat, FlatOwner, PropertyOwner, Person, PropertyTenant
+from .models import Building, BuildingObject, Flat, FlatOwner, PropertyOwner, Person, PropertyTenant
+
+
+class BuildingObjectFilterSet(NetBoxModelFilterSet):
+    q = django_filters.CharFilter(method="search", label=_("Search"))
+    name = django_filters.CharFilter(lookup_expr="icontains", label=_("Name"))
+    municipality_name = django_filters.CharFilter(lookup_expr="icontains", label=_("Municipality"))
+    city_part_name = django_filters.CharFilter(lookup_expr="icontains", label=_("City part"))
+    cuzk_building_id = django_filters.NumberFilter()
+
+    def search(self, queryset, name, value):
+        return queryset.filter(
+            Q(name__icontains=value)
+            | Q(municipality_name__icontains=value)
+            | Q(city_part_name__icontains=value)
+            | Q(cadastral_territory_name__icontains=value)
+        )
+
+    class Meta:
+        model = BuildingObject
+        fields = ["name", "municipality_name", "city_part_name", "cuzk_building_id"]
 
 
 class BuildingFilterSet(NetBoxModelFilterSet):
@@ -14,11 +34,16 @@ class BuildingFilterSet(NetBoxModelFilterSet):
     name = django_filters.CharFilter(lookup_expr="icontains", label=_("Name"))
     city = django_filters.CharFilter(lookup_expr="icontains", label=_("City"))
     house_number = django_filters.CharFilter(lookup_expr="icontains")
+    building_object_id = django_filters.ModelChoiceFilter(
+        queryset=BuildingObject.objects.all(),
+        label=_("Building object"),
+    )
     cuzk_building_id = django_filters.NumberFilter()
 
     def search(self, queryset, name, value):
         return queryset.filter(
             Q(name__icontains=value)
+            | Q(building_object__name__icontains=value)
             | Q(street__icontains=value)
             | Q(house_number__icontains=value)
             | Q(city__icontains=value)
@@ -26,7 +51,7 @@ class BuildingFilterSet(NetBoxModelFilterSet):
 
     class Meta:
         model = Building
-        fields = ["name", "city", "house_number", "cuzk_building_id"]
+        fields = ["name", "city", "house_number", "building_object_id", "cuzk_building_id"]
 
 
 class FlatFilterSet(NetBoxModelFilterSet):

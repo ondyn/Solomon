@@ -6,10 +6,14 @@ from solomon_property.api.serializers import FlatOwnerSerializer, PropertyOwnerS
 
 from solomon_meetings.models import (
     AgendaItem,
+    AgendaVoteBallot,
+    AgendaVoteSession,
     Meeting,
     MeetingAttendance,
+    MeetingAttendanceEvent,
     MeetingInvitation,
     MeetingMinutes,
+    MeetingOwnerSnapshot,
     MeetingType,
     Vote,
     VoteWeightStyle,
@@ -132,6 +136,69 @@ class MeetingAttendanceSerializer(NetBoxModelSerializer):
         brief_fields = ["id", "url", "display", "representation"]
 
 
+class MeetingOwnerSnapshotSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:solomon_meetings-api:meetingownersnapshot-detail"
+    )
+    owner = PropertyOwnerSerializer(nested=True)
+    flat_owner = FlatOwnerSerializer(nested=True)
+
+    class Meta:
+        model = MeetingOwnerSnapshot
+        fields = [
+            "id",
+            "url",
+            "display",
+            "meeting",
+            "owner",
+            "flat_owner",
+            "owner_display_name",
+            "flat_label",
+            "representation",
+            "proxy_name",
+            "share_numerator",
+            "share_denominator",
+            "share_value",
+            "unit_count",
+            "ballot_label",
+            "ballot_color",
+            "snapshot_taken_at",
+            "first_arrived_at",
+            "last_left_at",
+            "is_currently_present",
+            "tags",
+            "custom_fields",
+            "created",
+            "last_updated",
+        ]
+        brief_fields = ["id", "url", "display", "owner_display_name", "flat_label"]
+
+
+class MeetingAttendanceEventSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:solomon_meetings-api:meetingattendanceevent-detail"
+    )
+    owner_snapshot = MeetingOwnerSnapshotSerializer(nested=True)
+
+    class Meta:
+        model = MeetingAttendanceEvent
+        fields = [
+            "id",
+            "url",
+            "display",
+            "owner_snapshot",
+            "event_type",
+            "event_time",
+            "source",
+            "note",
+            "tags",
+            "custom_fields",
+            "created",
+            "last_updated",
+        ]
+        brief_fields = ["id", "url", "display", "event_type", "event_time"]
+
+
 class VoteSerializer(NetBoxModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="plugins-api:solomon_meetings-api:vote-detail"
@@ -178,6 +245,61 @@ class VoteWeightStyleSerializer(NetBoxModelSerializer):
             "last_updated",
         ]
         brief_fields = ["id", "url", "display", "label", "weight_value"]
+
+
+class AgendaVoteSessionSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:solomon_meetings-api:agendavotesession-detail"
+    )
+    agenda_item = AgendaItemSerializer(nested=True)
+
+    class Meta:
+        model = AgendaVoteSession
+        fields = [
+            "id",
+            "url",
+            "display",
+            "agenda_item",
+            "started_at",
+            "completed_at",
+            "negative_form",
+            "present_weight",
+            "quorum_met",
+            "result",
+            "tags",
+            "custom_fields",
+            "created",
+            "last_updated",
+        ]
+        brief_fields = ["id", "url", "display", "started_at", "result"]
+
+
+class AgendaVoteBallotSerializer(NetBoxModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="plugins-api:solomon_meetings-api:agendavoteballot-detail"
+    )
+    session = AgendaVoteSessionSerializer(nested=True)
+
+    class Meta:
+        model = AgendaVoteBallot
+        fields = [
+            "id",
+            "url",
+            "display",
+            "session",
+            "label",
+            "color",
+            "share_value",
+            "issued_count",
+            "for_count",
+            "against_count",
+            "abstain_count",
+            "tags",
+            "custom_fields",
+            "created",
+            "last_updated",
+        ]
+        brief_fields = ["id", "url", "display", "label", "share_value"]
 
 
 class MeetingMinutesSerializer(NetBoxModelSerializer):

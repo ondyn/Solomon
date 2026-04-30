@@ -5,6 +5,7 @@ from netbox.api.routers import NetBoxRouter
 from . import views
 
 router = NetBoxRouter()
+router.register("building-objects", views.BuildingObjectViewSet)
 router.register("buildings", views.BuildingViewSet)
 router.register("flats", views.FlatViewSet)
 router.register("persons", views.PersonViewSet)

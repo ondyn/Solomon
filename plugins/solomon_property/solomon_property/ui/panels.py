@@ -6,10 +6,36 @@ from netbox.ui import attrs, panels
 
 
 # ---------------------------------------------------------------------------
+#  Building Object panel
+# ---------------------------------------------------------------------------
+
+class BuildingObjectPanel(panels.ObjectAttributesPanel):
+    name = attrs.TextAttr('name', label=_('Name'))
+    cuzk_building_id = attrs.TextAttr('cuzk_building_id', label=_('CUZK building object ID'))
+    municipality_name = attrs.TextAttr('municipality_name', label=_('Municipality'))
+    city_part_name = attrs.TextAttr('city_part_name', label=_('City part'))
+    cadastral_territory_name = attrs.TextAttr('cadastral_territory_name', label=_('Cadastral territory'))
+    house_numbers = attrs.TextAttr('house_numbers', label=_('House numbers'))
+
+
+class BuildingObjectTechnicalPanel(panels.ObjectAttributesPanel):
+    title = _('Type & Usage')
+    building_type_name = attrs.TextAttr('building_type_name', label=_('Building type'))
+    usage_name = attrs.TextAttr('usage_name', label=_('Usage'))
+    lv_number = attrs.TextAttr('lv_number', label=_('Title deed (LV)'))
+
+
+class BuildingObjectNotesPanel(panels.ObjectAttributesPanel):
+    title = _('Notes')
+    note = attrs.TextAttr('note', label=_('Note'))
+
+
+# ---------------------------------------------------------------------------
 #  Building panel
 # ---------------------------------------------------------------------------
 
 class BuildingPanel(panels.ObjectAttributesPanel):
+    building_object = attrs.RelatedObjectAttr('building_object', label=_('Building object'), linkify=True)
     name = attrs.TextAttr('name', label=_('Name'))
     street = attrs.TextAttr('street', label=_('Street'))
     house_number = attrs.TextAttr('house_number', label=_('House number'))

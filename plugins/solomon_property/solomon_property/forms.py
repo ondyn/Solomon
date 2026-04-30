@@ -7,13 +7,40 @@ from django.utils.translation import gettext_lazy as _
 from netbox.forms import NetBoxModelForm
 from utilities.forms.fields import DynamicModelChoiceField, DynamicModelMultipleChoiceField
 
-from .models import Building, Flat, FlatOwner, PropertyOwner, Person, PropertyTenant
+from .models import Building, BuildingObject, Flat, FlatOwner, PropertyOwner, Person, PropertyTenant
+
+
+class BuildingObjectForm(NetBoxModelForm):
+    class Meta:
+        model = BuildingObject
+        fields = [
+            "name",
+            "cuzk_building_id",
+            "building_type_name",
+            "usage_name",
+            "municipality_name",
+            "city_part_name",
+            "lv_number",
+            "cadastral_territory_name",
+            "house_numbers",
+            "note",
+            "tags",
+        ]
+        widgets = {
+            "note": forms.Textarea(attrs={"rows": 3}),
+        }
 
 
 class BuildingForm(NetBoxModelForm):
+    building_object = DynamicModelChoiceField(
+        queryset=BuildingObject.objects.all(),
+        label=_("Building object"),
+    )
+
     class Meta:
         model = Building
         fields = [
+            "building_object",
             "name", "street", "house_number", "city", "postal_code",
             "number_of_floors", "elevator", "year_built", "total_units",
             "land_plot_number", "common_rooms", "floor_plan_url",

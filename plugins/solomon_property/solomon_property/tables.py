@@ -5,10 +5,30 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.tables import NetBoxTable, columns
 
-from .models import Building, Flat, FlatOwner, PropertyOwner, Person, PropertyTenant
+from .models import Building, BuildingObject, Flat, FlatOwner, PropertyOwner, Person, PropertyTenant
+
+
+class BuildingObjectTable(NetBoxTable):
+    name = tables.Column(linkify=True)
+    municipality_name = tables.Column(verbose_name=_("Municipality"))
+    city_part_name = tables.Column(verbose_name=_("City part"))
+    house_numbers = tables.Column(orderable=False)
+    usage_name = tables.Column(verbose_name=_("Usage"))
+    cuzk_building_id = tables.Column(verbose_name=_("CUZK ID"))
+
+    class Meta(NetBoxTable.Meta):
+        model = BuildingObject
+        fields = (
+            "pk", "name", "municipality_name", "city_part_name", "house_numbers",
+            "usage_name", "cuzk_building_id", "actions",
+        )
+        default_columns = (
+            "name", "municipality_name", "city_part_name", "house_numbers", "usage_name",
+        )
 
 
 class BuildingTable(NetBoxTable):
+    building_object = tables.Column(linkify=True, verbose_name=_("Building object"))
     name = tables.Column(linkify=True)
     street = tables.Column()
     house_number = tables.Column(verbose_name=_("House No"))
@@ -20,11 +40,11 @@ class BuildingTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = Building
         fields = (
-            "pk", "name", "street", "house_number", "city",
+            "pk", "building_object", "name", "street", "house_number", "city",
             "total_units", "elevator", "year_built", "cuzk_building_id", "actions",
         )
         default_columns = (
-            "name", "street", "house_number", "city", "total_units", "elevator",
+            "building_object", "name", "street", "house_number", "city", "total_units", "elevator",
         )
 
 

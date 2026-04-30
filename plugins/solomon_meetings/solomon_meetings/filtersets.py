@@ -6,10 +6,14 @@ from netbox.filtersets import NetBoxModelFilterSet
 
 from .models import (
     AgendaItem,
+    AgendaVoteBallot,
+    AgendaVoteSession,
     Meeting,
     MeetingAttendance,
+    MeetingAttendanceEvent,
     MeetingInvitation,
     MeetingMinutes,
+    MeetingOwnerSnapshot,
     MeetingType,
     Vote,
     VoteWeightStyle,
@@ -55,6 +59,18 @@ class MeetingAttendanceFilterSet(NetBoxModelFilterSet):
         fields = ["meeting", "owner", "representation"]
 
 
+class MeetingOwnerSnapshotFilterSet(NetBoxModelFilterSet):
+    class Meta:
+        model = MeetingOwnerSnapshot
+        fields = ["meeting", "owner", "flat_owner", "representation", "is_currently_present"]
+
+
+class MeetingAttendanceEventFilterSet(NetBoxModelFilterSet):
+    class Meta:
+        model = MeetingAttendanceEvent
+        fields = ["owner_snapshot", "event_type", "event_time", "source"]
+
+
 class VoteFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = Vote
@@ -65,6 +81,18 @@ class VoteWeightStyleFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = VoteWeightStyle
         fields = ["voting_method", "weight_value", "label"]
+
+
+class AgendaVoteSessionFilterSet(NetBoxModelFilterSet):
+    class Meta:
+        model = AgendaVoteSession
+        fields = ["agenda_item", "started_at", "completed_at", "quorum_met", "result"]
+
+
+class AgendaVoteBallotFilterSet(NetBoxModelFilterSet):
+    class Meta:
+        model = AgendaVoteBallot
+        fields = ["session", "label", "share_value"]
 
 
 class MeetingMinutesFilterSet(NetBoxModelFilterSet):

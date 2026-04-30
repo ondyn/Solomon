@@ -8,6 +8,7 @@ from django.test import TestCase
 
 from solomon_property.models import (
     Building,
+    BuildingObject,
     Flat,
     FlatOwner,
     Person,
@@ -20,8 +21,19 @@ from solomon_property.models import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+def make_building_object(**kwargs):
+    defaults = dict(
+        name="SO Test",
+        municipality_name="Praha",
+        city_part_name="Chodov",
+    )
+    defaults.update(kwargs)
+    return BuildingObject.objects.create(**defaults)
+
+
 def make_building(**kwargs):
     defaults = dict(
+        building_object=make_building_object(),
         name="Test Building",
         street="Testovací",
         house_number="1",
@@ -48,6 +60,22 @@ def make_owner(**kwargs):
     defaults = dict(display_name="Novák Jan", person_type="natural")
     defaults.update(kwargs)
     return PropertyOwner.objects.create(**defaults)
+
+
+# ---------------------------------------------------------------------------
+# BuildingObject tests
+# ---------------------------------------------------------------------------
+
+class BuildingObjectModelTest(TestCase):
+    def test_str_returns_name(self):
+        obj = make_building_object(name="SO 21835349")
+        self.assertEqual(str(obj), "SO 21835349")
+
+    def test_get_absolute_url_contains_pk(self):
+        obj = make_building_object()
+        url = obj.get_absolute_url()
+        self.assertIn(str(obj.pk), url)
+        self.assertIn("building-objects", url)
 
 
 # ---------------------------------------------------------------------------

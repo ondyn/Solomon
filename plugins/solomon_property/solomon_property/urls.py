@@ -16,6 +16,20 @@ from .cuzk_views import (
 )
 
 urlpatterns = [
+    # ── Building Objects ───────────────────────────────────────────────────
+    path("building-objects/", views.BuildingObjectListView.as_view(), name="buildingobject_list"),
+    path("building-objects/add/", views.BuildingObjectEditView.as_view(), name="buildingobject_add"),
+    path("building-objects/delete/", views.BuildingObjectBulkDeleteView.as_view(), name="buildingobject_bulk_delete"),
+    path("building-objects/<int:pk>/", views.BuildingObjectView.as_view(), name="buildingobject"),
+    path("building-objects/<int:pk>/edit/", views.BuildingObjectEditView.as_view(), name="buildingobject_edit"),
+    path("building-objects/<int:pk>/delete/", views.BuildingObjectDeleteView.as_view(), name="buildingobject_delete"),
+    path(
+        "building-objects/<int:pk>/changelog/",
+        ObjectChangeLogView.as_view(),
+        name="buildingobject_changelog",
+        kwargs={"model": models.BuildingObject},
+    ),
+
     # ── Buildings ──────────────────────────────────────────────────────────
     path("buildings/", views.BuildingListView.as_view(), name="building_list"),
     path("buildings/add/", views.BuildingEditView.as_view(), name="building_add"),

@@ -52,49 +52,128 @@ class MeetingListView(generic.ObjectListView):
 class MeetingView(generic.ObjectView):
     queryset = models.Meeting.objects.select_related("meeting_type", "moderator").prefetch_related("buildings")
 
-    def get_extra_context(self, request, instance):
-        snapshots = instance.owner_snapshots.select_related("owner", "flat_owner").prefetch_related("events")
-        agenda_items = instance.agenda_items.all().order_by("order", "title")
-        present_snapshots = snapshots.filter(
-            representation__in=[models.REPRESENTATION_PRESENT, models.REPRESENTATION_PROXY],
-            is_currently_present=True,
-        )
+    @staticmethod
+    def _fraction_from_pairs(pairs):
+        valid_pairs = [(num, den) for num, den in pairs if den]
+        if not valid_pairs:
+            return 0, 1
 
-        present_count = present_snapshots.count()
-        total_count = snapshots.count()
-        present_share = sum((snapshot.share_value for snapshot in present_snapshots), Decimal("0"))
-        total_share = sum((snapshot.share_value for snapshot in snapshots), Decimal("0"))
+        common_denominator = valid_pairs[0][1]
+        for _, denominator in valid_pairs[1:]:
+            common_denominator = models.lcm(common_denominator, denominator)
 
-        latest_vote_sessions = {}
-        for agenda_item in agenda_items:
-            latest_vote_sessions[agenda_item.pk] = agenda_item.vote_sessions.order_by("-created").first()
+        numerator = sum(num * common_denominator // den for num, den in valid_pairs)
+        return numerator, common_denominator
 
-        ballot_type_summary = instance.get_ballot_type_summary()
-        summary_fraction_by_value = {
-            row["share_value"]: row["share_fraction"]
-            for row in ballot_type_summary
-        }
-        vote_styles = list(models.VoteWeightStyle.objects.order_by("voting_method", "weight_value"))
-        for style in vote_styles:
-            style.share_fraction_display = summary_fraction_by_value.get(
-                style.weight_value,
-                style.weight_fraction,
+    @staticmethod
+    def _format_fraction_pair(numerator, denominator):
+        return f"{numerator}/{denominator}"
+
+    @staticmethod
+    def _build_attendance_rows(snapshots):
+        snapshots_by_owner = defaultdict(list)
+        for snapshot in snapshots:
+            snapshots_by_owner[snapshot.owner_id].append(snapshot)
+
+        rows = []
+        for owner_snapshots in snapshots_by_owner.values():
+            owner_snapshots.sort(key=lambda snapshot: snapshot.flat_label)
+            share_numerator, share_denominator = MeetingView._fraction_from_pairs(
+                [
+                    (snapshot.share_numerator, snapshot.share_denominator)
+                    for snapshot in owner_snapshots
+                ]
             )
 
+            first_arrivals = [snapshot.first_arrived_at for snapshot in owner_snapshots if snapshot.first_arrived_at]
+            last_departures = [snapshot.last_left_at for snapshot in owner_snapshots if snapshot.last_left_at]
+            flat_labels = [snapshot.flat_label for snapshot in owner_snapshots if snapshot.flat_label]
+            ballot_options = {
+                (snapshot.ballot_label or "-", snapshot.ballot_color or "") for snapshot in owner_snapshots
+            }
+            ballot_label, ballot_color = next(iter(ballot_options))
+            if len(ballot_options) > 1:
+                ballot_label = _("Multiple")
+                ballot_color = ""
+
+            rows.append(
+                {
+                    "owner_id": owner_snapshots[0].owner_id,
+                    "owner_display_name": owner_snapshots[0].owner_display_name,
+                    "flat_label": ", ".join(flat_labels),
+                    "share_fraction": MeetingView._format_fraction_pair(
+                        share_numerator,
+                        share_denominator,
+                    ),
+                    "share_fraction_numerator": share_numerator,
+                    "share_fraction_denominator": share_denominator,
+                    "share_value": sum((snapshot.share_value for snapshot in owner_snapshots), Decimal("0")),
+                    "ballot_label": ballot_label,
+                    "ballot_color": ballot_color,
+                    "is_currently_present": any(snapshot.is_currently_present for snapshot in owner_snapshots),
+                    "first_arrived_at": min(first_arrivals) if first_arrivals else None,
+                    "last_left_at": max(last_departures) if last_departures else None,
+                    "event_snapshot_id": owner_snapshots[0].pk,
+                }
+            )
+
+        rows.sort(key=lambda row: row["owner_display_name"].lower())
+        return rows
+
+    def get_extra_context(self, request, instance):
+        snapshots = list(instance.owner_snapshots.select_related("owner", "flat_owner").prefetch_related("events"))
+        attendance_rows = self._build_attendance_rows(snapshots)
+        agenda_items = list(instance.agenda_items.all().order_by("order", "title"))
+
+        present_count = sum(1 for row in attendance_rows if row["is_currently_present"])
+        total_count = len(attendance_rows)
+        present_share_numerator, present_share_denominator = self._fraction_from_pairs(
+            [
+                (row["share_fraction_numerator"], row["share_fraction_denominator"])
+                for row in attendance_rows
+                if row["is_currently_present"]
+            ]
+        )
+        total_share_numerator, total_share_denominator = self._fraction_from_pairs(
+            [
+                (row["share_fraction_numerator"], row["share_fraction_denominator"])
+                for row in attendance_rows
+            ]
+        )
+
+        for agenda_item in agenda_items:
+            agenda_item.latest_vote_session = agenda_item.vote_sessions.order_by("-created").first()
+            agenda_item.latest_vote_percentages = None
+            if agenda_item.latest_vote_session and agenda_item.latest_vote_session.present_weight > 0:
+                totals = agenda_item.latest_vote_session.totals_by_role()
+                present_weight = agenda_item.latest_vote_session.present_weight
+                agenda_item.latest_vote_percentages = {
+                    "for": (totals[models.BALLOT_ROLE_FOR] / present_weight) * Decimal("100"),
+                    "against": (totals[models.BALLOT_ROLE_AGAINST] / present_weight) * Decimal("100"),
+                    "abstain": (totals[models.BALLOT_ROLE_ABSTAIN] / present_weight) * Decimal("100"),
+                }
+
+        quorum_ratio = instance.calculate_quorum_ratio()
+        ballot_type_summary = instance.get_ballot_type_summary()
         return {
             "active_tab": request.GET.get("tab", "meeting"),
             "agenda_items": agenda_items,
-            "snapshots": snapshots,
+            "attendance_rows": attendance_rows,
             "present_count": present_count,
             "total_count": total_count,
-            "present_share": present_share,
-            "total_share": total_share,
-            "quorum_ratio": instance.calculate_quorum_ratio(),
-            "latest_vote_sessions": latest_vote_sessions,
+            "present_share": self._format_fraction_pair(
+                present_share_numerator,
+                present_share_denominator,
+            ),
+            "total_share": self._format_fraction_pair(
+                total_share_numerator,
+                total_share_denominator,
+            ),
+            "quorum_ratio": quorum_ratio,
+            "quorum_ratio_percent": quorum_ratio * Decimal("100"),
             "agenda_form": forms.MeetingAgendaInlineForm(),
             "export_form": forms.MeetingExportForm(),
             "ballot_type_summary": ballot_type_summary,
-            "vote_styles": vote_styles,
         }
 
 
@@ -165,23 +244,37 @@ class MeetingAttendanceToggleView(View):
 
     def post(self, request, pk):
         meeting = get_object_or_404(self.queryset, pk=pk)
-        snapshot = get_object_or_404(models.MeetingOwnerSnapshot, pk=request.POST.get("snapshot_id"), meeting=meeting)
 
         if meeting.phase != models.MEETING_PHASE_IN_PROGRESS:
             messages.error(request, _("Attendance can be changed only while the meeting is in progress."))
             return redirect(f"{meeting.get_absolute_url()}?tab=attendance")
 
+        snapshots = models.MeetingOwnerSnapshot.objects.filter(meeting=meeting)
+        owner_id = request.POST.get("owner_id")
+        if owner_id:
+            snapshots = snapshots.filter(owner_id=owner_id)
+        else:
+            snapshots = snapshots.filter(pk=request.POST.get("snapshot_id"))
+
+        if not snapshots.exists():
+            messages.error(request, _("Owner snapshot was not found."))
+            return redirect(f"{meeting.get_absolute_url()}?tab=attendance")
+
+        is_currently_present = snapshots.filter(is_currently_present=True).exists()
+
         event_type = (
             models.ATTENDANCE_EVENT_DEPARTURE
-            if snapshot.is_currently_present
+            if is_currently_present
             else models.ATTENDANCE_EVENT_ARRIVAL
         )
-        models.MeetingAttendanceEvent.objects.create(
-            snapshot=snapshot,
-            event_type=event_type,
-            event_time=timezone.now(),
-            source="workflow",
-        )
+        event_time = timezone.now()
+        for snapshot in snapshots:
+            models.MeetingAttendanceEvent.objects.create(
+                owner_snapshot=snapshot,
+                event_type=event_type,
+                event_time=event_time,
+                source="workflow",
+            )
         messages.success(request, _("Attendance status has been updated."))
         return redirect(f"{meeting.get_absolute_url()}?tab=attendance")
 
@@ -246,10 +339,59 @@ class MeetingAgendaMoveView(View):
 class AgendaItemStartVotingView(View):
     queryset = models.AgendaItem.objects.select_related("meeting")
 
+    @staticmethod
+    def _share_fraction_from_decimal(share_value):
+        style = models.VoteWeightStyle.objects.filter(
+            voting_method=models.QUORUM_TYPE_BY_SHARE,
+            weight_value=share_value,
+        ).first()
+        if style:
+            return style.weight_fraction
+
+        fraction = Fraction(str(share_value)).limit_denominator(1000000)
+        return f"{fraction.numerator}/{fraction.denominator}"
+
+    def _rows_from_existing_session(self, session):
+        rows = []
+        for row in session.ballot_rows.order_by("share_value", "label"):
+            rows.append(
+                {
+                    "label": row.label,
+                    "color": row.color,
+                    "share_value": row.share_value,
+                    "share_fraction": self._share_fraction_from_decimal(row.share_value),
+                    "issued_count": row.issued_count,
+                    "for_count": row.for_count,
+                    "against_count": row.against_count,
+                    "abstain_count": row.abstain_count,
+                }
+            )
+        return rows
+
     def get(self, request, pk):
         agenda_item = get_object_or_404(self.queryset, pk=pk)
         meeting = agenda_item.meeting
-        summary_rows = [row for row in meeting.get_ballot_type_summary() if row["issued_count"] > 0]
+        selected_session = None
+        session_id = request.GET.get("session")
+        if session_id:
+            selected_session = agenda_item.vote_sessions.filter(pk=session_id).first()
+        if selected_session is None:
+            selected_session = agenda_item.vote_sessions.order_by("-created").first()
+
+        if selected_session:
+            summary_rows = self._rows_from_existing_session(selected_session)
+        else:
+            summary_rows = [
+                {
+                    **row,
+                    "for_count": None,
+                    "against_count": None,
+                    "abstain_count": None,
+                }
+                for row in meeting.get_ballot_type_summary()
+                if row["issued_count"] > 0
+            ]
+
         return render(
             request,
             "solomon_meetings/agenda_vote_form.html",
@@ -258,6 +400,7 @@ class AgendaItemStartVotingView(View):
                 "meeting": meeting,
                 "summary_rows": summary_rows,
                 "rows": len(summary_rows),
+                "editing_session": selected_session,
             },
         )
 
@@ -270,10 +413,19 @@ class AgendaItemStartVotingView(View):
             messages.error(request, _("Voting form contains invalid values."))
             return redirect(f"{meeting.get_absolute_url()}?tab=agenda")
 
-        session = models.AgendaVoteSession.objects.create(
-            agenda_item=agenda_item,
-            negative_form=form.cleaned_data["negative_form"],
-        )
+        session_id = request.POST.get("session_id")
+        if session_id:
+            session = get_object_or_404(models.AgendaVoteSession, pk=session_id, agenda_item=agenda_item)
+            session.negative_form = form.cleaned_data["negative_form"]
+            session.save(update_fields=["negative_form", "last_updated"])
+            session.ballot_rows.all().delete()
+            created_new_session = False
+        else:
+            session = models.AgendaVoteSession.objects.create(
+                agenda_item=agenda_item,
+                negative_form=form.cleaned_data["negative_form"],
+            )
+            created_new_session = True
 
         for row in form.cleaned_data["parsed_rows"]:
             models.AgendaVoteBallot.objects.create(
@@ -288,7 +440,10 @@ class AgendaItemStartVotingView(View):
             )
 
         session.finalize()
-        messages.success(request, _("Voting has been recorded for this agenda point."))
+        if created_new_session:
+            messages.success(request, _("Voting has been recorded for this agenda point."))
+        else:
+            messages.success(request, _("Voting has been updated for this agenda point."))
         return redirect(f"{meeting.get_absolute_url()}?tab=agenda")
 
 
@@ -307,29 +462,35 @@ class MeetingSyncBallotStylesView(View):
         for ownership in ownerships:
             flat_to_ownerships[ownership.flat_id].append(ownership)
 
-        unique_shares = set()
+        holder_totals = defaultdict(lambda: Fraction(0, 1))
         for flat_id, flat_ownerships in flat_to_ownerships.items():
-            flat = flat_ownerships[0].flat
             if len(flat_ownerships) == 1:
-                o = flat_ownerships[0]
-                if o.share_denominator:
-                    unique_shares.add(Decimal(o.share_numerator) / Decimal(o.share_denominator))
+                ownership = flat_ownerships[0]
+                if not ownership.share_denominator:
+                    continue
+
+                holder_key = ("owner", ownership.owner_id)
+                share_fraction = Fraction(ownership.share_numerator, ownership.share_denominator)
             else:
+                flat = flat_ownerships[0].flat
+                holder_key = ("flat", flat_id)
                 if flat.cuzk_share_numerator and flat.cuzk_share_denominator:
-                    unique_shares.add(
-                        Decimal(flat.cuzk_share_numerator) / Decimal(flat.cuzk_share_denominator)
-                    )
+                    share_fraction = Fraction(flat.cuzk_share_numerator, flat.cuzk_share_denominator)
                 else:
-                    total = sum(
+                    share_fraction = sum(
                         (Fraction(o.share_numerator, o.share_denominator) for o in flat_ownerships),
                         Fraction(0, 1),
                     )
-                    if total.denominator:
-                        unique_shares.add(Decimal(total.numerator) / Decimal(total.denominator))
 
-        unique_shares = sorted(unique_shares)
+            holder_totals[holder_key] += share_fraction
+
+        unique_shares = sorted(set(holder_totals.values()))
+
         created = 0
-        for share in unique_shares:
+        for share_fraction in unique_shares:
+            numerator = share_fraction.numerator
+            denominator = share_fraction.denominator
+            share = models.quantize_weight_fraction(numerator, denominator)
             exists = models.VoteWeightStyle.objects.filter(
                 voting_method=models.QUORUM_TYPE_BY_SHARE,
                 weight_value=share,
@@ -348,12 +509,14 @@ class MeetingSyncBallotStylesView(View):
             models.VoteWeightStyle.objects.create(
                 voting_method=models.QUORUM_TYPE_BY_SHARE,
                 weight_value=share,
+                weight_numerator=numerator,
+                weight_denominator=denominator,
                 label=label,
                 color="#1976D2",
             )
             created += 1
 
-        meeting.snapshot_owners()
+        meeting.snapshot_owners(refresh_existing=True)
         messages.success(request, _("Ballot types synchronized from ownership shares."))
         return redirect(f"{meeting.get_absolute_url()}?tab=ballots")
 
@@ -414,6 +577,16 @@ class AgendaItemListView(generic.ObjectListView):
 class AgendaItemView(generic.ObjectView):
     queryset = models.AgendaItem.objects.select_related("meeting")
 
+    def get_extra_context(self, request, instance):
+        vote_sessions = list(instance.vote_sessions.prefetch_related("ballot_rows").order_by("-started_at", "-created"))
+        latest_session = vote_sessions[0] if vote_sessions else None
+        latest_totals = latest_session.totals_by_role() if latest_session else None
+        return {
+            "vote_sessions": vote_sessions,
+            "latest_vote_session": latest_session,
+            "latest_vote_totals": latest_totals,
+        }
+
 
 class AgendaItemEditView(generic.ObjectEditView):
     queryset = models.AgendaItem.objects.all()
@@ -464,19 +637,25 @@ class MeetingOwnerSnapshotView(generic.ObjectView):
 
 
 class MeetingAttendanceEventListView(generic.ObjectListView):
-    queryset = models.MeetingAttendanceEvent.objects.select_related("snapshot", "snapshot__meeting")
+    queryset = models.MeetingAttendanceEvent.objects.select_related("owner_snapshot", "owner_snapshot__meeting")
     table = tables.MeetingAttendanceEventTable
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         snapshot_id = request.GET.get("snapshot_id")
         if snapshot_id:
-            queryset = queryset.filter(snapshot_id=snapshot_id)
+            queryset = queryset.filter(owner_snapshot_id=snapshot_id)
+        owner_id = request.GET.get("owner_id")
+        meeting_id = request.GET.get("meeting_id")
+        if owner_id:
+            queryset = queryset.filter(owner_snapshot__owner_id=owner_id)
+        if meeting_id:
+            queryset = queryset.filter(owner_snapshot__meeting_id=meeting_id)
         return queryset
 
 
 class MeetingAttendanceEventView(generic.ObjectView):
-    queryset = models.MeetingAttendanceEvent.objects.select_related("snapshot", "snapshot__meeting")
+    queryset = models.MeetingAttendanceEvent.objects.select_related("owner_snapshot", "owner_snapshot__meeting")
 
 
 class MeetingAttendanceEventEditView(generic.ObjectEditView):
@@ -489,7 +668,7 @@ class MeetingAttendanceEventDeleteView(generic.ObjectDeleteView):
 
 
 class MeetingAttendanceEventBulkDeleteView(generic.BulkDeleteView):
-    queryset = models.MeetingAttendanceEvent.objects.select_related("snapshot", "snapshot__meeting")
+    queryset = models.MeetingAttendanceEvent.objects.select_related("owner_snapshot", "owner_snapshot__meeting")
     table = tables.MeetingAttendanceEventTable
 
 

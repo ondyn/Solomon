@@ -28,11 +28,69 @@ from netbox.models import NetBoxModel
 
 
 # ---------------------------------------------------------------------------
+#  Building Object
+# ---------------------------------------------------------------------------
+
+class BuildingObject(NetBoxModel):
+    """Parent CUZK building object (stavebni objekt) that can group multiple buildings."""
+
+    name = models.CharField(
+        max_length=200,
+        verbose_name=_("Name"),
+        help_text=_("Descriptive label for the building object"),
+    )
+    cuzk_building_id = models.BigIntegerField(
+        null=True,
+        blank=True,
+        unique=True,
+        db_index=True,
+        verbose_name=_("CUZK building object ID"),
+        help_text=_("Kód stavebního objektu (RUIAN)"),
+    )
+    building_type_name = models.CharField(max_length=200, blank=True, verbose_name=_("Building type"))
+    usage_name = models.CharField(max_length=200, blank=True, verbose_name=_("Usage"))
+    municipality_name = models.CharField(max_length=100, blank=True, verbose_name=_("Municipality"))
+    city_part_name = models.CharField(max_length=100, blank=True, verbose_name=_("City part"))
+    lv_number = models.IntegerField(null=True, blank=True, verbose_name=_("Title deed (LV)"))
+    cadastral_territory_name = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name=_("Cadastral territory"),
+    )
+    house_numbers = ArrayField(
+        base_field=models.PositiveIntegerField(),
+        default=list,
+        blank=True,
+        verbose_name=_("House numbers"),
+        help_text=_("House numbers linked to this building object"),
+    )
+    note = models.TextField(blank=True, verbose_name=_("Note"))
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = _("Building object")
+        verbose_name_plural = _("Building objects")
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("plugins:solomon_property:buildingobject", kwargs={"pk": self.pk})
+
+
+# ---------------------------------------------------------------------------
 #  Building
 # ---------------------------------------------------------------------------
 
 class Building(NetBoxModel):
     """An apartment building managed under the SVJ."""
+
+    building_object = models.ForeignKey(
+        BuildingObject,
+        on_delete=models.PROTECT,
+        related_name="buildings",
+        verbose_name=_("Building object"),
+    )
 
     name = models.CharField(
         max_length=200,
@@ -85,7 +143,8 @@ class Building(NetBoxModel):
         verbose_name_plural = _("Buildings")
 
     def __str__(self):
-        return f"{self.name} ({self.street} {self.house_number})"
+        # return f"{self.name} ({self.street} {self.house_number})"
+        return f"{self.name}"
 
     def get_absolute_url(self):
         return reverse("plugins:solomon_property:building", kwargs={"pk": self.pk})

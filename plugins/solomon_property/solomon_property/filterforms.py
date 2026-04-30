@@ -5,17 +5,34 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import NetBoxModelFilterSetForm
 from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
-from utilities.forms.fields import DynamicModelChoiceField, DynamicModelMultipleChoiceField, TagFilterField
+from utilities.forms.fields import DynamicModelChoiceField, TagFilterField
 from utilities.forms.rendering import FieldSet
 
-from .models import Building, Flat, FlatOwner, Person, PropertyOwner, PropertyTenant
+from .models import Building, BuildingObject, Flat, FlatOwner, Person, PropertyOwner, PropertyTenant
+
+
+class BuildingObjectFilterForm(NetBoxModelFilterSetForm):
+    model = BuildingObject
+    fieldsets = (
+        FieldSet('q', 'filter_id', 'tag'),
+        FieldSet('name', 'municipality_name', 'city_part_name', name=_('Building object')),
+    )
+    name = forms.CharField(required=False, label=_('Name'))
+    municipality_name = forms.CharField(required=False, label=_('Municipality'))
+    city_part_name = forms.CharField(required=False, label=_('City part'))
+    tag = TagFilterField(model)
 
 
 class BuildingFilterForm(NetBoxModelFilterSetForm):
     model = Building
     fieldsets = (
         FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('name', 'city', 'house_number', name=_('Building')),
+        FieldSet('building_object_id', 'name', 'city', 'house_number', name=_('Building')),
+    )
+    building_object_id = DynamicModelChoiceField(
+        queryset=BuildingObject.objects.all(),
+        required=False,
+        label=_('Building object'),
     )
     name = forms.CharField(required=False, label=_('Name'))
     city = forms.CharField(required=False, label=_('City'))

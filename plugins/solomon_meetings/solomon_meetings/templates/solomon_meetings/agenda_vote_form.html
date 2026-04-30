@@ -3,24 +3,50 @@
 
 {% block title %}{% trans "Start voting" %} - {{ object.title }}{% endblock %}
 
+{% block head %}
+{{ block.super }}
+<style>
+	.vote-input-invalid {
+		border-color: #dc3545;
+		box-shadow: inset 0 0 0 1px #dc3545;
+		background-image: none;
+		padding-right: 0.75rem;
+	}
+
+	.vote-input-invalid:focus {
+		border-color: #dc3545;
+		box-shadow: 0 0 0 0.1rem rgba(220, 53, 69, 0.2);
+	}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row">
 	<div class="col col-lg-10">
 		<div class="card">
 			<h5 class="card-header">{% trans "Voting" %}: {{ object.title }}</h5>
 			<div class="card-body">
-				<form method="post">
+				{% if editing_session %}
+				<div class="alert alert-info" role="alert">
+					{% trans "You are editing an existing voting record for this agenda item." %}
+				</div>
+				{% endif %}
+				<form method="post" id="agenda-vote-form">
 					{% csrf_token %}
 					<input type="hidden" name="rows" value="{{ rows }}">
+					{% if editing_session %}
+					<input type="hidden" name="session_id" value="{{ editing_session.pk }}">
+					{% endif %}
 					<div class="form-check mb-3">
-						<input id="id_negative_form" name="negative_form" type="checkbox" class="form-check-input">
+						<input id="id_negative_form" name="negative_form" type="checkbox" class="form-check-input"{% if editing_session and editing_session.negative_form %} checked{% endif %}>
 						<label class="form-check-label" for="id_negative_form">{% trans "Negative form voting" %}</label>
 					</div>
 					<div class="table-responsive">
 						<table class="table table-hover">
 							<thead>
 								<tr>
-									<th>{% trans "Ballot" %}</th>
+									<th>{% trans "Ballot label" %}</th>
+									<th>{% trans "Ballot color" %}</th>
 									<th>{% trans "Share" %}</th>
 									<th>{% trans "Issued" %}</th>
 									<th>{% trans "For" %}</th>
@@ -32,30 +58,38 @@
 								{% for row in summary_rows %}
 								<tr>
 									<td>
-										{% if row.color %}<span class="badge" style="background-color: {{ row.color }};">{{ row.label|default:'-' }}</span>{% else %}{{ row.label|default:'-' }}{% endif %}
+										{{ row.label|default:'-' }}
 										<input type="hidden" name="row-{{ forloop.counter0 }}-label" value="{{ row.label }}">
 										<input type="hidden" name="row-{{ forloop.counter0 }}-color" value="{{ row.color }}">
 									</td>
 									<td>
-										{{ row.share_value }}
+										{% if row.color %}
+											<span style="display:inline-block;width:1rem;height:1rem;border:1px solid var(--bs-border-color);border-radius:0.2rem;background-color: {{ row.color }};vertical-align:middle;"></span>
+										{% else %}
+											{{ ''|placeholder }}
+										{% endif %}
+									</td>
+									<td>
+										{{ row.share_fraction }}
 										<input type="hidden" name="row-{{ forloop.counter0 }}-share_value" value="{{ row.share_value }}">
 									</td>
 									<td>
 										{{ row.issued_count }}
 										<input type="hidden" name="row-{{ forloop.counter0 }}-issued_count" value="{{ row.issued_count }}">
 									</td>
-									<td><input class="form-control" type="number" min="0" name="row-{{ forloop.counter0 }}-for_count" data-row="{{ forloop.counter0 }}" data-issued="{{ row.issued_count }}"></td>
-									<td><input class="form-control" type="number" min="0" name="row-{{ forloop.counter0 }}-against_count" data-row="{{ forloop.counter0 }}" data-issued="{{ row.issued_count }}"></td>
-									<td><input class="form-control" type="number" min="0" name="row-{{ forloop.counter0 }}-abstain_count" data-row="{{ forloop.counter0 }}" data-issued="{{ row.issued_count }}"></td>
+									<td><input class="form-control" type="number" min="0" name="row-{{ forloop.counter0 }}-for_count" data-row="{{ forloop.counter0 }}" data-issued="{{ row.issued_count }}"{% if row.for_count is not None %} value="{{ row.for_count }}"{% endif %}></td>
+									<td><input class="form-control" type="number" min="0" name="row-{{ forloop.counter0 }}-against_count" data-row="{{ forloop.counter0 }}" data-issued="{{ row.issued_count }}"{% if row.against_count is not None %} value="{{ row.against_count }}"{% endif %}></td>
+									<td><input class="form-control" type="number" min="0" name="row-{{ forloop.counter0 }}-abstain_count" data-row="{{ forloop.counter0 }}" data-issued="{{ row.issued_count }}"{% if row.abstain_count is not None %} value="{{ row.abstain_count }}"{% endif %}></td>
 								</tr>
 								{% empty %}
-								<tr><td colspan="6">{% trans "No present ballots. Mark attendance first." %}</td></tr>
+								<tr><td colspan="7">{% trans "No present ballots. Mark attendance first." %}</td></tr>
 								{% endfor %}
 							</tbody>
 						</table>
 					</div>
+					<div id="vote-form-error" class="alert alert-danger d-none mb-3" role="alert"></div>
 					<div class="d-flex gap-2">
-						<button type="submit" class="btn btn-primary">{% trans "Save voting" %}</button>
+						<button type="submit" class="btn btn-primary" id="vote-form-submit">{% if editing_session %}{% trans "Update voting" %}{% else %}{% trans "Save voting" %}{% endif %}</button>
 						<a class="btn btn-outline-secondary" href="{{ meeting.get_absolute_url }}?tab=agenda">{% trans "Back" %}</a>
 					</div>
 				</form>
@@ -64,31 +98,103 @@
 	</div>
 </div>
 <script>
-document.querySelectorAll('input[type="number"][data-row]').forEach((input) => {
-	input.addEventListener('input', () => {
-		const row = input.dataset.row;
-		const issued = parseInt(input.dataset.issued || '0', 10);
-		const forInput = document.querySelector(`input[name="row-${row}-for_count"]`);
-		const againstInput = document.querySelector(`input[name="row-${row}-against_count"]`);
-		const abstainInput = document.querySelector(`input[name="row-${row}-abstain_count"]`);
-		const values = [forInput, againstInput, abstainInput].map((el) => el.value === '' ? null : parseInt(el.value || '0', 10));
-		const filled = values.filter((v) => v !== null);
-		if (filled.length < 2) {
-			return;
+(() => {
+	const form = document.getElementById('agenda-vote-form');
+	if (!form) {
+		return;
+	}
+
+	const submitButton = document.getElementById('vote-form-submit');
+	const errorBox = document.getElementById('vote-form-error');
+	const rowIndexes = new Set(
+		Array.from(form.querySelectorAll('input[type="number"][data-row]')).map((input) => input.dataset.row)
+	);
+
+	const getRowInputs = (row) => ({
+		forInput: form.querySelector(`input[name="row-${row}-for_count"]`),
+		againstInput: form.querySelector(`input[name="row-${row}-against_count"]`),
+		abstainInput: form.querySelector(`input[name="row-${row}-abstain_count"]`),
+	});
+
+	const parseValue = (input) => (input.value === '' ? null : parseInt(input.value || '0', 10));
+
+	const setRowState = (row, isValid) => {
+		const { forInput, againstInput, abstainInput } = getRowInputs(row);
+		[forInput, againstInput, abstainInput].forEach((input) => {
+			if (!input) {
+				return;
+			}
+			input.classList.toggle('vote-input-invalid', !isValid);
+		});
+	};
+
+	const validateRow = (row) => {
+		const { forInput, againstInput, abstainInput } = getRowInputs(row);
+		if (!forInput || !againstInput || !abstainInput) {
+			return { valid: true, message: '' };
 		}
-		const total = filled.reduce((acc, value) => acc + value, 0);
-		const missing = issued - total;
-		if (missing < 0) {
-			return;
+
+		const issued = parseInt(forInput.dataset.issued || '0', 10);
+		const values = [parseValue(forInput), parseValue(againstInput), parseValue(abstainInput)];
+		const filled = values.filter((value) => value !== null);
+
+		if (filled.length >= 2 && filled.length < 3) {
+			const totalFilled = filled.reduce((acc, value) => acc + value, 0);
+			const missing = issued - totalFilled;
+			if (missing >= 0) {
+				if (values[0] === null) {
+					forInput.value = missing;
+				} else if (values[1] === null) {
+					againstInput.value = missing;
+				} else {
+					abstainInput.value = missing;
+				}
+			}
 		}
-		if (values[0] === null) {
-			forInput.value = missing;
-		} else if (values[1] === null) {
-			againstInput.value = missing;
-		} else if (values[2] === null) {
-			abstainInput.value = missing;
+
+		const forValue = parseInt(forInput.value || '0', 10);
+		const againstValue = parseInt(againstInput.value || '0', 10);
+		const abstainValue = parseInt(abstainInput.value || '0', 10);
+		const total = forValue + againstValue + abstainValue;
+
+		if (total !== issued) {
+			return {
+				valid: false,
+				message: `Row ${parseInt(row, 10) + 1}: For + Against + Abstain must equal Issued (${issued}).`,
+			};
+		}
+
+		return { valid: true, message: '' };
+	};
+
+	const validateForm = () => {
+		const messages = [];
+		rowIndexes.forEach((row) => {
+			const result = validateRow(row);
+			setRowState(row, result.valid);
+			if (!result.valid) {
+				messages.push(result.message);
+			}
+		});
+
+		const hasErrors = messages.length > 0;
+		submitButton.disabled = hasErrors;
+		errorBox.classList.toggle('d-none', !hasErrors);
+		errorBox.innerHTML = hasErrors ? messages.join('<br>') : '';
+		return !hasErrors;
+	};
+
+	form.querySelectorAll('input[type="number"][data-row]').forEach((input) => {
+		input.addEventListener('input', validateForm);
+	});
+
+	form.addEventListener('submit', (event) => {
+		if (!validateForm()) {
+			event.preventDefault();
 		}
 	});
-});
+
+	validateForm();
+})();
 </script>
 {% endblock %}

@@ -187,8 +187,8 @@
 			<h5 class="card-header">{% trans "Attendance summary" %}</h5>
 			<div class="card-body">
 				<div><strong>{% trans "Present owners" %}:</strong> {{ present_count }} / {{ total_count }}</div>
-				<div><strong>{% trans "Present share" %}:</strong> {{ present_share }} / {{ total_share }}</div>
-				<div><strong>{% trans "Quorum ratio" %}:</strong> {{ quorum_ratio|floatformat:4 }}</div>
+				<div><strong>{% trans "Present share" %}:</strong> {{ present_share }}</div>
+				<div><strong>{% trans "Quorum ratio" %}:</strong> {{ quorum_ratio_percent|floatformat:2 }}%</div>
 			</div>
 		</div>
 	</div>
@@ -197,6 +197,20 @@
 	<div class="col-12">
 		<div class="card">
 			<h5 class="card-header">{% trans "Owners" %}</h5>
+			<div class="card-body border-bottom">
+				<div class="input-group input-group-flat">
+					<input
+						type="search"
+						id="attendance-owner-quicksearch"
+						class="form-control"
+						placeholder="{% trans 'Quick search owners' %}"
+						aria-label="{% trans 'Quick search owners' %}"
+					>
+					<span class="input-group-text">
+						<i class="mdi mdi-magnify" aria-hidden="true"></i>
+					</span>
+				</div>
+			</div>
 			<div class="table-responsive">
 				<table class="table table-hover mb-0">
 					<thead>
@@ -204,7 +218,8 @@
 							<th>{% trans "Owner" %}</th>
 							<th>{% trans "Flat" %}</th>
 							<th>{% trans "Share" %}</th>
-							<th>{% trans "Ballot" %}</th>
+							<th>{% trans "Ballot label" %}</th>
+							<th>{% trans "Ballot color" %}</th>
 							<th>{% trans "Status" %}</th>
 							<th>{% trans "Arrived" %}</th>
 							<th>{% trans "Left" %}</th>
@@ -212,29 +227,35 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for snapshot in snapshots %}
-						<tr>
-							<td>{{ snapshot.owner_display_name }}</td>
-							<td>{{ snapshot.flat_label }}</td>
-							<td>{{ snapshot.share_value }}</td>
+						{% for row in attendance_rows %}
+						<tr data-attendance-owner-row data-search-text="{{ row.owner_display_name|lower }} {{ row.flat_label|default:''|lower }} {{ row.share_fraction }} {{ row.ballot_label|default:'-'|lower }} {% if row.is_currently_present %}{% trans 'present' %}{% else %}{% trans 'absent' %}{% endif %}">
+							<td>{{ row.owner_display_name }}</td>
+							<td>{{ row.flat_label|placeholder }}</td>
+							<td>{{ row.share_fraction }}</td>
+							<td>{{ row.ballot_label|default:'-' }}</td>
 							<td>
-								{% if snapshot.ballot_color %}<span class="badge" style="background-color: {{ snapshot.ballot_color }};">{{ snapshot.ballot_label|default:'-' }}</span>{% else %}{{ snapshot.ballot_label|default:'-' }}{% endif %}
+								{% if row.ballot_color %}
+									<span style="display:inline-block;width:1rem;height:1rem;border:1px solid #6c757d;border-radius:0.2rem;background-color: {{ row.ballot_color }};vertical-align:middle;margin-right:0.4rem;"></span>{{ row.ballot_color }}
+								{% else %}
+									{{ ''|placeholder }}
+								{% endif %}
 							</td>
-							<td>{% if snapshot.is_currently_present %}<span class="badge bg-success">{% trans "Present" %}</span>{% else %}<span class="badge bg-secondary">{% trans "Absent" %}</span>{% endif %}</td>
-							<td>{{ snapshot.first_arrived_at|isodatetime:"minutes"|placeholder }}</td>
-							<td>{{ snapshot.last_left_at|isodatetime:"minutes"|placeholder }}</td>
+							<td>{% if row.is_currently_present %}<span class="badge text-bg-success">{% trans "Present" %}</span>{% else %}<span class="badge text-bg-secondary">{% trans "Absent" %}</span>{% endif %}</td>
+							<td>{{ row.first_arrived_at|isodatetime:"minutes"|placeholder }}</td>
+							<td>{{ row.last_left_at|isodatetime:"minutes"|placeholder }}</td>
 							<td class="text-end">
 								<form method="post" action="{% url 'plugins:solomon_meetings:meeting_toggle_attendance' pk=object.pk %}" class="d-inline">
 									{% csrf_token %}
-									<input type="hidden" name="snapshot_id" value="{{ snapshot.pk }}">
-									<button type="submit" class="btn btn-sm btn-outline-primary">{% if snapshot.is_currently_present %}{% trans "Mark left" %}{% else %}{% trans "Mark arrived" %}{% endif %}</button>
+									<input type="hidden" name="owner_id" value="{{ row.owner_id }}">
+									<button type="submit" class="btn btn-sm btn-outline-primary">{% if row.is_currently_present %}{% trans "Mark left" %}{% else %}{% trans "Mark arrived" %}{% endif %}</button>
 								</form>
-								<a href="{% url 'plugins:solomon_meetings:meetingattendanceevent_list' %}?snapshot_id={{ snapshot.pk }}" class="btn btn-sm btn-outline-secondary">{% trans "Events" %}</a>
+								<a href="{% url 'plugins:solomon_meetings:meetingattendanceevent_list' %}?owner_id={{ row.owner_id }}&amp;meeting_id={{ object.pk }}" class="btn btn-sm btn-outline-secondary">{% trans "Events" %}</a>
 							</td>
 						</tr>
 						{% empty %}
-						<tr><td colspan="8">{% trans "No owner snapshot yet. Start the meeting first." %}</td></tr>
+						<tr data-attendance-empty-row><td colspan="9">{% trans "No owner snapshot yet. Start the meeting first." %}</td></tr>
 						{% endfor %}
+						<tr data-attendance-no-results class="d-none"><td colspan="9">{% trans "No owners match this search." %}</td></tr>
 					</tbody>
 				</table>
 			</div>
@@ -267,7 +288,19 @@
 							<td><a href="{{ item.get_absolute_url }}">{{ item.title }}</a></td>
 							<td>{{ item.presenter|placeholder }}</td>
 							<td>{{ item.voting_required|yesno:_('Yes,No') }}</td>
-							<td>{{ item.get_result_display }}</td>
+							<td>
+								{{ item.get_result_display }}
+								{% if item.latest_vote_session %}
+									<div class="small text-muted">{% trans "Session" %}: {{ item.latest_vote_session.started_at|isodatetime:"minutes" }}</div>
+									{% if item.latest_vote_percentages %}
+									<div class="small text-muted">
+										{% trans "For" %}: {{ item.latest_vote_percentages.for|floatformat:1 }}% |
+										{% trans "Against" %}: {{ item.latest_vote_percentages.against|floatformat:1 }}% |
+										{% trans "Abstain" %}: {{ item.latest_vote_percentages.abstain|floatformat:1 }}%
+									</div>
+									{% endif %}
+								{% endif %}
+							</td>
 							<td class="text-end">
 								<form method="post" action="{% url 'plugins:solomon_meetings:meeting_agenda_move' pk=object.pk %}" class="d-inline">
 									{% csrf_token %}
@@ -282,7 +315,13 @@
 									<button type="submit" class="btn btn-sm btn-outline-secondary">{% trans "Down" %}</button>
 								</form>
 								<a href="{% url 'plugins:solomon_meetings:agendaitem_edit' pk=item.pk %}" class="btn btn-sm btn-outline-secondary">{% trans "Edit" %}</a>
-								{% if item.voting_required %}<a href="{% url 'plugins:solomon_meetings:agendaitem_start_voting' pk=item.pk %}" class="btn btn-sm btn-primary">{% trans "Start voting" %}</a>{% endif %}
+								{% if item.voting_required %}
+									{% if item.latest_vote_session %}
+									<a href="{% url 'plugins:solomon_meetings:agendaitem_start_voting' pk=item.pk %}?session={{ item.latest_vote_session.pk }}" class="btn btn-sm btn-warning">{% trans "Edit voting" %}</a>
+									{% else %}
+									<a href="{% url 'plugins:solomon_meetings:agendaitem_start_voting' pk=item.pk %}" class="btn btn-sm btn-primary">{% trans "Start voting" %}</a>
+									{% endif %}
+								{% endif %}
 							</td>
 						</tr>
 						{% empty %}
@@ -314,9 +353,56 @@
 </div>
 {% endif %}
 
+{% block javascript %}
+	{{ block.super }}
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const searchInput = document.getElementById('attendance-owner-quicksearch');
+			if (!searchInput) {
+				return;
+			}
+
+			const ownerRows = Array.from(document.querySelectorAll('[data-attendance-owner-row]'));
+			const emptyRow = document.querySelector('[data-attendance-empty-row]');
+			const noResultsRow = document.querySelector('[data-attendance-no-results]');
+			const normalizeSearchText = function (value) {
+				return (value || '')
+					.toLowerCase()
+					.normalize('NFD')
+					.replace(/[\u0300-\u036f]/g, '');
+			};
+
+			const filterRows = function () {
+				const query = normalizeSearchText(searchInput.value.trim());
+				let visibleRows = 0;
+
+				ownerRows.forEach(function (row) {
+					const searchText = normalizeSearchText(row.dataset.searchText || '');
+					const isMatch = !query || searchText.includes(query);
+					row.classList.toggle('d-none', !isMatch);
+					if (isMatch) {
+						visibleRows += 1;
+					}
+				});
+
+				if (emptyRow) {
+					emptyRow.classList.toggle('d-none', query.length > 0);
+				}
+
+				if (noResultsRow) {
+					noResultsRow.classList.toggle('d-none', visibleRows > 0 || ownerRows.length === 0);
+				}
+			};
+
+			searchInput.addEventListener('input', filterRows);
+			searchInput.addEventListener('search', filterRows);
+		});
+	</script>
+{% endblock %}
+
 {% if active_tab == 'ballots' %}
 <div class="row">
-	<div class="col col-lg-7">
+	<div class="col col-lg-12">
 		<div class="card mb-3">
 			<h5 class="card-header d-flex justify-content-between align-items-center">
 				<span>{% trans "Ballot types at meeting" %}</span>
@@ -327,39 +413,18 @@
 			</h5>
 			<div class="table-responsive">
 				<table class="table table-hover mb-0">
-					<thead><tr><th>{% trans "Label" %}</th><th>{% trans "Share" %}</th><th>{% trans "Owners" %}</th><th>{% trans "Issued ballots" %}</th></tr></thead>
+					<thead><tr><th>{% trans "Label" %}</th><th>{% trans "Color" %}</th><th>{% trans "Share" %}</th><th>{% trans "Count" %}</th><th>{% trans "Issued ballots" %}</th></tr></thead>
 					<tbody>
 						{% for row in ballot_type_summary %}
 						<tr>
-							<td>{% if row.color %}<span class="badge" style="background-color: {{ row.color }};">{{ row.label|default:'-' }}</span>{% else %}{{ row.label|default:'-' }}{% endif %}</td>
+							<td>{{ row.label|default:'-' }}</td>
+							<td>{% if row.color %}<span style="display:inline-block;width:1rem;height:1rem;border:1px solid #6c757d;border-radius:0.2rem;background-color: {{ row.color }};vertical-align:middle;margin-right:0.4rem;"></span>{{ row.color }}{% else %}{{ ''|placeholder }}{% endif %}</td>
 							<td>{{ row.share_fraction }}</td>
 							<td>{{ row.owner_count }}</td>
 							<td>{{ row.issued_count }}</td>
 						</tr>
 						{% empty %}
-						<tr><td colspan="4">{% trans "No ballot types available yet." %}</td></tr>
-						{% endfor %}
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-	<div class="col col-lg-5">
-		<div class="card mb-3">
-			<h5 class="card-header">{% trans "Vote style catalog" %}</h5>
-			<div class="table-responsive">
-				<table class="table table-hover mb-0">
-					<thead><tr><th>{% trans "Method" %}</th><th>{% trans "Share" %}</th><th>{% trans "Label" %}</th><th>{% trans "Color" %}</th></tr></thead>
-					<tbody>
-						{% for style in vote_styles %}
-						<tr>
-							<td>{{ style.get_voting_method_display }}</td>
-							<td>{{ style.share_fraction_display }}</td>
-							<td><a href="{{ style.get_absolute_url }}">{{ style.label }}</a></td>
-							<td><span class="badge" style="background-color: {{ style.color }};">{{ style.color }}</span></td>
-						</tr>
-						{% empty %}
-						<tr><td colspan="4">{% trans "No vote styles configured." %}</td></tr>
+						<tr><td colspan="5">{% trans "No ballot types available yet." %}</td></tr>
 						{% endfor %}
 					</tbody>
 				</table>
