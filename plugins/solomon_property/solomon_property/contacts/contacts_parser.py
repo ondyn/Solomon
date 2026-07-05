@@ -338,6 +338,31 @@ def _last_name_matches(csv_last: str, db_last: str) -> bool:
     return _strip_diacritics(csv_last) == _strip_diacritics(db_last)
 
 
+def _last_name_variants(raw_last: str) -> list[str]:
+    """
+    Return plausible surname variants from a Google CSV last-name field.
+
+    Some exported contacts use the last-name column to store extra apartment or
+    role notes, for example "Pejsar 1939 byt 4 3+1". In those cases the first
+    token is still the real surname, so we keep both the full string and that
+    leading token as match candidates.
+
+    We only fall back to the first token after trying the full field, so
+    appended notes do not block a match but genuine multi-word surnames still
+    get the first chance to match exactly.
+    """
+    cleaned = raw_last.strip()
+    if not cleaned:
+        return []
+
+    variants = [cleaned]
+    words = cleaned.split()
+    if len(words) > 1:
+        variants.append(words[0])
+
+    return variants
+
+
 def _extract_first_word(name: str) -> str:
     """Return the first whitespace-delimited word of a name string."""
     parts = name.strip().split()
@@ -383,10 +408,19 @@ def match_contacts_to_persons(rows: list[ContactRow]) -> list[ContactRow]:
             row.match_status = "unmatched"
             continue
 
-        csv_last_norm = _strip_diacritics(row.last_name)
+        csv_last_variants = _last_name_variants(row.last_name)
 
-        # Persons with a matching last name
-        last_candidates: list[Person] = last_name_index.get(csv_last_norm, [])
+        # Persons with a matching last name, including rows where Google CSV
+        # stored flat metadata after the real surname.
+        last_candidates: list[Person] = []
+        seen_last_candidate_pks: set[int] = set()
+        for csv_last in csv_last_variants:
+            csv_last_norm = _strip_diacritics(csv_last)
+            for person in last_name_index.get(csv_last_norm, []):
+                if person.pk in seen_last_candidate_pks:
+                    continue
+                seen_last_candidate_pks.add(person.pk)
+                last_candidates.append(person)
 
         if not last_candidates:
             row.match_status = "unmatched"

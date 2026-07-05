@@ -189,6 +189,19 @@
 				<div><strong>{% trans "Present owners" %}:</strong> {{ present_count }} / {{ total_count }}</div>
 				<div><strong>{% trans "Present share" %}:</strong> {{ present_share }}</div>
 				<div><strong>{% trans "Quorum ratio" %}:</strong> {{ quorum_ratio_percent|floatformat:2 }}%</div>
+							<hr class="my-3">
+							<div class="mb-2"><strong>{% trans "Threshold checks" %}</strong></div>
+							<div class="d-grid gap-2">
+								{% for check in attendance_threshold_checks %}
+								<div class="d-flex justify-content-between align-items-center gap-3">
+									<div>
+										<div class="fw-semibold">{{ check.label }}</div>
+										<div class="text-muted small">{{ present_share_ratio_percent|floatformat:2 }}% / {{ check.threshold_percent|floatformat:2 }}%</div>
+									</div>
+									<span class="badge {% if check.is_met %}text-bg-success{% else %}text-bg-danger{% endif %}">{% if check.is_met %}{% trans "Met" %}{% else %}{% trans "Not met" %}{% endif %}</span>
+								</div>
+								{% endfor %}
+							</div>
 			</div>
 		</div>
 	</div>

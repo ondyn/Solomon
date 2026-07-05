@@ -77,8 +77,23 @@ class MeetingTypeTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = MeetingType
-        fields = ("pk", "name", "quorum_type", "default_quorum_threshold", "actions")
-        default_columns = ("name", "quorum_type", "default_quorum_threshold", "actions")
+        fields = (
+            "pk",
+            "name",
+            "quorum_type",
+            "default_quorum_threshold",
+            "attendance_threshold_50",
+            "attendance_threshold_two_thirds",
+            "actions",
+        )
+        default_columns = (
+            "name",
+            "quorum_type",
+            "default_quorum_threshold",
+            "attendance_threshold_50",
+            "attendance_threshold_two_thirds",
+            "actions",
+        )
 
 
 class MeetingTable(NetBoxTable):

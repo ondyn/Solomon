@@ -26,7 +26,14 @@ from .models import (
 class MeetingTypeForm(NetBoxModelForm):
     class Meta:
         model = MeetingType
-        fields = ["name", "quorum_type", "default_quorum_threshold", "tags"]
+        fields = [
+            "name",
+            "quorum_type",
+            "default_quorum_threshold",
+            "attendance_threshold_50",
+            "attendance_threshold_two_thirds",
+            "tags",
+        ]
 
 
 class MeetingForm(NetBoxModelForm):
@@ -233,7 +240,6 @@ class AgendaVoteBallotInputForm(forms.Form):
 
 
 class AgendaVoteSessionForm(forms.Form):
-    negative_form = forms.BooleanField(required=False)
     rows = forms.IntegerField(min_value=0, widget=forms.HiddenInput)
 
     def clean(self):

@@ -34,6 +34,8 @@ class MeetingTypeSerializer(NetBoxModelSerializer):
             "name",
             "quorum_type",
             "default_quorum_threshold",
+            "attendance_threshold_50",
+            "attendance_threshold_two_thirds",
             "tags",
             "custom_fields",
             "created",

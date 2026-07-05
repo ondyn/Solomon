@@ -95,20 +95,38 @@
 						<td>{{ latest_vote_session.quorum_met|yesno:_('Yes,No') }}</td>
 					</tr>
 					<tr>
-						<th scope="row">{% trans "Present weight" %}</th>
-						<td>{{ latest_vote_session.present_weight }}</td>
+						<th scope="row">{% trans "Attendance share at vote start" %}</th>
+						<td>{{ latest_attendance_share_percent|floatformat:1 }}%</td>
 					</tr>
 					<tr>
 						<th scope="row">{% trans "For" %}</th>
-						<td>{{ latest_vote_totals.FOR|default:0 }}</td>
+						<td>
+							{% if latest_vote_percentages %}
+								{{ latest_vote_percentages.for|floatformat:1 }}%
+							{% else %}
+								{{ latest_vote_totals.FOR|default:0 }}
+							{% endif %}
+						</td>
 					</tr>
 					<tr>
 						<th scope="row">{% trans "Against" %}</th>
-						<td>{{ latest_vote_totals.AGAINST|default:0 }}</td>
+						<td>
+							{% if latest_vote_percentages %}
+								{{ latest_vote_percentages.against|floatformat:1 }}%
+							{% else %}
+								{{ latest_vote_totals.AGAINST|default:0 }}
+							{% endif %}
+						</td>
 					</tr>
 					<tr>
 						<th scope="row">{% trans "Abstain" %}</th>
-						<td>{{ latest_vote_totals.ABSTAIN|default:0 }}</td>
+						<td>
+							{% if latest_vote_percentages %}
+								{{ latest_vote_percentages.abstain|floatformat:1 }}%
+							{% else %}
+								{{ latest_vote_totals.ABSTAIN|default:0 }}
+							{% endif %}
+						</td>
 					</tr>
 				</table>
 				<div class="mt-3">

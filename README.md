@@ -14,3 +14,36 @@ docker compose logs -f netbox    # Watch reload events
 docker compose exec netbox python manage.py makemigrations <plugin>
 docker compose exec netbox python manage.py migrate <plugin>
 ```
+
+# Database backup and restore
+
+PostgreSQL runs in Docker Compose service `postgres`.
+
+Backups are stored in `./backup` and use this format:
+
+- `db_backup_YYYYMMDD_HHMMSS.dump`
+
+Create a backup:
+
+```sh
+./backup_db.sh
+```
+
+Restore latest backup found in `./backup`:
+
+```sh
+./restore_db.sh
+```
+
+Restore a specific timestamp:
+
+```sh
+./restore_db.sh 20260705_154210
+```
+
+Restore behavior:
+
+1) Terminates active connections to target DB
+2) Drops existing DB
+3) Creates a new empty DB
+4) Restores dump content into the new DB

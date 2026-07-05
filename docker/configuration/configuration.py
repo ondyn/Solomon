@@ -121,6 +121,7 @@ CORS_ORIGIN_REGEX_WHITELIST = [
 
 DEBUG = _environ_get_and_map("DEBUG", "False", _AS_BOOL)
 DEVELOPER = _environ_get_and_map("DEVELOPER", "False", _AS_BOOL)
+ISOLATED_DEPLOYMENT = _environ_get_and_map("ISOLATED_DEPLOYMENT", "False", _AS_BOOL)
 
 # Email
 EMAIL = {

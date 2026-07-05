@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -31,13 +31,15 @@ from solomon_property.models import Building, Person
 logger = logging.getLogger(__name__)
 
 
-class ContactsImportView(LoginRequiredMixin, View):
+class ContactsImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
     """
     Two-step import of Google Contacts CSV:
       1. Upload CSV -> parse & match -> show preview
       2. User selects rows to import -> execute
     """
     template_name = "solomon_property/contacts_import.html"
+    permission_required = "solomon_property.import_contacts_data"
+    raise_exception = True
 
     def get(self, request):
         # If there's parsed data in session, show preview
@@ -211,7 +213,7 @@ class ContactsImportView(LoginRequiredMixin, View):
         ]
 
 
-class ContactsExportView(LoginRequiredMixin, View):
+class ContactsExportView(LoginRequiredMixin, PermissionRequiredMixin, View):
     """
     Two-step export of persons as Google Contacts CSV.
 
@@ -219,6 +221,8 @@ class ContactsExportView(LoginRequiredMixin, View):
     POST - apply filters and stream the CSV file download
     """
     template_name = "solomon_property/contacts_export.html"
+    permission_required = "solomon_property.export_contacts_data"
+    raise_exception = True
 
     def get(self, request):
         buildings = Building.objects.order_by("name")

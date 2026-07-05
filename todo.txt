@@ -9,6 +9,7 @@ Plugins:
 - task/bug/issue tracking system, different sets (eg. repair, planned, tasks from the board meeting), exporting or reports, actual status
 - support for tenders - bid management, communication records, list of companies and craftsmen management
 - plugin eshop
+- floors/flats plan (schematic shape of flats, floors, buildings) - for each flat/floor/building show the list of common spaces/rooms and technical equipment, show the location of technical equipment on the plan, show the location of common spaces/rooms on the plan. Show the location of flats on the floor plan. Show the location of floors in the building. Show the location of buildings in the complex. Show the location of common spaces/rooms in the complex. Show the location of technical equipment in the complex. Support svg editor to simply create the shape of the flat/floor/building. Support svg editor to simply create the location of technical equipment and common spaces/rooms on the plan. Support svg editor to simply create the location of flats on the floor plan. Support svg editor to simply create the location of floors in the building. Support svg editor to simply create the location of buildings in the complex. Support svg editor to simply create the location of common spaces/rooms in the complex. Support svg editor to simply create the location of technical equipment in the complex.
 
 Self app related plugins:
 - system backup/restore managemen

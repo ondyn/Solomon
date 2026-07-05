@@ -16,7 +16,7 @@ import logging
 from collections import defaultdict
 from fractions import Fraction
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
@@ -51,8 +51,10 @@ _municipality_cache: list | None = None
 # ---------------------------------------------------------------------------
 #  Step 1 - Search / enter building ID
 # ---------------------------------------------------------------------------
-class CUZKImportSearchView(LoginRequiredMixin, View):
+class CUZKImportSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
     template_name = "solomon_property/cuzk_import_search.html"
+    permission_required = "solomon_property.import_cuzk_data"
+    raise_exception = True
 
     def get(self, request):
         return render(request, self.template_name, {
@@ -89,8 +91,10 @@ class CUZKImportSearchView(LoginRequiredMixin, View):
 # ---------------------------------------------------------------------------
 #  Autocomplete - search buildings by address via CUZK
 # ---------------------------------------------------------------------------
-class CUZKAddressSearchView(LoginRequiredMixin, View):
+class CUZKAddressSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
     """POST: search CUZK buildings by city_part_code + house_number. Returns JSON."""
+    permission_required = "solomon_property.import_cuzk_data"
+    raise_exception = True
 
     def post(self, request):
         try:
@@ -120,8 +124,10 @@ class CUZKAddressSearchView(LoginRequiredMixin, View):
         return JsonResponse(data, safe=False)
 
 
-class CUZKCityPartAutocompleteView(LoginRequiredMixin, View):
+class CUZKCityPartAutocompleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
     """GET ?q=<text>  - return matching city parts as JSON."""
+    permission_required = "solomon_property.import_cuzk_data"
+    raise_exception = True
 
     def get(self, request):
         global _city_parts_cache, _municipality_cache  # noqa: PLW0603
@@ -177,8 +183,10 @@ class CUZKCityPartAutocompleteView(LoginRequiredMixin, View):
 # ---------------------------------------------------------------------------
 #  Step 2 - Preview diff
 # ---------------------------------------------------------------------------
-class CUZKImportPreviewView(LoginRequiredMixin, View):
+class CUZKImportPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
     template_name = "solomon_property/cuzk_import_preview.html"
+    permission_required = "solomon_property.import_cuzk_data"
+    raise_exception = True
 
     def _get_import_data(self, request):
         """Return (cuzk_building, cuzk_units) from session or None."""
@@ -256,8 +264,10 @@ class CUZKImportPreviewView(LoginRequiredMixin, View):
 # ---------------------------------------------------------------------------
 #  Owners.txt import
 # ---------------------------------------------------------------------------
-class OwnersImportView(LoginRequiredMixin, View):
+class OwnersImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
     template_name = "solomon_property/owners_import.html"
+    permission_required = "solomon_property.import_owner_data"
+    raise_exception = True
 
     def _annotate_preview(self, records):
         # === Cross-record: detect co-owned flats (same flat claimed by multiple owners) ===
@@ -441,7 +451,7 @@ class OwnersImportView(LoginRequiredMixin, View):
 # ---------------------------------------------------------------------------
 #  Flat area auto-calculation
 # ---------------------------------------------------------------------------
-class FlatAreaCalculationView(LoginRequiredMixin, View):
+class FlatAreaCalculationView(LoginRequiredMixin, PermissionRequiredMixin, View):
     """
     Preview page showing calculated area for every flat that has CUZK share data.
 
@@ -451,6 +461,8 @@ class FlatAreaCalculationView(LoginRequiredMixin, View):
     """
 
     template_name = "solomon_property/flat_area_calculation.html"
+    permission_required = "solomon_property.calculate_flat_area"
+    raise_exception = True
 
     def _build_preview(self):
         """Return (max_denominator, rows) where rows is a list of dicts."""

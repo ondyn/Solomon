@@ -37,9 +37,11 @@
 					{% if editing_session %}
 					<input type="hidden" name="session_id" value="{{ editing_session.pk }}">
 					{% endif %}
-					<div class="form-check mb-3">
-						<input id="id_negative_form" name="negative_form" type="checkbox" class="form-check-input"{% if editing_session and editing_session.negative_form %} checked{% endif %}>
-						<label class="form-check-label" for="id_negative_form">{% trans "Negative form voting" %}</label>
+					<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+						<span class="text-muted small me-1">{% trans "Quick fill votes:" %}</span>
+						<button type="button" class="btn btn-sm btn-outline-success" data-preset-vote="for">{% trans "Set all as For" %}</button>
+						<button type="button" class="btn btn-sm btn-outline-danger" data-preset-vote="against">{% trans "Set all as Against" %}</button>
+						<button type="button" class="btn btn-sm btn-outline-secondary" data-preset-vote="abstain">{% trans "Set all as Abstain" %}</button>
 					</div>
 					<div class="table-responsive">
 						<table class="table table-hover">
@@ -183,6 +185,28 @@
 		errorBox.innerHTML = hasErrors ? messages.join('<br>') : '';
 		return !hasErrors;
 	};
+
+	const applyPreset = (role) => {
+		rowIndexes.forEach((row) => {
+			const { forInput, againstInput, abstainInput } = getRowInputs(row);
+			if (!forInput || !againstInput || !abstainInput) {
+				return;
+			}
+
+			const issued = parseInt(forInput.dataset.issued || '0', 10);
+			forInput.value = role === 'for' ? issued : 0;
+			againstInput.value = role === 'against' ? issued : 0;
+			abstainInput.value = role === 'abstain' ? issued : 0;
+		});
+
+		validateForm();
+	};
+
+	form.querySelectorAll('[data-preset-vote]').forEach((button) => {
+		button.addEventListener('click', () => {
+			applyPreset(button.dataset.presetVote);
+		});
+	});
 
 	form.querySelectorAll('input[type="number"][data-row]').forEach((input) => {
 		input.addEventListener('input', validateForm);

@@ -119,6 +119,22 @@ class MeetingType(NetBoxModel):
         verbose_name=_("Default quorum threshold"),
         help_text=_("Decimal value from 0 to 1, e.g. 0.5 for 50%."),
     )
+    attendance_threshold_50 = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        default=Decimal("0.5000"),
+        validators=[MinValueValidator(Decimal("0")), MaxValueValidator(Decimal("1"))],
+        verbose_name=_("Attendance threshold 50%"),
+        help_text=_("Minimum share ratio required to mark 50% attendance as reached."),
+    )
+    attendance_threshold_two_thirds = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        default=Decimal("0.6667"),
+        validators=[MinValueValidator(Decimal("0")), MaxValueValidator(Decimal("1"))],
+        verbose_name=_("Attendance threshold 2/3"),
+        help_text=_("Minimum share ratio required to mark 2/3 attendance as reached."),
+    )
 
     class Meta:
         ordering = ["name"]
@@ -205,6 +221,12 @@ class Meeting(NetBoxModel):
         ordering = ["-date_time", "title"]
         verbose_name = _("Meeting")
         verbose_name_plural = _("Meetings")
+        permissions = (
+            ("manage_meeting_workflow", "Can manage meeting workflow actions"),
+            ("manage_attendance_live", "Can toggle live meeting attendance"),
+            ("sync_ballot_styles", "Can synchronize ballot styles from ownership"),
+            ("export_meeting_data", "Can export meeting reports"),
+        )
 
     def __str__(self):
         return f"{self.title} ({self.date_time:%Y-%m-%d %H:%M})"
@@ -584,6 +606,9 @@ class AgendaItem(NetBoxModel):
         unique_together = [("meeting", "order")]
         verbose_name = _("Agenda item")
         verbose_name_plural = _("Agenda items")
+        permissions = (
+            ("run_voting_session", "Can create and update voting sessions"),
+        )
 
     def __str__(self):
         return f"{self.meeting.title} - {self.order}. {self.title}"
