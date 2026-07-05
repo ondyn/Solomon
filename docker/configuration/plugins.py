@@ -12,7 +12,7 @@
 # List of enabled plugins (must be installed in the container image)
 PLUGINS = [
     # "solomon_core",
-    "solomon_test_plugin",
+    # "solomon_test_plugin",
     "solomon_theme",
     "solomon_property",
     "solomon_meetings",
@@ -37,9 +37,9 @@ PLUGINS_CONFIG = {
         "enable_power": False,
         "enable_provisioning": False,
     },
-    "solomon_test_plugin": {
-        "greeting": "Hello from Solomon!",
-    },
+    # "solomon_test_plugin": {
+    #     "greeting": "Hello from Solomon!",
+    # },
     "solomon_theme": {},
     "solomon_property": {},
     "solomon_meetings": {},

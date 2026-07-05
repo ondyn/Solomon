@@ -92,7 +92,7 @@
 					<div id="vote-form-error" class="alert alert-danger d-none mb-3" role="alert"></div>
 					<div class="d-flex gap-2">
 						<button type="submit" class="btn btn-primary" id="vote-form-submit">{% if editing_session %}{% trans "Update voting" %}{% else %}{% trans "Save voting" %}{% endif %}</button>
-						<a class="btn btn-outline-secondary" href="{{ meeting.get_absolute_url }}?tab=agenda">{% trans "Back" %}</a>
+						<a class="btn btn-outline-secondary" href="{% url 'plugins:solomon_meetings:meeting_agenda' pk=meeting.pk %}">{% trans "Back" %}</a>
 					</div>
 				</form>
 			</div>

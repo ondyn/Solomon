@@ -7,15 +7,21 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from netbox.views import generic
+from utilities.views import ViewTab, register_model_view
 
 from solomon_property.models import FlatOwner
 
 from . import filterforms, filtersets, forms, models, tables
+
+
+def get_meeting_tab_url(meeting, tab_name):
+    return reverse(f"plugins:solomon_meetings:meeting_{tab_name}", kwargs={"pk": meeting.pk})
 
 
 class MeetingTypeListView(generic.ObjectListView):
@@ -52,6 +58,7 @@ class MeetingListView(generic.ObjectListView):
 
 class MeetingView(generic.ObjectView):
     queryset = models.Meeting.objects.select_related("meeting_type", "moderator").prefetch_related("buildings")
+    active_tab = "meeting"
 
     @staticmethod
     def _fraction_from_pairs(pairs):
@@ -189,7 +196,7 @@ class MeetingView(generic.ObjectView):
         quorum_ratio = instance.calculate_quorum_ratio()
         ballot_type_summary = instance.get_ballot_type_summary()
         return {
-            "active_tab": request.GET.get("tab", "meeting"),
+            "active_tab": self.active_tab,
             "agenda_items": agenda_items,
             "attendance_rows": attendance_rows,
             "present_count": present_count,
@@ -211,6 +218,33 @@ class MeetingView(generic.ObjectView):
             "export_form": forms.MeetingExportForm(),
             "ballot_type_summary": ballot_type_summary,
         }
+
+
+@register_model_view(models.Meeting, "attendance", path="attendance")
+class MeetingAttendanceTabView(MeetingView):
+    active_tab = "attendance"
+    tab = ViewTab(
+        label=_("Attendance"),
+        permission="solomon_meetings.view_meeting",
+    )
+
+
+@register_model_view(models.Meeting, "agenda", path="agenda")
+class MeetingAgendaTabView(MeetingView):
+    active_tab = "agenda"
+    tab = ViewTab(
+        label=_("Agenda"),
+        permission="solomon_meetings.view_meeting",
+    )
+
+
+@register_model_view(models.Meeting, "ballots", path="ballots")
+class MeetingBallotsTabView(MeetingView):
+    active_tab = "ballots"
+    tab = ViewTab(
+        label=_("Ballots"),
+        permission="solomon_meetings.view_meeting",
+    )
 
 
 class MeetingEditView(generic.ObjectEditView):
@@ -239,7 +273,7 @@ class MeetingStartView(PermissionRequiredMixin, View):
             messages.success(request, _("Meeting has been started."))
         except ValidationError as exc:
             messages.error(request, str(exc))
-        return redirect(f"{meeting.get_absolute_url()}?tab=meeting")
+        return redirect(meeting.get_absolute_url())
 
 
 class MeetingFinishView(PermissionRequiredMixin, View):
@@ -254,7 +288,7 @@ class MeetingFinishView(PermissionRequiredMixin, View):
             messages.success(request, _("Meeting has been finished."))
         except ValidationError as exc:
             messages.error(request, str(exc))
-        return redirect(f"{meeting.get_absolute_url()}?tab=meeting")
+        return redirect(meeting.get_absolute_url())
 
 
 class MeetingGenerateInvitationView(PermissionRequiredMixin, View):
@@ -267,7 +301,7 @@ class MeetingGenerateInvitationView(PermissionRequiredMixin, View):
         meeting.invitation_pdf_generated_at = timezone.now()
         meeting.save(update_fields=["invitation_pdf_generated_at", "last_updated"])
         messages.success(request, _("Invitation PDF generation was recorded."))
-        return redirect(f"{meeting.get_absolute_url()}?tab=meeting")
+        return redirect(meeting.get_absolute_url())
 
 
 class MeetingPublishInvitationView(PermissionRequiredMixin, View):
@@ -280,7 +314,7 @@ class MeetingPublishInvitationView(PermissionRequiredMixin, View):
         meeting.invitation_published_at = timezone.now()
         meeting.save(update_fields=["invitation_published_at", "last_updated"])
         messages.success(request, _("Invitation publication was recorded."))
-        return redirect(f"{meeting.get_absolute_url()}?tab=meeting")
+        return redirect(meeting.get_absolute_url())
 
 
 class MeetingAttendanceToggleView(PermissionRequiredMixin, View):
@@ -293,7 +327,7 @@ class MeetingAttendanceToggleView(PermissionRequiredMixin, View):
 
         if meeting.phase != models.MEETING_PHASE_IN_PROGRESS:
             messages.error(request, _("Attendance can be changed only while the meeting is in progress."))
-            return redirect(f"{meeting.get_absolute_url()}?tab=attendance")
+            return redirect(get_meeting_tab_url(meeting, "attendance"))
 
         snapshots = models.MeetingOwnerSnapshot.objects.filter(meeting=meeting)
         owner_id = request.POST.get("owner_id")
@@ -304,7 +338,7 @@ class MeetingAttendanceToggleView(PermissionRequiredMixin, View):
 
         if not snapshots.exists():
             messages.error(request, _("Owner snapshot was not found."))
-            return redirect(f"{meeting.get_absolute_url()}?tab=attendance")
+            return redirect(get_meeting_tab_url(meeting, "attendance"))
 
         is_currently_present = snapshots.filter(is_currently_present=True).exists()
 
@@ -322,7 +356,7 @@ class MeetingAttendanceToggleView(PermissionRequiredMixin, View):
                 source="workflow",
             )
         messages.success(request, _("Attendance status has been updated."))
-        return redirect(f"{meeting.get_absolute_url()}?tab=attendance")
+        return redirect(get_meeting_tab_url(meeting, "attendance"))
 
 
 class MeetingAgendaAddView(PermissionRequiredMixin, View):
@@ -335,7 +369,7 @@ class MeetingAgendaAddView(PermissionRequiredMixin, View):
         form = forms.MeetingAgendaInlineForm(request.POST)
         if not form.is_valid():
             messages.error(request, _("Agenda point could not be created. Check input values."))
-            return redirect(f"{meeting.get_absolute_url()}?tab=agenda")
+            return redirect(get_meeting_tab_url(meeting, "agenda"))
 
         next_order = (meeting.agenda_items.order_by("-order").values_list("order", flat=True).first() or 0) + 1
         models.AgendaItem.objects.create(
@@ -350,7 +384,7 @@ class MeetingAgendaAddView(PermissionRequiredMixin, View):
             minimum_pass_percentage=form.cleaned_data["minimum_pass_percentage"],
         )
         messages.success(request, _("Agenda point added."))
-        return redirect(f"{meeting.get_absolute_url()}?tab=agenda")
+        return redirect(get_meeting_tab_url(meeting, "agenda"))
 
 
 class MeetingAgendaMoveView(PermissionRequiredMixin, View):
@@ -383,7 +417,7 @@ class MeetingAgendaMoveView(PermissionRequiredMixin, View):
             agenda_item.save(update_fields=["order", "last_updated"])
             swap_with.save(update_fields=["order", "last_updated"])
 
-        return redirect(f"{meeting.get_absolute_url()}?tab=agenda")
+        return redirect(get_meeting_tab_url(meeting, "agenda"))
 
 
 class AgendaItemStartVotingView(PermissionRequiredMixin, View):
@@ -463,7 +497,7 @@ class AgendaItemStartVotingView(PermissionRequiredMixin, View):
 
         if not form.is_valid():
             messages.error(request, _("Voting form contains invalid values."))
-            return redirect(f"{meeting.get_absolute_url()}?tab=agenda")
+            return redirect(get_meeting_tab_url(meeting, "agenda"))
 
         session_id = request.POST.get("session_id")
         if session_id:
@@ -496,7 +530,7 @@ class AgendaItemStartVotingView(PermissionRequiredMixin, View):
             messages.success(request, _("Voting has been recorded for this agenda point."))
         else:
             messages.success(request, _("Voting has been updated for this agenda point."))
-        return redirect(f"{meeting.get_absolute_url()}?tab=agenda")
+        return redirect(get_meeting_tab_url(meeting, "agenda"))
 
 
 class MeetingSyncBallotStylesView(PermissionRequiredMixin, View):
@@ -572,7 +606,7 @@ class MeetingSyncBallotStylesView(PermissionRequiredMixin, View):
 
         meeting.snapshot_owners(refresh_existing=True)
         messages.success(request, _("Ballot types synchronized from ownership shares."))
-        return redirect(f"{meeting.get_absolute_url()}?tab=ballots")
+        return redirect(get_meeting_tab_url(meeting, "ballots"))
 
 
 class MeetingExportView(PermissionRequiredMixin, View):
@@ -591,7 +625,7 @@ class MeetingExportView(PermissionRequiredMixin, View):
         form = forms.MeetingExportForm(request.POST)
         if not form.is_valid():
             messages.error(request, _("Please select valid export options."))
-            return redirect(f"{meeting.get_absolute_url()}?tab=meeting")
+            return redirect(meeting.get_absolute_url())
 
         lines = [
             f"Meeting: {meeting.title}",

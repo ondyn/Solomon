@@ -38,7 +38,7 @@ class ContactsImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
       2. User selects rows to import -> execute
     """
     template_name = "solomon_property/contacts_import.html"
-    permission_required = "solomon_property.import_contacts_data"
+    permission_required = "solomon_property.import_contacts_data_person"
     raise_exception = True
 
     def get(self, request):
@@ -221,7 +221,7 @@ class ContactsExportView(LoginRequiredMixin, PermissionRequiredMixin, View):
     POST - apply filters and stream the CSV file download
     """
     template_name = "solomon_property/contacts_export.html"
-    permission_required = "solomon_property.export_contacts_data"
+    permission_required = "solomon_property.export_contacts_data_person"
     raise_exception = True
 
     def get(self, request):

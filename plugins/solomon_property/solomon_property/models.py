@@ -142,8 +142,8 @@ class Building(NetBoxModel):
         verbose_name = _("Building")
         verbose_name_plural = _("Buildings")
         permissions = (
-            ("import_cuzk_data", "Can import building and flat data from CUZK"),
-            ("calculate_flat_area", "Can calculate and apply flat areas from CUZK shares"),
+            ("import_cuzk_data_building", "Can import building and flat data from CUZK"),
+            ("calculate_flat_area_building", "Can calculate and apply flat areas from CUZK shares"),
         )
 
     def __str__(self):
@@ -353,8 +353,8 @@ class Person(NetBoxModel):
         verbose_name = _("Person")
         verbose_name_plural = _("Persons")
         permissions = (
-            ("import_contacts_data", "Can import contacts from CSV"),
-            ("export_contacts_data", "Can export contacts to CSV"),
+            ("import_contacts_data_person", "Can import contacts from CSV"),
+            ("export_contacts_data_person", "Can export contacts to CSV"),
         )
 
     def __str__(self):
@@ -462,7 +462,7 @@ class PropertyOwner(NetBoxModel):
         verbose_name = _("Property Owner")
         verbose_name_plural = _("Property Owners")
         permissions = (
-            ("import_owner_data", "Can import owners from text data"),
+            ("import_owner_data_propertyowner", "Can import owners from text data"),
         )
 
     def __str__(self):

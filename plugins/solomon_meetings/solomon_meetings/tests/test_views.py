@@ -103,7 +103,7 @@ class MeetingViewAttendanceRowsTests(TestCase):
             source="test",
         )
 
-        request = RequestFactory().get("/plugins/meetings/meetings/1/?tab=attendance")
+        request = RequestFactory().get("/plugins/meetings/meetings/1/attendance/")
         context = MeetingView().get_extra_context(request, self.meeting)
 
         self.assertEqual(len(context["attendance_rows"]), 1)
@@ -136,7 +136,7 @@ class MeetingViewAttendanceRowsTests(TestCase):
             color="#2e7d32",
         )
 
-        request = RequestFactory().get("/plugins/meetings/meetings/1/?tab=attendance")
+        request = RequestFactory().get("/plugins/meetings/meetings/1/attendance/")
         context = MeetingView().get_extra_context(request, self.meeting)
 
         self.assertEqual(len(context["attendance_rows"]), 1)

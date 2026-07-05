@@ -22,6 +22,9 @@ urlpatterns = [
     path("meetings/add/", views.MeetingEditView.as_view(), name="meeting_add"),
     path("meetings/delete/", views.MeetingBulkDeleteView.as_view(), name="meeting_bulk_delete"),
     path("meetings/<int:pk>/", views.MeetingView.as_view(), name="meeting"),
+    path("meetings/<int:pk>/attendance/", views.MeetingAttendanceTabView.as_view(), name="meeting_attendance"),
+    path("meetings/<int:pk>/agenda/", views.MeetingAgendaTabView.as_view(), name="meeting_agenda"),
+    path("meetings/<int:pk>/ballots/", views.MeetingBallotsTabView.as_view(), name="meeting_ballots"),
     path("meetings/<int:pk>/start/", views.MeetingStartView.as_view(), name="meeting_start"),
     path("meetings/<int:pk>/finish/", views.MeetingFinishView.as_view(), name="meeting_finish"),
     path(

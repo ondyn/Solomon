@@ -53,7 +53,7 @@ _municipality_cache: list | None = None
 # ---------------------------------------------------------------------------
 class CUZKImportSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
     template_name = "solomon_property/cuzk_import_search.html"
-    permission_required = "solomon_property.import_cuzk_data"
+    permission_required = "solomon_property.import_cuzk_data_building"
     raise_exception = True
 
     def get(self, request):
@@ -93,7 +93,7 @@ class CUZKImportSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
 # ---------------------------------------------------------------------------
 class CUZKAddressSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
     """POST: search CUZK buildings by city_part_code + house_number. Returns JSON."""
-    permission_required = "solomon_property.import_cuzk_data"
+    permission_required = "solomon_property.import_cuzk_data_building"
     raise_exception = True
 
     def post(self, request):
@@ -126,7 +126,7 @@ class CUZKAddressSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 class CUZKCityPartAutocompleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
     """GET ?q=<text>  - return matching city parts as JSON."""
-    permission_required = "solomon_property.import_cuzk_data"
+    permission_required = "solomon_property.import_cuzk_data_building"
     raise_exception = True
 
     def get(self, request):
@@ -185,7 +185,7 @@ class CUZKCityPartAutocompleteView(LoginRequiredMixin, PermissionRequiredMixin, 
 # ---------------------------------------------------------------------------
 class CUZKImportPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
     template_name = "solomon_property/cuzk_import_preview.html"
-    permission_required = "solomon_property.import_cuzk_data"
+    permission_required = "solomon_property.import_cuzk_data_building"
     raise_exception = True
 
     def _get_import_data(self, request):
@@ -266,7 +266,7 @@ class CUZKImportPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
 # ---------------------------------------------------------------------------
 class OwnersImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
     template_name = "solomon_property/owners_import.html"
-    permission_required = "solomon_property.import_owner_data"
+    permission_required = "solomon_property.import_owner_data_propertyowner"
     raise_exception = True
 
     def _annotate_preview(self, records):
@@ -461,7 +461,7 @@ class FlatAreaCalculationView(LoginRequiredMixin, PermissionRequiredMixin, View)
     """
 
     template_name = "solomon_property/flat_area_calculation.html"
-    permission_required = "solomon_property.calculate_flat_area"
+    permission_required = "solomon_property.calculate_flat_area_building"
     raise_exception = True
 
     def _build_preview(self):

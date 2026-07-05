@@ -176,7 +176,7 @@ class MeetingReportSpreadsheetTests(TestCase):
         return session
 
     def _meeting_context(self):
-        request = RequestFactory().get(f"{self.meeting.get_absolute_url()}?tab=agenda")
+        request = RequestFactory().get(f"{self.meeting.get_absolute_url()}agenda/")
         return MeetingView().get_extra_context(request, self.meeting)
 
     def _agenda_item(self, title):
