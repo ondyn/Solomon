@@ -1,13 +1,14 @@
 from importlib.metadata import metadata
 
 from netbox.plugins import PluginConfig
+from django.utils.translation import gettext_lazy as _
 
 _meta = metadata("solomon-theme")
 
 
 class SolomonThemeConfig(PluginConfig):
     name = "solomon_theme"
-    verbose_name = "Solomon Theme"
+    verbose_name = _("Solomon Theme")
     version = _meta["Version"]
     author = _meta["Author"]
     description = _meta["Summary"]

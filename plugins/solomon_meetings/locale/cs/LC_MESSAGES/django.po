@@ -1,0 +1,1208 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-05 19:39+0200\n"
+"PO-Revision-Date: 2026-07-05 19:39\n"
+"Last-Translator: GitHub Copilot\n"
+"Language-Team: Czech\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#: solomon_meetings/__init__.py:11
+msgid "Solomon Meetings"
+msgstr "Setkání"
+
+#: solomon_meetings/filterforms.py:13 solomon_meetings/filterforms.py:18
+#: solomon_meetings/filterforms.py:23 solomon_meetings/filterforms.py:28
+msgid "Filters"
+msgstr "Filtry"
+
+#: solomon_meetings/filtersets.py:24 solomon_meetings/filtersets.py:35
+#: solomon_meetings/filtersets.py:46
+msgid "Search"
+msgstr "Vyhledávání"
+
+#: solomon_meetings/forms.py:136 solomon_meetings/models.py:762
+msgid "Weight numerator"
+msgstr "Čitatel hmotnosti"
+
+#: solomon_meetings/forms.py:137
+msgid "Numerator of the ownership share fraction, e.g. 779"
+msgstr "Čitatel podílu vlastnického podílu, např. 779"
+
+#: solomon_meetings/forms.py:141 solomon_meetings/models.py:767
+msgid "Weight denominator"
+msgstr "Jmenovatel hmotnosti"
+
+#: solomon_meetings/forms.py:142
+msgid "Denominator of the ownership share fraction, e.g. 54534"
+msgstr "Jmenovatel zlomku vlastnického podílu, např. 54534"
+
+#: solomon_meetings/models.py:23
+#: solomon_meetings/templates/solomon_meetings/meeting.html:350
+msgid "By units"
+msgstr "Podle jednotek"
+
+#: solomon_meetings/models.py:24
+#: solomon_meetings/templates/solomon_meetings/meeting.html:350
+msgid "By ownership share"
+msgstr "Podle vlastnického podílu"
+
+#: solomon_meetings/models.py:32
+msgid "Planned"
+msgstr "Plánováno"
+
+#: solomon_meetings/models.py:33 solomon_meetings/models.py:72
+msgid "In progress"
+msgstr "Probíhá"
+
+#: solomon_meetings/models.py:34
+msgid "Adjourned"
+msgstr "Odloženo"
+
+#: solomon_meetings/models.py:35
+msgid "Closed"
+msgstr "ZAVŘENO"
+
+#: solomon_meetings/models.py:42
+#: solomon_meetings/templates/solomon_meetings/meeting.html:248
+#: solomon_meetings/templates/solomon_meetings/meetingownersnapshot.html:17
+msgid "Present"
+msgstr "Současnost"
+
+#: solomon_meetings/models.py:43
+msgid "Proxy"
+msgstr "Proxy"
+
+#: solomon_meetings/models.py:44
+#: solomon_meetings/templates/solomon_meetings/meeting.html:248
+msgid "Absent"
+msgstr "Chybí"
+
+#: solomon_meetings/models.py:51 solomon_meetings/models.py:91
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:54
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:102
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:183
+#: solomon_meetings/templates/solomon_meetings/agendavoteballot.html:16
+#: solomon_meetings/templates/solomon_meetings/meeting.html:302
+msgid "For"
+msgstr "Pro"
+
+#: solomon_meetings/models.py:52 solomon_meetings/models.py:92
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:55
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:112
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:184
+#: solomon_meetings/templates/solomon_meetings/agendavoteballot.html:17
+#: solomon_meetings/templates/solomon_meetings/meeting.html:303
+msgid "Against"
+msgstr "Proti"
+
+#: solomon_meetings/models.py:53 solomon_meetings/models.py:93
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:56
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:122
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:185
+#: solomon_meetings/templates/solomon_meetings/agendavoteballot.html:18
+#: solomon_meetings/templates/solomon_meetings/meeting.html:304
+msgid "Abstain"
+msgstr "zdržet se hlasování"
+
+#: solomon_meetings/models.py:61
+msgid "Approved"
+msgstr "Schválený"
+
+#: solomon_meetings/models.py:62
+msgid "Rejected"
+msgstr "Odmítnuto"
+
+#: solomon_meetings/models.py:63
+msgid "Deferred"
+msgstr "Odložený"
+
+#: solomon_meetings/models.py:64
+msgid "N/A"
+msgstr "N/A"
+
+#: solomon_meetings/models.py:71
+msgid "Planning"
+msgstr "Plánování"
+
+#: solomon_meetings/models.py:73
+msgid "Finished"
+msgstr "Hotovo"
+
+#: solomon_meetings/models.py:79
+msgid "Arrival"
+msgstr "Příchod"
+
+#: solomon_meetings/models.py:80
+msgid "Departure"
+msgstr "Odchod"
+
+#: solomon_meetings/models.py:100
+msgid "Email"
+msgstr "E-mail"
+
+#: solomon_meetings/models.py:101
+msgid "Post"
+msgstr "Zveřejnit"
+
+#: solomon_meetings/models.py:102
+msgid "Personal delivery"
+msgstr "Osobní předání"
+
+#: solomon_meetings/models.py:107
+#: solomon_meetings/templates/solomon_meetings/meeting.html:282
+#: solomon_meetings/templates/solomon_meetings/meeting.html:346
+#: solomon_meetings/templates/solomon_meetings/meetingtype.html:12
+msgid "Name"
+msgstr "Jméno"
+
+#: solomon_meetings/models.py:112
+#: solomon_meetings/templates/solomon_meetings/meetingtype.html:16
+msgid "Quorum type"
+msgstr "Typ kvora"
+
+#: solomon_meetings/models.py:119
+#: solomon_meetings/templates/solomon_meetings/meetingtype.html:20
+msgid "Default quorum threshold"
+msgstr "Výchozí práh kvora"
+
+#: solomon_meetings/models.py:120 solomon_meetings/models.py:179
+msgid "Decimal value from 0 to 1, e.g. 0.5 for 50%."
+msgstr "Desetinná hodnota od 0 do 1, např. 0,5 za 50 %."
+
+#: solomon_meetings/models.py:127
+msgid "Attendance threshold 50%"
+msgstr "Hranice účasti 50 %"
+
+#: solomon_meetings/models.py:128
+msgid "Minimum share ratio required to mark 50% attendance as reached."
+msgstr ""
+"Minimální poměr podílů potřebný k označení 50% návštěvnosti jako dosažené."
+
+#: solomon_meetings/models.py:135
+#: solomon_meetings/templates/solomon_meetings/meetingtype.html:28
+msgid "Attendance threshold 2/3"
+msgstr "Hranice docházky 2/3"
+
+#: solomon_meetings/models.py:136
+msgid "Minimum share ratio required to mark 2/3 attendance as reached."
+msgstr ""
+"Minimální poměr podílů potřebný k označení 2/3 návštěvnosti jako dosažené."
+
+#: solomon_meetings/models.py:141 solomon_meetings/models.py:156
+#: solomon_meetings/templates/solomon_meetings/meeting.html:29
+#: solomon_meetings/templates/solomon_meetings/meetingtype.html:8
+msgid "Meeting type"
+msgstr "Typ schůzky"
+
+#: solomon_meetings/models.py:142 solomon_meetings/navigation.py:27
+msgid "Meeting types"
+msgstr "Typy schůzek"
+
+#: solomon_meetings/models.py:158 solomon_meetings/models.py:572
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:21
+#: solomon_meetings/templates/solomon_meetings/meeting.html:33
+msgid "Title"
+msgstr "Titul"
+
+#: solomon_meetings/models.py:162
+#: solomon_meetings/templates/solomon_meetings/meeting.html:110
+msgid "Buildings"
+msgstr "Budovy"
+
+#: solomon_meetings/models.py:163
+msgid "Buildings summoned to this meeting."
+msgstr "Budovy svolané na toto jednání."
+
+#: solomon_meetings/models.py:165
+#: solomon_meetings/templates/solomon_meetings/meeting.html:37
+msgid "Date and time"
+msgstr "Datum a čas"
+
+#: solomon_meetings/models.py:166
+#: solomon_meetings/templates/solomon_meetings/meeting.html:41
+msgid "Location"
+msgstr "Umístění"
+
+#: solomon_meetings/models.py:171
+#: solomon_meetings/templates/solomon_meetings/meeting.html:45
+#: solomon_meetings/templates/solomon_meetings/meeting.html:228
+msgid "Status"
+msgstr "Postavení"
+
+#: solomon_meetings/models.py:178 solomon_meetings/models.py:594
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:50
+#: solomon_meetings/templates/solomon_meetings/meeting.html:66
+msgid "Quorum threshold"
+msgstr "Práh kvora"
+
+#: solomon_meetings/models.py:181
+#: solomon_meetings/templates/solomon_meetings/meeting.html:70
+msgid "Quorum achieved"
+msgstr "Bylo dosaženo kvora"
+
+#: solomon_meetings/models.py:185
+#: solomon_meetings/templates/solomon_meetings/meeting.html:74
+msgid "Quorum updated at"
+msgstr "Kvorum aktualizováno na"
+
+#: solomon_meetings/models.py:193
+#: solomon_meetings/templates/solomon_meetings/meeting.html:53
+msgid "Moderator"
+msgstr "Moderátor"
+
+#: solomon_meetings/models.py:195 solomon_meetings/models.py:886
+#: solomon_meetings/templates/solomon_meetings/meeting.html:125
+#: solomon_meetings/templates/solomon_meetings/meetingattendanceevent.html:17
+msgid "Note"
+msgstr "Poznámka"
+
+#: solomon_meetings/models.py:196 solomon_meetings/models.py:928
+#: solomon_meetings/templates/solomon_meetings/meeting.html:78
+msgid "Started at"
+msgstr "Začátek v"
+
+#: solomon_meetings/models.py:197
+#: solomon_meetings/templates/solomon_meetings/meeting.html:82
+msgid "Ended at"
+msgstr "Skončilo v"
+
+#: solomon_meetings/models.py:202
+#: solomon_meetings/templates/solomon_meetings/meeting.html:49
+msgid "Workflow phase"
+msgstr "Fáze pracovního postupu"
+
+#: solomon_meetings/models.py:207
+#: solomon_meetings/templates/solomon_meetings/meeting.html:106
+msgid "Invitation published at"
+msgstr "Pozvánka zveřejněna na"
+
+#: solomon_meetings/models.py:212
+#: solomon_meetings/templates/solomon_meetings/meeting.html:102
+msgid "Invitation PDF generated at"
+msgstr "Pozvánka ve formátu PDF vygenerována na"
+
+#: solomon_meetings/models.py:217
+#: solomon_meetings/templates/solomon_meetings/meeting.html:86
+msgid "Owner snapshot taken at"
+msgstr "Snímek vlastníka pořízen v"
+
+#: solomon_meetings/models.py:222 solomon_meetings/models.py:569
+#: solomon_meetings/models.py:669 solomon_meetings/models.py:808
+#: solomon_meetings/models.py:1113 solomon_meetings/models.py:1145
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:13
+#: solomon_meetings/templates/solomon_meetings/agendavotesession.html:12
+#: solomon_meetings/templates/solomon_meetings/meetingattendance.html:13
+#: solomon_meetings/templates/solomon_meetings/meetingattendanceevent.html:12
+#: solomon_meetings/templates/solomon_meetings/meetinginvitation.html:13
+#: solomon_meetings/templates/solomon_meetings/meetingminutes.html:13
+#: solomon_meetings/templates/solomon_meetings/meetingownersnapshot.html:12
+msgid "Meeting"
+msgstr "Zasedání"
+
+#: solomon_meetings/models.py:223 solomon_meetings/navigation.py:7
+#: solomon_meetings/navigation.py:10 solomon_meetings/navigation.py:14
+msgid "Meetings"
+msgstr "Setkání"
+
+#: solomon_meetings/models.py:240
+msgid "Meeting cannot be closed before quorum is achieved."
+msgstr "Schůze nemůže být ukončena před dosažením kvóra."
+
+#: solomon_meetings/models.py:242
+msgid "Meeting end must be after meeting start."
+msgstr "Konec schůzky musí být po zahájení schůzky."
+
+#: solomon_meetings/models.py:244
+msgid "Planning meetings cannot already be started."
+msgstr "Plánovací schůzky již nelze zahájit."
+
+#: solomon_meetings/models.py:246
+msgid "Finished meetings must have an end time."
+msgstr "Ukončené schůzky musí mít čas ukončení."
+
+#: solomon_meetings/models.py:346
+msgid "Only planned meetings can be started."
+msgstr "Lze zahájit pouze plánované schůzky."
+
+#: solomon_meetings/models.py:368
+msgid "Only meetings in progress can be finished."
+msgstr "Dokončit lze pouze probíhající schůzky."
+
+#: solomon_meetings/models.py:370
+msgid "Meeting cannot be finished without quorum."
+msgstr "Schůze nemůže být ukončena bez usnášeníschopnosti."
+
+#: solomon_meetings/models.py:571
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:17
+#: solomon_meetings/templates/solomon_meetings/meeting.html:281
+msgid "Order"
+msgstr "Objednávka"
+
+#: solomon_meetings/models.py:573
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:66
+#: solomon_meetings/templates/solomon_meetings/meeting.html:347
+msgid "Description"
+msgstr "Popis"
+
+#: solomon_meetings/models.py:574
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:25
+#: solomon_meetings/templates/solomon_meetings/meeting.html:283
+#: solomon_meetings/templates/solomon_meetings/meeting.html:348
+msgid "Presenter"
+msgstr "Přednášející"
+
+#: solomon_meetings/models.py:575
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:42
+#: solomon_meetings/templates/solomon_meetings/meeting.html:349
+msgid "Voting required"
+msgstr "Je vyžadováno hlasování"
+
+#: solomon_meetings/models.py:580 solomon_meetings/models.py:756
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:46
+#: solomon_meetings/templates/solomon_meetings/meeting.html:350
+#: solomon_meetings/templates/solomon_meetings/voteweightstyle.html:12
+msgid "Voting method"
+msgstr "Způsob hlasování"
+
+#: solomon_meetings/models.py:587
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:54
+msgid "Minimum pass percentage"
+msgstr "Minimální procento úspěšnosti"
+
+#: solomon_meetings/models.py:595
+msgid "Required meeting quorum before this agenda item can be adopted."
+msgstr "Před přijetím tohoto bodu programu je vyžadováno usnášeníschopnost."
+
+#: solomon_meetings/models.py:601 solomon_meetings/models.py:942
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:29
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:90
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:149
+#: solomon_meetings/templates/solomon_meetings/agendavotesession.html:18
+#: solomon_meetings/templates/solomon_meetings/meeting.html:285
+msgid "Result"
+msgstr "Výsledek"
+
+#: solomon_meetings/models.py:607 solomon_meetings/models.py:926
+#: solomon_meetings/models.py:1063
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:9
+#: solomon_meetings/templates/solomon_meetings/agendavotesession.html:13
+#: solomon_meetings/templates/solomon_meetings/vote.html:13
+msgid "Agenda item"
+msgstr "Bod programu"
+
+#: solomon_meetings/models.py:608 solomon_meetings/navigation.py:40
+msgid "Agenda items"
+msgstr "Položky agendy"
+
+#: solomon_meetings/models.py:675 solomon_meetings/models.py:814
+#: solomon_meetings/models.py:1151
+#: solomon_meetings/templates/solomon_meetings/meeting.html:223
+#: solomon_meetings/templates/solomon_meetings/meetingattendance.html:17
+#: solomon_meetings/templates/solomon_meetings/meetingattendanceevent.html:13
+#: solomon_meetings/templates/solomon_meetings/meetinginvitation.html:17
+#: solomon_meetings/templates/solomon_meetings/meetingownersnapshot.html:13
+msgid "Owner"
+msgstr "Majitel"
+
+#: solomon_meetings/models.py:681 solomon_meetings/models.py:820
+#: solomon_meetings/templates/solomon_meetings/meetingattendance.html:21
+msgid "Flat ownership"
+msgstr "Vlastnictví bytu"
+
+#: solomon_meetings/models.py:687 solomon_meetings/models.py:828
+#: solomon_meetings/templates/solomon_meetings/meetingattendance.html:25
+msgid "Representation"
+msgstr "Zastoupení"
+
+#: solomon_meetings/models.py:689 solomon_meetings/models.py:830
+#: solomon_meetings/templates/solomon_meetings/meetingattendance.html:29
+msgid "Proxy name"
+msgstr "Jméno proxy"
+
+#: solomon_meetings/models.py:690
+#: solomon_meetings/templates/solomon_meetings/meetingattendance.html:42
+msgid "Arrived at"
+msgstr "Dorazil v"
+
+#: solomon_meetings/models.py:691
+#: solomon_meetings/templates/solomon_meetings/meetingattendance.html:46
+msgid "Left at"
+msgstr "Vlevo v"
+
+#: solomon_meetings/models.py:696
+msgid "Meeting attendance"
+msgstr "Účast na jednání"
+
+#: solomon_meetings/models.py:697
+msgid "Meeting attendances"
+msgstr "Účast na schůzích"
+
+#: solomon_meetings/models.py:716
+msgid "Flat ownership must belong to the selected owner."
+msgstr "Vlastnictví bytu musí patřit vybranému vlastníkovi."
+
+#: solomon_meetings/models.py:718
+msgid "Proxy name is required for proxy representation."
+msgstr "Pro zastoupení proxy je vyžadováno jméno proxy."
+
+#: solomon_meetings/models.py:720
+msgid "Left at must be after arrived at."
+msgstr "Opuštěno v musí být po příchodu v."
+
+#: solomon_meetings/models.py:758
+#: solomon_meetings/templates/solomon_meetings/voteweightstyle.html:16
+msgid "Weight value"
+msgstr "Hodnota hmotnosti"
+
+#: solomon_meetings/models.py:769
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:179
+#: solomon_meetings/templates/solomon_meetings/agendavoteballot.html:13
+#: solomon_meetings/templates/solomon_meetings/meeting.html:421
+#: solomon_meetings/templates/solomon_meetings/voteweightstyle.html:20
+msgid "Label"
+msgstr "Označení"
+
+#: solomon_meetings/models.py:769
+msgid "Display marker, e.g. 1, A, B."
+msgstr "Zobrazovací značka, např. 1, A, B."
+
+#: solomon_meetings/models.py:773 solomon_meetings/tables.py:196
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:180
+#: solomon_meetings/templates/solomon_meetings/meeting.html:421
+#: solomon_meetings/templates/solomon_meetings/voteweightstyle.html:24
+msgid "Color"
+msgstr "Barva"
+
+#: solomon_meetings/models.py:774
+msgid "Hex color, e.g. #1976D2."
+msgstr "Hexadecimální barva, např. #1976D2."
+
+#: solomon_meetings/models.py:780
+#: solomon_meetings/templates/solomon_meetings/voteweightstyle.html:8
+msgid "Vote weight style"
+msgstr "Hlasujte styl váhy"
+
+#: solomon_meetings/models.py:781 solomon_meetings/navigation.py:84
+msgid "Vote weight styles"
+msgstr "Styly vážení hlasů"
+
+#: solomon_meetings/models.py:822
+msgid "Owner display name"
+msgstr "Zobrazované jméno vlastníka"
+
+#: solomon_meetings/models.py:823
+msgid "Flat label"
+msgstr "Plochý štítek"
+
+#: solomon_meetings/models.py:831
+msgid "Share numerator"
+msgstr "Sdílet čitatel"
+
+#: solomon_meetings/models.py:832
+msgid "Share denominator"
+msgstr "Jmenovatel podílu"
+
+#: solomon_meetings/models.py:833 solomon_meetings/models.py:1016
+msgid "Share value"
+msgstr "Hodnota podílu"
+
+#: solomon_meetings/models.py:834
+msgid "Unit count"
+msgstr "Počet jednotek"
+
+#: solomon_meetings/models.py:835 solomon_meetings/models.py:1014
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:50
+#: solomon_meetings/templates/solomon_meetings/meeting.html:226
+msgid "Ballot label"
+msgstr "Štítek s hlasovacím lístkem"
+
+#: solomon_meetings/models.py:836 solomon_meetings/models.py:1015
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:51
+#: solomon_meetings/templates/solomon_meetings/meeting.html:227
+msgid "Ballot color"
+msgstr "Barva hlasovacího lístku"
+
+#: solomon_meetings/models.py:837
+msgid "Snapshot taken at"
+msgstr "Snímek pořízen v"
+
+#: solomon_meetings/models.py:838
+msgid "First arrived at"
+msgstr "První dorazil na"
+
+#: solomon_meetings/models.py:839
+msgid "Last left at"
+msgstr "Naposledy vlevo v"
+
+#: solomon_meetings/models.py:840
+msgid "Currently present"
+msgstr "V současné době přítomen"
+
+#: solomon_meetings/models.py:845
+msgid "Meeting owner snapshot"
+msgstr "Snímek schůzky vlastníka"
+
+#: solomon_meetings/models.py:846
+msgid "Meeting owner snapshots"
+msgstr "Snímky schůzek vlastníků"
+
+#: solomon_meetings/models.py:877
+#: solomon_meetings/templates/solomon_meetings/meetingownersnapshot.html:9
+msgid "Owner snapshot"
+msgstr "Snímek vlastníka"
+
+#: solomon_meetings/models.py:882
+msgid "Event type"
+msgstr "Typ události"
+
+#: solomon_meetings/models.py:884
+msgid "Event time"
+msgstr "Čas události"
+
+#: solomon_meetings/models.py:885
+#: solomon_meetings/templates/solomon_meetings/meetingattendanceevent.html:16
+msgid "Source"
+msgstr "Zdroj"
+
+#: solomon_meetings/models.py:890
+msgid "Meeting attendance event"
+msgstr "Účast na setkání"
+
+#: solomon_meetings/models.py:891
+msgid "Meeting attendance events"
+msgstr "Akce pro účast na schůzích"
+
+#: solomon_meetings/models.py:905
+msgid "Attendance events must alternate arrival and departure."
+msgstr "Docházkové akce musí střídat příchod a odchod."
+
+#: solomon_meetings/models.py:929
+msgid "Completed at"
+msgstr "Dokončeno v"
+
+#: solomon_meetings/models.py:930
+msgid "Negative form voting"
+msgstr "Negativní forma hlasování"
+
+#: solomon_meetings/models.py:935
+#: solomon_meetings/templates/solomon_meetings/agendavotesession.html:16
+msgid "Present weight"
+msgstr "Současná váha"
+
+#: solomon_meetings/models.py:937
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:94
+#: solomon_meetings/templates/solomon_meetings/agendavotesession.html:17
+msgid "Quorum met"
+msgstr "Kvorum splněno"
+
+#: solomon_meetings/models.py:947
+msgid "Agenda vote session"
+msgstr "Relace hlasování o programu"
+
+#: solomon_meetings/models.py:948
+msgid "Agenda vote sessions"
+msgstr "Program hlasování zasedání"
+
+#: solomon_meetings/models.py:951
+#, python-brace-format
+msgid "Vote session for {agenda}"
+msgstr "Hlasujte pro {agenda}"
+
+#: solomon_meetings/models.py:1012
+#: solomon_meetings/templates/solomon_meetings/agendavotesession.html:9
+msgid "Vote session"
+msgstr "Hlasovací relace"
+
+#: solomon_meetings/models.py:1017
+msgid "Issued count"
+msgstr "Vydaný počet"
+
+#: solomon_meetings/models.py:1018
+msgid "For count"
+msgstr "Pro počítání"
+
+#: solomon_meetings/models.py:1019
+msgid "Against count"
+msgstr "Proti počtu"
+
+#: solomon_meetings/models.py:1020
+msgid "Abstain count"
+msgstr "Počet zdržet se"
+
+#: solomon_meetings/models.py:1024
+msgid "Agenda vote ballot row"
+msgstr "Řádek hlasování o agendě"
+
+#: solomon_meetings/models.py:1025
+msgid "Agenda vote ballot rows"
+msgstr "Řádky pro hlasování o agendě"
+
+#: solomon_meetings/models.py:1028
+#, python-brace-format
+msgid "{label} ({share})"
+msgstr "{label} ({share})"
+
+#: solomon_meetings/models.py:1028
+msgid "Unlabeled"
+msgstr "Neoznačené"
+
+#: solomon_meetings/models.py:1036
+msgid "Vote counts cannot exceed issued ballots."
+msgstr "Počet hlasů nesmí překročit počet vydaných hlasovacích lístků."
+
+#: solomon_meetings/models.py:1069 solomon_meetings/navigation.py:58
+#: solomon_meetings/templates/solomon_meetings/meetingattendance.html:9
+#: solomon_meetings/templates/solomon_meetings/vote.html:17
+#: solomon_meetings/views.py:227
+msgid "Attendance"
+msgstr "Účast"
+
+#: solomon_meetings/models.py:1071 solomon_meetings/models.py:1083
+#: solomon_meetings/templates/solomon_meetings/meeting.html:284
+#: solomon_meetings/templates/solomon_meetings/vote.html:9
+#: solomon_meetings/templates/solomon_meetings/vote.html:21
+msgid "Vote"
+msgstr "Hlasování"
+
+#: solomon_meetings/models.py:1076
+#: solomon_meetings/templates/solomon_meetings/vote.html:25
+msgid "Vote weight"
+msgstr "Váha hlasů"
+
+#: solomon_meetings/models.py:1084 solomon_meetings/navigation.py:71
+msgid "Votes"
+msgstr "Hlasy"
+
+#: solomon_meetings/models.py:1096
+msgid "Attendance must belong to the same meeting as agenda item."
+msgstr "Účast musí patřit ke stejnému jednání jako bod programu."
+
+#: solomon_meetings/models.py:1115
+#: solomon_meetings/templates/solomon_meetings/meetingminutes.html:40
+msgid "Content"
+msgstr "Obsah"
+
+#: solomon_meetings/models.py:1122
+#: solomon_meetings/templates/solomon_meetings/meetingminutes.html:17
+msgid "Approved by"
+msgstr "Schváleno uživatelem"
+
+#: solomon_meetings/models.py:1124
+#: solomon_meetings/templates/solomon_meetings/meetingminutes.html:21
+msgid "Approved at"
+msgstr "Schváleno v"
+
+#: solomon_meetings/models.py:1125
+#: solomon_meetings/templates/solomon_meetings/meetingminutes.html:25
+msgid "CMS published"
+msgstr "Zveřejněno CMS"
+
+#: solomon_meetings/models.py:1126
+#: solomon_meetings/templates/solomon_meetings/meetingminutes.html:29
+msgid "CMS published at"
+msgstr "CMS zveřejněno na"
+
+#: solomon_meetings/models.py:1130 solomon_meetings/models.py:1131
+msgid "Meeting minutes"
+msgstr "Zápis z jednání"
+
+#: solomon_meetings/models.py:1134
+#, python-brace-format
+msgid "Minutes for {meeting}"
+msgstr "Minuty na {meeting}"
+
+#: solomon_meetings/models.py:1153
+#: solomon_meetings/templates/solomon_meetings/meetinginvitation.html:21
+msgid "Sent at"
+msgstr "Odesláno v"
+
+#: solomon_meetings/models.py:1158
+#: solomon_meetings/templates/solomon_meetings/meetinginvitation.html:25
+msgid "Delivery method"
+msgstr "Způsob doručení"
+
+#: solomon_meetings/models.py:1160
+#: solomon_meetings/templates/solomon_meetings/meetinginvitation.html:29
+msgid "Confirmed"
+msgstr "Potvrzeno"
+
+#: solomon_meetings/models.py:1165
+msgid "Meeting invitation"
+msgstr "Pozvánka na schůzku"
+
+#: solomon_meetings/models.py:1166
+msgid "Meeting invitations"
+msgstr "Pozvánky na schůzky"
+
+#: solomon_meetings/models.py:1169
+#, python-brace-format
+msgid "Invitation for {owner} ({meeting})"
+msgstr "Pozvánka pro {owner} ({meeting})"
+
+#: solomon_meetings/navigation.py:19 solomon_meetings/navigation.py:32
+#: solomon_meetings/navigation.py:45 solomon_meetings/navigation.py:63
+#: solomon_meetings/navigation.py:76 solomon_meetings/navigation.py:89
+#: solomon_meetings/navigation.py:107 solomon_meetings/navigation.py:120
+#: solomon_meetings/templates/solomon_meetings/meeting.html:353
+msgid "Add"
+msgstr "Přidat"
+
+#: solomon_meetings/navigation.py:54
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:27
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:38
+msgid "Voting"
+msgstr "Hlasování"
+
+#: solomon_meetings/navigation.py:98
+msgid "Records"
+msgstr "Evidence"
+
+#: solomon_meetings/navigation.py:102
+msgid "Minutes"
+msgstr "Zápis"
+
+#: solomon_meetings/navigation.py:115
+msgid "Invitations"
+msgstr "Pozvánky"
+
+#: solomon_meetings/tables.py:186
+msgid "Weight"
+msgstr "Hmotnost"
+
+#: solomon_meetings/tables.py:197
+#: solomon_meetings/templates/solomon_meetings/meeting.html:421
+msgid "Count"
+msgstr "Počítat"
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:4
+#: solomon_meetings/templates/solomon_meetings/meeting.html:327
+msgid "Start voting"
+msgstr "Začněte hlasovat"
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:31
+msgid "You are editing an existing voting record for this agenda item."
+msgstr "Upravujete existující záznam hlasování pro tento bod programu."
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:41
+msgid "Quick fill votes:"
+msgstr "Rychlé vyplnění hlasů:"
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:42
+msgid "Set all as For"
+msgstr "Nastavit vše jako pro"
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:43
+msgid "Set all as Against"
+msgstr "Nastavit vše jako Proti"
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:44
+msgid "Set all as Abstain"
+msgstr "Nastavit vše jako Zdržet se"
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:52
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:181
+#: solomon_meetings/templates/solomon_meetings/agendavoteballot.html:14
+#: solomon_meetings/templates/solomon_meetings/meeting.html:225
+#: solomon_meetings/templates/solomon_meetings/meeting.html:421
+#: solomon_meetings/templates/solomon_meetings/meetingownersnapshot.html:15
+msgid "Share"
+msgstr "Podíl"
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:53
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:182
+#: solomon_meetings/templates/solomon_meetings/agendavoteballot.html:15
+msgid "Issued"
+msgstr "Vydáno"
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:87
+msgid "No present ballots. Mark attendance first."
+msgstr "Žádné aktuální hlasovací lístky. Nejprve označte účast."
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:94
+msgid "Update voting"
+msgstr "Aktualizovat hlasování"
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:94
+msgid "Save voting"
+msgstr "Uložit hlasování"
+
+#: solomon_meetings/templates/solomon_meetings/agenda_vote_form.html:95
+msgid "Back"
+msgstr "Zadní"
+
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:43
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:95
+#: solomon_meetings/templates/solomon_meetings/agendavotesession.html:17
+#: solomon_meetings/templates/solomon_meetings/meeting.html:71
+#: solomon_meetings/templates/solomon_meetings/meeting.html:295
+#: solomon_meetings/templates/solomon_meetings/meetinginvitation.html:30
+#: solomon_meetings/templates/solomon_meetings/meetingminutes.html:26
+#: solomon_meetings/templates/solomon_meetings/meetingownersnapshot.html:17
+msgid "Yes,No"
+msgstr "Ano, ne"
+
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:77
+msgid "Latest voting totals"
+msgstr "Poslední součet hlasování"
+
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:82
+msgid "Session started"
+msgstr "Relace zahájena"
+
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:86
+msgid "Session completed"
+msgstr "Relace dokončena"
+
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:98
+msgid "Attendance share at vote start"
+msgstr "Podíl účasti na zahájení hlasování"
+
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:133
+#: solomon_meetings/templates/solomon_meetings/meeting.html:325
+msgid "Edit voting"
+msgstr "Upravit hlasování"
+
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:143
+msgid "Vote sessions"
+msgstr "Hlasování"
+
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:148
+#: solomon_meetings/templates/solomon_meetings/agendavotesession.html:14
+msgid "Started"
+msgstr "Zahájeno"
+
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:150
+msgid "Rows"
+msgstr "Řádky"
+
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:161
+msgid "No voting sessions recorded yet."
+msgstr "Dosud nebylo zaznamenáno žádné hlasování."
+
+#: solomon_meetings/templates/solomon_meetings/agendaitem.html:174
+msgid "Ballot rows (latest session)"
+msgstr "Hlasovací řádky (poslední relace)"
+
+#: solomon_meetings/templates/solomon_meetings/agendavoteballot.html:9
+msgid "Vote ballot row"
+msgstr "Hlasovací řada"
+
+#: solomon_meetings/templates/solomon_meetings/agendavoteballot.html:12
+#: solomon_meetings/templates/solomon_meetings/meeting.html:299
+msgid "Session"
+msgstr "Zasedání"
+
+#: solomon_meetings/templates/solomon_meetings/agendavotesession.html:15
+msgid "Completed"
+msgstr "Dokončeno"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:9
+msgid "Start meeting"
+msgstr "Začněte se scházet"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:15
+msgid "End meeting"
+msgstr "Konec schůzky"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:25
+msgid "General"
+msgstr "Generál"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:62
+msgid "Quorum and workflow"
+msgstr "Kvorum a pracovní postup"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:98
+msgid "Invitations and publication"
+msgstr "Pozvánky a publikace"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:136
+msgid "Invitation actions"
+msgstr "Akce pozvání"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:140
+msgid "Generate invitation/notice"
+msgstr "Vygenerovat pozvánku/oznámení"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:144
+msgid "Publish invitation in CMS"
+msgstr "Publikovat pozvánku v CMS"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:151
+#: solomon_meetings/templates/solomon_meetings/meeting.html:167
+msgid "Export"
+msgstr "Vývozní"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:157
+msgid "Attendance list"
+msgstr "Prezenční listina"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:161
+msgid "Voting details"
+msgstr "Podrobnosti o hlasování"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:165
+msgid "Agenda text"
+msgstr "Text agendy"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:179
+msgid "Attendance summary"
+msgstr "Přehled docházky"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:181
+msgid "Present owners"
+msgstr "Současní majitelé"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:182
+msgid "Present share"
+msgstr "Současné sdílení"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:183
+msgid "Quorum ratio"
+msgstr "Poměr kvora"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:185
+msgid "Threshold checks"
+msgstr "Kontroly prahů"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:193
+msgid "Met"
+msgstr "Setkal"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:193
+msgid "Not met"
+msgstr "Nesplněno"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:204
+msgid "Owners"
+msgstr "Vlastníci"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:211
+#: solomon_meetings/templates/solomon_meetings/meeting.html:212
+msgid "Quick search owners"
+msgstr "Rychlé vyhledávání vlastníků"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:224
+#: solomon_meetings/templates/solomon_meetings/meetingownersnapshot.html:14
+msgid "Flat"
+msgstr "Byt"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:229
+msgid "Arrived"
+msgstr "Přišel"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:230
+msgid "Left"
+msgstr "Vlevo"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:231
+#: solomon_meetings/templates/solomon_meetings/meeting.html:286
+msgid "Actions"
+msgstr "Akce"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:236
+msgid "present"
+msgstr "současnost"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:236
+msgid "absent"
+msgstr "nepřítomný"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:255
+msgid "Mark left"
+msgstr "Mark odešel"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:255
+msgid "Mark arrived"
+msgstr "Mark dorazil"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:257
+msgid "Events"
+msgstr "Události"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:261
+msgid "No owner snapshot yet. Start the meeting first."
+msgstr "Zatím žádný snímek vlastníka. Nejprve začněte schůzku."
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:263
+msgid "No owners match this search."
+msgstr "Tomuto vyhledávání neodpovídají žádní vlastníci."
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:276
+msgid "Meeting points"
+msgstr "Místa setkání"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:314
+msgid "Up"
+msgstr "Nahoru"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:320
+msgid "Down"
+msgstr "Dolů"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:322
+msgid "Edit"
+msgstr "Upravit"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:333
+msgid "No meeting points yet."
+msgstr "Zatím žádné body setkání."
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:342
+msgid "Add meeting point"
+msgstr "Přidat místo setkání"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:351
+msgid "Quorum"
+msgstr "Kvorum"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:352
+msgid "Pass threshold"
+msgstr "Práh průchodu"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:413
+msgid "Ballot types at meeting"
+msgstr "Typy hlasovacích lístků na schůzi"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:416
+msgid "Get unique shares"
+msgstr "Získejte jedinečné akcie"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:421
+msgid "Issued ballots"
+msgstr "Vydané hlasovací lístky"
+
+#: solomon_meetings/templates/solomon_meetings/meeting.html:432
+msgid "No ballot types available yet."
+msgstr "Zatím nejsou k dispozici žádné typy hlasovacích lístků."
+
+#: solomon_meetings/templates/solomon_meetings/meetingattendance.html:38
+msgid "Presence window"
+msgstr "Okno přítomnosti"
+
+#: solomon_meetings/templates/solomon_meetings/meetingattendance.html:50
+msgid "Vote weight by units"
+msgstr "Váha hlasů po jednotkách"
+
+#: solomon_meetings/templates/solomon_meetings/meetingattendance.html:54
+msgid "Vote weight by share"
+msgstr "Váha hlasů podle podílu"
+
+#: solomon_meetings/templates/solomon_meetings/meetingattendanceevent.html:9
+msgid "Attendance event"
+msgstr "Prezenční akce"
+
+#: solomon_meetings/templates/solomon_meetings/meetingattendanceevent.html:14
+msgid "Type"
+msgstr "Typ"
+
+#: solomon_meetings/templates/solomon_meetings/meetingattendanceevent.html:15
+msgid "Time"
+msgstr "Čas"
+
+#: solomon_meetings/templates/solomon_meetings/meetinginvitation.html:9
+msgid "Invitation"
+msgstr "Pozvání"
+
+#: solomon_meetings/templates/solomon_meetings/meetingminutes.html:9
+msgid "Minutes metadata"
+msgstr "Metadata minut"
+
+#: solomon_meetings/templates/solomon_meetings/meetingownersnapshot.html:16
+msgid "Ballot"
+msgstr "Hlasování"
+
+#: solomon_meetings/templates/solomon_meetings/meetingtype.html:24
+#, python-format
+msgid "Attendance threshold 50%%"
+msgstr "Hranice účasti 50 %%"
+
+#: solomon_meetings/views.py:121
+msgid "Multiple"
+msgstr "Násobek"
+
+#: solomon_meetings/views.py:171
+#, python-format
+#| msgid "50% of shares present"
+msgid "50%% of shares present"
+msgstr "50%% přítomných podílů"
+
+#: solomon_meetings/views.py:177
+msgid "2/3 of shares present"
+msgstr "2/3 přítomných akcií"
+
+#: solomon_meetings/views.py:236
+msgid "Agenda"
+msgstr "Agenda"
+
+#: solomon_meetings/views.py:245
+msgid "Ballots"
+msgstr "Hlasovací lístky"
+
+#: solomon_meetings/views.py:273
+msgid "Meeting has been started."
+msgstr "Schůzka byla zahájena."
+
+#: solomon_meetings/views.py:288
+msgid "Meeting has been finished."
+msgstr "Setkání bylo ukončeno."
+
+#: solomon_meetings/views.py:303
+msgid "Invitation PDF generation was recorded."
+msgstr "Generování pozvánky do PDF bylo zaznamenáno."
+
+#: solomon_meetings/views.py:316
+msgid "Invitation publication was recorded."
+msgstr "Zveřejnění pozvánky bylo zaznamenáno."
+
+#: solomon_meetings/views.py:329
+msgid "Attendance can be changed only while the meeting is in progress."
+msgstr "Účast lze změnit pouze v průběhu schůzky."
+
+#: solomon_meetings/views.py:340
+msgid "Owner snapshot was not found."
+msgstr "Snímek vlastníka nebyl nalezen."
+
+#: solomon_meetings/views.py:358
+msgid "Attendance status has been updated."
+msgstr "Stav docházky byl aktualizován."
+
+#: solomon_meetings/views.py:371
+msgid "Agenda point could not be created. Check input values."
+msgstr "Bod agendy se nepodařilo vytvořit. Zkontrolujte vstupní hodnoty."
+
+#: solomon_meetings/views.py:386
+msgid "Agenda point added."
+msgstr "Přidán bod programu."
+
+#: solomon_meetings/views.py:499
+msgid "Voting form contains invalid values."
+msgstr "Hlasovací formulář obsahuje neplatné hodnoty."
+
+#: solomon_meetings/views.py:530
+msgid "Voting has been recorded for this agenda point."
+msgstr "Pro tento bod programu bylo zaznamenáno hlasování."
+
+#: solomon_meetings/views.py:532
+msgid "Voting has been updated for this agenda point."
+msgstr "Hlasování pro tento bod programu bylo aktualizováno."
+
+#: solomon_meetings/views.py:608
+msgid "Ballot types synchronized from ownership shares."
+msgstr "Typy hlasovacích lístků synchronizované z vlastnických podílů."
+
+#: solomon_meetings/views.py:627
+msgid "Please select valid export options."
+msgstr "Vyberte prosím platné možnosti exportu."

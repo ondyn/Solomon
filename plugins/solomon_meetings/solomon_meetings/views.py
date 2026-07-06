@@ -168,7 +168,7 @@ class MeetingView(generic.ObjectView):
         present_share_ratio = self._fraction_to_decimal(present_share_numerator, present_share_denominator)
         attendance_threshold_checks = [
             {
-                "label": _("50% of shares present"),
+                "label": _("50%% of shares present"),
                 "threshold": instance.meeting_type.attendance_threshold_50,
                 "threshold_percent": instance.meeting_type.attendance_threshold_50 * Decimal("100"),
                 "is_met": present_share_ratio >= instance.meeting_type.attendance_threshold_50,

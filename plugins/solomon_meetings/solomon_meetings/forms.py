@@ -2,6 +2,7 @@ from decimal import Decimal
 from fractions import Fraction
 
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from netbox.forms import NetBoxModelForm
 from utilities.forms.fields import DynamicModelChoiceField, DynamicModelMultipleChoiceField
 
@@ -133,13 +134,13 @@ class VoteForm(NetBoxModelForm):
 class VoteWeightStyleForm(NetBoxModelForm):
     weight_numerator = forms.IntegerField(
         min_value=1,
-        label="Weight numerator",
-        help_text="Numerator of the ownership share fraction, e.g. 779",
+        label=_("Weight numerator"),
+        help_text=_("Numerator of the ownership share fraction, e.g. 779"),
     )
     weight_denominator = forms.IntegerField(
         min_value=1,
-        label="Weight denominator",
-        help_text="Denominator of the ownership share fraction, e.g. 54534",
+        label=_("Weight denominator"),
+        help_text=_("Denominator of the ownership share fraction, e.g. 54534"),
     )
 
     class Meta:

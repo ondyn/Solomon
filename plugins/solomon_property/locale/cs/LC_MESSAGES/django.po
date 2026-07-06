@@ -1,0 +1,1475 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-05 19:38+0200\n"
+"PO-Revision-Date: 2026-07-05 19:39\n"
+"Last-Translator: GitHub Copilot\n"
+"Language-Team: Czech\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#: solomon_property/__init__.py:11
+#| msgid "Property"
+msgid "Solomon Property"
+msgstr "Vlastnictví"
+
+#: solomon_property/contacts_views.py:59 solomon_property/contacts_views.py:68
+#: solomon_property/contacts_views.py:90
+#: solomon_property/contacts_views.py:103
+#: solomon_property/contacts_views.py:111
+#: solomon_property/templates/solomon_property/contacts_import.html:4
+msgid "Import Contacts from Google CSV"
+msgstr "Importujte kontakty z Google CSV"
+
+#: solomon_property/contacts_views.py:88
+msgid "Please select a CSV file."
+msgstr "Vyberte prosím soubor CSV."
+
+#: solomon_property/contacts_views.py:101
+msgid "Unable to read the CSV file. Check encoding."
+msgstr "Soubor CSV nelze přečíst. Zkontrolujte kódování."
+
+#: solomon_property/contacts_views.py:109
+msgid "No contacts found in the CSV file."
+msgstr "V souboru CSV nebyly nalezeny žádné kontakty."
+
+#: solomon_property/contacts_views.py:122
+msgid "Session expired. Please upload the CSV again."
+msgstr "Platnost relace vypršela. Nahrajte soubor CSV znovu."
+
+#: solomon_property/contacts_views.py:148
+msgid "No contacts selected for import."
+msgstr "Pro import nebyly vybrány žádné kontakty."
+
+#: solomon_property/contacts_views.py:164 solomon_property/cuzk_views.py:435
+#, python-format
+msgid "%(name)s: %(err)s"
+msgstr "%(name)s: %(err)s"
+
+#: solomon_property/contacts_views.py:169
+#, python-format
+msgid ""
+"Import complete: %(u)d person(s) updated, %(e)d email(s) added, %(p)d "
+"phone(s) added."
+msgstr ""
+"Import dokončen: Aktualizováno %(u)d osob, přidáno %(e)d e-mailů, přidáno "
+"%(p)d telefonů."
+
+#: solomon_property/contacts_views.py:230
+#: solomon_property/contacts_views.py:249
+#: solomon_property/templates/solomon_property/contacts_export.html:4
+#: solomon_property/templates/solomon_property/contacts_export.html:15
+msgid "Export Contacts to Google CSV"
+msgstr "Exportujte kontakty do Google CSV"
+
+#: solomon_property/contacts_views.py:246
+msgid "Please select at least one contact group to export."
+msgstr "Vyberte prosím alespoň jednu skupinu kontaktů k exportu."
+
+#: solomon_property/cuzk/import_building.py:36
+msgid "Create new"
+msgstr "Vytvořit nový"
+
+#: solomon_property/cuzk/import_building.py:37
+msgid "Update existing"
+msgstr "Aktualizovat stávající"
+
+#: solomon_property/cuzk/import_building.py:38
+msgid "Skip"
+msgstr "Přeskočit"
+
+#: solomon_property/cuzk/import_building.py:88
+#: solomon_property/cuzk/import_building.py:93
+#: solomon_property/filterforms.py:39 solomon_property/forms.py:59
+#: solomon_property/models.py:103
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:30
+#: solomon_property/ui/panels.py:41
+msgid "House number"
+msgstr "Číslo domu"
+
+#: solomon_property/cuzk/import_building.py:89
+#: solomon_property/cuzk/import_building.py:94
+#: solomon_property/filterforms.py:38 solomon_property/filtersets.py:35
+#: solomon_property/models.py:106 solomon_property/ui/panels.py:42
+msgid "City"
+msgstr "Město"
+
+#: solomon_property/cuzk/import_building.py:90
+#: solomon_property/cuzk/import_building.py:95 solomon_property/models.py:54
+#: solomon_property/ui/panels.py:25
+msgid "Title deed (LV)"
+msgstr "List vlastnictví (LV)"
+
+#: solomon_property/cuzk/import_building.py:114
+#: solomon_property/cuzk/import_building.py:119
+#: solomon_property/filterforms.py:54 solomon_property/filtersets.py:59
+#: solomon_property/models.py:187 solomon_property/ui/panels.py:71
+msgid "Flat number"
+msgstr "Číslo bytu"
+
+#: solomon_property/cuzk/import_building.py:115
+#: solomon_property/cuzk/import_building.py:120 solomon_property/models.py:523
+msgid "Share numerator"
+msgstr "Sdílet čitatel"
+
+#: solomon_property/cuzk/import_building.py:116
+#: solomon_property/cuzk/import_building.py:121 solomon_property/models.py:529
+msgid "Share denominator"
+msgstr "Jmenovatel podílu"
+
+#: solomon_property/cuzk_views.py:61 solomon_property/cuzk_views.py:69
+#: solomon_property/cuzk_views.py:75 solomon_property/cuzk_views.py:82
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:4
+msgid "CUZK Import - Search"
+msgstr "Import CUZK - Hledat"
+
+#: solomon_property/cuzk_views.py:68
+msgid "Please enter a CUZK building ID."
+msgstr "Zadejte prosím ID budovy v CUZK."
+
+#: solomon_property/cuzk_views.py:74
+msgid "Invalid CUZK building ID - must be a number."
+msgstr "Neplatné ID budovy CUZK – musí být číslo."
+
+#: solomon_property/cuzk_views.py:81
+#, python-format
+msgid "CUZK API error: %(detail)s"
+msgstr "Chyba CUZK API: %(detail)s"
+
+#: solomon_property/cuzk_views.py:203
+msgid "No import data found. Please search for a building first."
+msgstr "Nebyla nalezena žádná data importu. Nejprve prosím vyhledejte budovu."
+
+#: solomon_property/cuzk_views.py:214
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:4
+msgid "CUZK Import - Preview"
+msgstr "Import CUZK - Náhled"
+
+#: solomon_property/cuzk_views.py:225
+msgid "Session expired. Please start again."
+msgstr "Platnost relace vypršela. Začněte prosím znovu."
+
+#: solomon_property/cuzk_views.py:243
+msgid "Import failed. Please check the logs."
+msgstr "Import se nezdařil. Zkontrolujte prosím protokoly."
+
+#: solomon_property/cuzk_views.py:250
+#, python-format
+msgid "%(n)d building(s) created"
+msgstr "Počet vytvořených budov: %(n)d"
+
+#: solomon_property/cuzk_views.py:252
+#, python-format
+msgid "%(n)d building(s) updated"
+msgstr "%(n)d budov bylo aktualizováno"
+
+#: solomon_property/cuzk_views.py:254
+#, python-format
+msgid "%(n)d flat(s) created"
+msgstr "Počet vytvořených bytů: %(n)d"
+
+#: solomon_property/cuzk_views.py:256
+#, python-format
+msgid "%(n)d flat(s) updated"
+msgstr "%(n)d bytů aktualizováno"
+
+#: solomon_property/cuzk_views.py:258
+#, python-format
+msgid "%(n)d skipped"
+msgstr "%(n)d přeskočeno"
+
+#: solomon_property/cuzk_views.py:260
+msgid "Import complete: "
+msgstr "Import dokončen:"
+
+#: solomon_property/cuzk_views.py:381 solomon_property/cuzk_views.py:388
+#: solomon_property/cuzk_views.py:401 solomon_property/navigation.py:135
+#: solomon_property/templates/solomon_property/owners_import.html:4
+msgid "Import Owners from Text"
+msgstr "Importovat vlastníky z textu"
+
+#: solomon_property/cuzk_views.py:399
+msgid "Please paste the owners text."
+msgstr "Vložte prosím text vlastníka."
+
+#: solomon_property/cuzk_views.py:413
+msgid "Session expired. Please paste the text again."
+msgstr "Platnost relace vypršela. Vložte prosím text znovu."
+
+#: solomon_property/cuzk_views.py:439
+#, python-format
+msgid ""
+"Import complete: %(o)d owner(s), %(p)d person(s), %(fo)d flat ownership(s)."
+msgstr "Import dokončen: %(o)d vlastníků, %(p)d osob, %(fo)d vlastníků bytů."
+
+#: solomon_property/cuzk_views.py:496 solomon_property/navigation.py:148
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:4
+msgid "Calculate Flat Areas"
+msgstr "Vypočítejte rovné plochy"
+
+#: solomon_property/cuzk_views.py:507
+msgid "No flats with CUZK share data found."
+msgstr "Nebyly nalezeny žádné byty s podílem v Kč."
+
+#: solomon_property/cuzk_views.py:523
+#, python-format
+msgid "Area updated for %(n)d flat(s)."
+msgstr "Oblast aktualizována pro %(n)d byty."
+
+#: solomon_property/filterforms.py:18 solomon_property/filterforms.py:35
+#: solomon_property/filtersets.py:39 solomon_property/forms.py:37
+#: solomon_property/models.py:71 solomon_property/models.py:92
+#: solomon_property/tables.py:31 solomon_property/ui/panels.py:38
+msgid "Building object"
+msgstr "Stavební objekt"
+
+#: solomon_property/filterforms.py:20 solomon_property/filterforms.py:37
+#: solomon_property/filterforms.py:78 solomon_property/filtersets.py:14
+#: solomon_property/filtersets.py:34 solomon_property/forms.py:57
+#: solomon_property/models.py:39 solomon_property/models.py:97
+#: solomon_property/tables.py:98 solomon_property/ui/panels.py:13
+#: solomon_property/ui/panels.py:39
+msgid "Name"
+msgstr "Jméno"
+
+#: solomon_property/filterforms.py:21 solomon_property/filtersets.py:15
+#: solomon_property/models.py:52 solomon_property/tables.py:13
+#: solomon_property/ui/panels.py:15
+msgid "Municipality"
+msgstr "Obec"
+
+#: solomon_property/filterforms.py:22 solomon_property/filtersets.py:16
+#: solomon_property/models.py:53 solomon_property/tables.py:14
+#: solomon_property/ui/panels.py:16
+msgid "City part"
+msgstr "Městská část"
+
+#: solomon_property/filterforms.py:30 solomon_property/filterforms.py:52
+#: solomon_property/filtersets.py:61 solomon_property/forms.py:64
+#: solomon_property/models.py:142 solomon_property/models.py:183
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:61
+#: solomon_property/ui/panels.py:70
+msgid "Building"
+msgstr "Budova"
+
+#: solomon_property/filterforms.py:47 solomon_property/filterforms.py:100
+#: solomon_property/filterforms.py:124 solomon_property/filtersets.py:126
+#: solomon_property/filtersets.py:157 solomon_property/forms.py:138
+#: solomon_property/forms.py:156 solomon_property/models.py:247
+#: solomon_property/models.py:512 solomon_property/models.py:611
+#: solomon_property/tables.py:203
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:60
+#: solomon_property/ui/panels.py:173 solomon_property/ui/panels.py:186
+msgid "Flat"
+msgstr "Byt"
+
+#: solomon_property/filterforms.py:55 solomon_property/models.py:191
+#: solomon_property/ui/panels.py:72
+msgid "Floor"
+msgstr "Patro"
+
+#: solomon_property/filterforms.py:56 solomon_property/models.py:201
+#: solomon_property/ui/panels.py:74
+msgid "Disposition"
+msgstr "Dispozice"
+
+#: solomon_property/filterforms.py:64 solomon_property/filterforms.py:129
+#: solomon_property/filtersets.py:160 solomon_property/forms.py:157
+#: solomon_property/models.py:353 solomon_property/models.py:617
+#: solomon_property/ui/panels.py:187
+msgid "Person"
+msgstr "Osoba"
+
+#: solomon_property/filterforms.py:66 solomon_property/models.py:322
+#: solomon_property/tables.py:70 solomon_property/tables.py:159
+#: solomon_property/ui/panels.py:108
+msgid "Last name"
+msgstr "Příjmení"
+
+#: solomon_property/filterforms.py:67 solomon_property/models.py:321
+#: solomon_property/tables.py:71 solomon_property/tables.py:160
+#: solomon_property/ui/panels.py:107
+msgid "First name"
+msgstr "Křestní jméno"
+
+#: solomon_property/filterforms.py:68 solomon_property/filtersets.py:82
+#: solomon_property/models.py:441 solomon_property/tables.py:75
+#: solomon_property/tables.py:164 solomon_property/ui/panels.py:142
+msgid "Email"
+msgstr "E-mail"
+
+#: solomon_property/filterforms.py:76 solomon_property/filterforms.py:105
+#: solomon_property/filtersets.py:129 solomon_property/forms.py:139
+#: solomon_property/models.py:518 solomon_property/tables.py:188
+#: solomon_property/ui/panels.py:174
+msgid "Owner"
+msgstr "Majitel"
+
+#: solomon_property/filterforms.py:81 solomon_property/filtersets.py:106
+#: solomon_property/models.py:397
+msgid "Natural person"
+msgstr "Fyzická osoba"
+
+#: solomon_property/filterforms.py:82 solomon_property/filtersets.py:107
+#: solomon_property/models.py:398
+msgid "Legal entity"
+msgstr "Právnická osoba"
+
+#: solomon_property/filterforms.py:83 solomon_property/filtersets.py:108
+msgid "SJM"
+msgstr "SJM"
+
+#: solomon_property/filterforms.py:86 solomon_property/tables.py:99
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:97
+#: solomon_property/templates/solomon_property/owners_import.html:22
+msgid "Type"
+msgstr "Typ"
+
+#: solomon_property/filterforms.py:95 solomon_property/navigation.py:56
+msgid "Ownership"
+msgstr "Vlastnictví"
+
+#: solomon_property/filterforms.py:109 solomon_property/filtersets.py:134
+msgid "Current owner"
+msgstr "Současný majitel"
+
+#: solomon_property/filterforms.py:119
+msgid "Tenancy"
+msgstr "Nájem"
+
+#: solomon_property/filterforms.py:133 solomon_property/filtersets.py:163
+msgid "Current tenant"
+msgstr "Současný nájemce"
+
+#: solomon_property/filtersets.py:13 solomon_property/filtersets.py:33
+#: solomon_property/filtersets.py:58 solomon_property/filtersets.py:79
+#: solomon_property/filtersets.py:102 solomon_property/filtersets.py:124
+#: solomon_property/filtersets.py:155
+msgid "Search"
+msgstr "Vyhledávání"
+
+#: solomon_property/forms.py:58 solomon_property/models.py:100
+#: solomon_property/ui/panels.py:40
+msgid "Street"
+msgstr "Ulice"
+
+#: solomon_property/forms.py:86 solomon_property/models.py:335
+#: solomon_property/ui/panels.py:112
+msgid "Emails"
+msgstr "e-maily"
+
+#: solomon_property/forms.py:87
+msgid "Comma-separated list of email addresses"
+msgstr "Seznam e-mailových adres oddělených čárkami"
+
+#: solomon_property/forms.py:92 solomon_property/models.py:341
+#: solomon_property/ui/panels.py:117
+msgid "Phones"
+msgstr "Telefony"
+
+#: solomon_property/forms.py:93
+msgid "Comma-separated list of phone numbers"
+msgstr "Seznam telefonních čísel oddělených čárkami"
+
+#: solomon_property/forms.py:116 solomon_property/models.py:354
+#: solomon_property/models.py:438 solomon_property/navigation.py:91
+#: solomon_property/templates/solomon_property/owners_import.html:23
+#: solomon_property/views.py:296
+msgid "Persons"
+msgstr "Osoby"
+
+#: solomon_property/forms.py:117
+msgid "Individual persons behind this ownership entity"
+msgstr "Jednotlivé osoby za tímto vlastnickým subjektem"
+
+#: solomon_property/models.py:40
+msgid "Descriptive label for the building object"
+msgstr "Popisný štítek pro stavební objekt"
+
+#: solomon_property/models.py:47 solomon_property/ui/panels.py:14
+msgid "CUZK building object ID"
+msgstr "CUZK stavební objekt ID"
+
+#: solomon_property/models.py:48
+msgid "Kód stavebního objektu (RUIAN)"
+msgstr "Kód stavebního objektu (RUIAN)"
+
+#: solomon_property/models.py:50 solomon_property/ui/panels.py:23
+msgid "Building type"
+msgstr "Typ budovy"
+
+#: solomon_property/models.py:51 solomon_property/tables.py:16
+#: solomon_property/ui/panels.py:24
+msgid "Usage"
+msgstr "Používání"
+
+#: solomon_property/models.py:58 solomon_property/ui/panels.py:17
+msgid "Cadastral territory"
+msgstr "Katastrální území"
+
+#: solomon_property/models.py:64 solomon_property/ui/panels.py:18
+msgid "House numbers"
+msgstr "Čísla domů"
+
+#: solomon_property/models.py:65
+msgid "House numbers linked to this building object"
+msgstr "Čísla domů související s tímto stavebním objektem"
+
+#: solomon_property/models.py:67 solomon_property/models.py:127
+#: solomon_property/models.py:228 solomon_property/models.py:349
+#: solomon_property/models.py:452 solomon_property/models.py:628
+#: solomon_property/ui/panels.py:30 solomon_property/ui/panels.py:62
+#: solomon_property/ui/panels.py:98 solomon_property/ui/panels.py:131
+#: solomon_property/ui/panels.py:165 solomon_property/ui/panels.py:195
+msgid "Note"
+msgstr "Poznámka"
+
+#: solomon_property/models.py:72
+msgid "Building objects"
+msgstr "Stavební objekty"
+
+#: solomon_property/models.py:98
+msgid "Descriptive name, e.g. 'Šalounova 1937'"
+msgstr "Popisný název, např. 'Šalounova 1937'"
+
+#: solomon_property/models.py:104
+msgid "Číslo popisné"
+msgstr "Číslo popisné"
+
+#: solomon_property/models.py:107 solomon_property/ui/panels.py:43
+msgid "Postal code"
+msgstr "PSČ"
+
+#: solomon_property/models.py:109 solomon_property/ui/panels.py:44
+msgid "Number of floors"
+msgstr "Počet pater"
+
+#: solomon_property/models.py:111 solomon_property/ui/panels.py:45
+msgid "Elevator"
+msgstr "Výtah"
+
+#: solomon_property/models.py:113 solomon_property/ui/panels.py:46
+msgid "Year built"
+msgstr "Rok výroby"
+
+#: solomon_property/models.py:116 solomon_property/ui/panels.py:47
+msgid "Total units"
+msgstr "Jednotky celkem"
+
+#: solomon_property/models.py:119 solomon_property/ui/panels.py:48
+msgid "Land plot number"
+msgstr "Číslo parcely"
+
+#: solomon_property/models.py:120
+msgid "Číslo parcely"
+msgstr "Číslo parcely"
+
+#: solomon_property/models.py:122 solomon_property/ui/panels.py:60
+msgid "Common rooms"
+msgstr "Společenské místnosti"
+
+#: solomon_property/models.py:123 solomon_property/ui/panels.py:49
+msgid "Floor plan URL"
+msgstr "URL půdorysu"
+
+#: solomon_property/models.py:125 solomon_property/ui/panels.py:61
+msgid "Common area rental info"
+msgstr "Informace o pronájmu společných prostor"
+
+#: solomon_property/models.py:131
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:26
+#: solomon_property/ui/panels.py:54
+msgid "CUZK building ID"
+msgstr "ID budovy CUZK"
+
+#: solomon_property/models.py:132
+msgid "ID stavby z ČÚZK katastru"
+msgstr "ID stavby z CUZK katastru"
+
+#: solomon_property/models.py:136 solomon_property/ui/panels.py:55
+msgid "CUZK LV number"
+msgstr "CUZK číslo LV"
+
+#: solomon_property/models.py:137
+msgid "Číslo listu vlastnictví"
+msgstr "Číslo listu vlastnictví"
+
+#: solomon_property/models.py:143 solomon_property/navigation.py:29
+#: solomon_property/views.py:60
+msgid "Buildings"
+msgstr "Budovy"
+
+#: solomon_property/models.py:172
+msgid "Other"
+msgstr "Ostatní"
+
+#: solomon_property/models.py:188
+msgid "Číslo jednotky, e.g. '1937/1'"
+msgstr "Číslo jednotky, např. '1937/1'"
+
+#: solomon_property/models.py:192
+msgid "0 = ground floor, negative = basement"
+msgstr "0 = přízemí, zápor = suterén"
+
+#: solomon_property/models.py:196 solomon_property/ui/panels.py:73
+msgid "Area (m²)"
+msgstr "Plocha (m²)"
+
+#: solomon_property/models.py:204 solomon_property/ui/panels.py:75
+msgid "Number of rooms"
+msgstr "Počet pokojů"
+
+#: solomon_property/models.py:207 solomon_property/ui/panels.py:80
+msgid "Water outlets"
+msgstr "Vývody vody"
+
+#: solomon_property/models.py:210 solomon_property/ui/panels.py:81
+msgid "Waste outlets"
+msgstr "Vývody odpadu"
+
+#: solomon_property/models.py:213 solomon_property/ui/panels.py:82
+msgid "Radiator count"
+msgstr "Počet radiátorů"
+
+#: solomon_property/models.py:217 solomon_property/ui/panels.py:83
+msgid "Radiator power (kW)"
+msgstr "Výkon chladiče (kW)"
+
+#: solomon_property/models.py:219 solomon_property/ui/panels.py:84
+msgid "Gas installed"
+msgstr "Plyn instalován"
+
+#: solomon_property/models.py:220 solomon_property/ui/panels.py:85
+msgid "Has balcony"
+msgstr "Má balkon"
+
+#: solomon_property/models.py:222 solomon_property/ui/panels.py:86
+msgid "Cellar unit"
+msgstr "Sklepní jednotka"
+
+#: solomon_property/models.py:225 solomon_property/ui/panels.py:91
+msgid "Ownership certificate number"
+msgstr "Číslo listu vlastnictví"
+
+#: solomon_property/models.py:226
+msgid "Číslo LV jednotky"
+msgstr "Číslo LV jednotky"
+
+#: solomon_property/models.py:232 solomon_property/ui/panels.py:92
+msgid "CUZK unit ID"
+msgstr "ID jednotky CUZK"
+
+#: solomon_property/models.py:236
+msgid "CUZK share numerator"
+msgstr "Čitatel akcií CUZK"
+
+#: solomon_property/models.py:237
+msgid "Podíl na společných částech - čitatel"
+msgstr "Podíl na společných částech - čtenář"
+
+#: solomon_property/models.py:240
+msgid "CUZK share denominator"
+msgstr "Jmenovatel akcie CUZK"
+
+#: solomon_property/models.py:241
+msgid "Podíl na společných částech - jmenovatel"
+msgstr "Podíl na společných částech - jmenovatel"
+
+#: solomon_property/models.py:248 solomon_property/navigation.py:42
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:46
+#: solomon_property/templates/solomon_property/owners_import.html:24
+#: solomon_property/views.py:108
+msgid "Flats"
+msgstr "Byty"
+
+#: solomon_property/models.py:265 solomon_property/models.py:266
+msgid "Both CUZK share values must be set together."
+msgstr "Obě hodnoty podílu CUZK musí být nastaveny společně."
+
+#: solomon_property/models.py:273
+msgid "CUZK share numerator must be greater than zero."
+msgstr "Čitatel podílu CUZK musí být větší než nula."
+
+#: solomon_property/models.py:277
+msgid "CUZK share denominator must be greater than zero."
+msgstr "Jmenovatel akcie CUZK musí být větší než nula."
+
+#: solomon_property/models.py:281
+msgid "CUZK share numerator cannot be greater than denominator."
+msgstr "Čitatel podílu CUZK nemůže být větší než jmenovatel."
+
+#: solomon_property/models.py:324 solomon_property/ui/panels.py:106
+msgid "Title before name"
+msgstr "Titul před jménem"
+
+#: solomon_property/models.py:325
+msgid "e.g. Ing., Mgr., JUDr."
+msgstr "např. Ing., Mgr., JUDr."
+
+#: solomon_property/models.py:328 solomon_property/ui/panels.py:109
+msgid "Title after name"
+msgstr "Titul za jménem"
+
+#: solomon_property/models.py:329
+msgid "e.g. Ph.D., MBA"
+msgstr "např. Ph.D., MBA"
+
+#: solomon_property/models.py:343 solomon_property/ui/panels.py:120
+msgid "Date of birth"
+msgstr "Datum narození"
+
+#: solomon_property/models.py:344 solomon_property/models.py:443
+#: solomon_property/ui/panels.py:125 solomon_property/ui/panels.py:148
+msgid "Permanent address"
+msgstr "Trvalá adresa"
+
+#: solomon_property/models.py:346 solomon_property/models.py:444
+#: solomon_property/ui/panels.py:126 solomon_property/ui/panels.py:149
+msgid "Contact address"
+msgstr "Kontaktní adresa"
+
+#: solomon_property/models.py:347
+msgid "If different from permanent address"
+msgstr "Pokud se liší od trvalé adresy"
+
+#: solomon_property/models.py:399
+msgid "SJM (joint ownership of spouses)"
+msgstr "SJM (spoluvlastnictví manželů)"
+
+#: solomon_property/models.py:425 solomon_property/ui/panels.py:139
+msgid "Display name"
+msgstr "Zobrazovaný název"
+
+#: solomon_property/models.py:426
+msgid "Full name as in cadastre/legal documents"
+msgstr "Celé jméno jako v katastru/právních dokumentech"
+
+#: solomon_property/models.py:432 solomon_property/ui/panels.py:140
+msgid "Person type"
+msgstr "Typ osoby"
+
+#: solomon_property/models.py:439
+msgid "Individual persons behind this ownership (for contacts)"
+msgstr "Jednotlivé osoby za tímto vlastnictvím (pro kontakty)"
+
+#: solomon_property/models.py:442 solomon_property/tables.py:80
+#: solomon_property/tables.py:169 solomon_property/ui/panels.py:143
+msgid "Phone"
+msgstr "Telefon"
+
+#: solomon_property/models.py:446 solomon_property/ui/panels.py:154
+msgid "Deputy name"
+msgstr "Jméno zástupce"
+
+#: solomon_property/models.py:447
+msgid "Statutory representative (for legal entities) or authorized person"
+msgstr "Statutární zástupce (u právnických osob) nebo pověřená osoba"
+
+#: solomon_property/models.py:450 solomon_property/ui/panels.py:155
+msgid "Deputy contact"
+msgstr "Kontakt na zástupce"
+
+#: solomon_property/models.py:456 solomon_property/ui/panels.py:160
+msgid "CUZK owner ID"
+msgstr "ID vlastníka CUZK"
+
+#: solomon_property/models.py:462
+msgid "Property Owner"
+msgstr "Majitel nemovitosti"
+
+#: solomon_property/models.py:463
+msgid "Property Owners"
+msgstr "Vlastníci nemovitostí"
+
+#: solomon_property/models.py:524
+msgid "Podíl vlastnictví - čitatel (e.g. 1 in 1/2)"
+msgstr "Podíl vlastnictví - čtenář (např. 1 v 1/2)"
+
+#: solomon_property/models.py:530
+msgid "Podíl vlastnictví - jmenovatel (e.g. 2 in 1/2)"
+msgstr "Podíl vlastnictví - jmenovatel (např. 2 v 1/2)"
+
+#: solomon_property/models.py:533 solomon_property/models.py:620
+#: solomon_property/ui/panels.py:176 solomon_property/ui/panels.py:188
+msgid "Effective from"
+msgstr "Účinné od"
+
+#: solomon_property/models.py:534
+msgid "Date ownership began (cadastral transfer date)"
+msgstr "Datum zahájení vlastnictví (datum převodu do katastru nemovitostí)"
+
+#: solomon_property/models.py:538 solomon_property/models.py:625
+#: solomon_property/ui/panels.py:177 solomon_property/ui/panels.py:189
+msgid "Effective to"
+msgstr "Účinné na"
+
+#: solomon_property/models.py:539
+msgid "Date ownership ended (null = current owner)"
+msgstr "Datum ukončení vlastnictví (null = aktuální vlastník)"
+
+#: solomon_property/models.py:545
+msgid "Flat ownership"
+msgstr "Vlastnictví bytu"
+
+#: solomon_property/models.py:546
+msgid "Flat ownerships"
+msgstr "Vlastnictví bytů"
+
+#: solomon_property/models.py:560 solomon_property/models.py:646
+msgid "Effective to cannot be before effective from."
+msgstr "Účinné do nemůže být dříve účinné od."
+
+#: solomon_property/models.py:565
+msgid "Share numerator cannot be greater than denominator."
+msgstr "Čitatel podílu nemůže být větší než jmenovatel."
+
+#: solomon_property/models.py:583
+msgid "Overlapping ownership period exists for this flat and owner."
+msgstr "U tohoto bytu a majitele existuje překrývající se období vlastnictví."
+
+#: solomon_property/models.py:621
+msgid "Move-in date"
+msgstr "Datum nastěhování"
+
+#: solomon_property/models.py:626
+msgid "Move-out date (null = current tenant)"
+msgstr "Datum přestěhování (null = aktuální nájemce)"
+
+#: solomon_property/models.py:632
+msgid "Property Tenant"
+msgstr "Nájemce nemovitosti"
+
+#: solomon_property/models.py:633
+msgid "Property Tenants"
+msgstr "Nájemníci nemovitosti"
+
+#: solomon_property/models.py:664
+msgid "Overlapping tenancy period exists for this flat and person."
+msgstr "U tohoto bytu a osoby existuje souběh doby nájmu."
+
+#: solomon_property/navigation.py:9
+msgid "Property"
+msgstr "Vlastnictví"
+
+#: solomon_property/navigation.py:12
+msgid "Buildings & Flats"
+msgstr "Budovy a byty"
+
+#: solomon_property/navigation.py:16
+msgid "Building Objects"
+msgstr "Stavební objekty"
+
+#: solomon_property/navigation.py:21 solomon_property/navigation.py:34
+#: solomon_property/navigation.py:47 solomon_property/navigation.py:65
+#: solomon_property/navigation.py:78 solomon_property/navigation.py:96
+#: solomon_property/navigation.py:109
+msgid "Add"
+msgstr "Přidat"
+
+#: solomon_property/navigation.py:60
+msgid "Owners"
+msgstr "Vlastníci"
+
+#: solomon_property/navigation.py:73 solomon_property/views.py:229
+#: solomon_property/views.py:297
+msgid "Flat Ownerships"
+msgstr "Bytové vlastnictví"
+
+#: solomon_property/navigation.py:87
+msgid "Tenants & Persons"
+msgstr "Nájemníci a osoby"
+
+#: solomon_property/navigation.py:104 solomon_property/views.py:163
+msgid "Tenants"
+msgstr "Nájemníci"
+
+#: solomon_property/navigation.py:118
+msgid "CUZK Import"
+msgstr "Dovoz CUZK"
+
+#: solomon_property/navigation.py:122
+msgid "Import Building from CUZK"
+msgstr "Import budovy z CUZK"
+
+#: solomon_property/navigation.py:127 solomon_property/navigation.py:140
+#: solomon_property/navigation.py:171
+msgid "Import"
+msgstr "Importovat"
+
+#: solomon_property/navigation.py:153
+msgid "Calculate"
+msgstr "Vypočítat"
+
+#: solomon_property/navigation.py:162
+msgid "Contacts"
+msgstr "Kontakty"
+
+#: solomon_property/navigation.py:166
+msgid "Import Contacts (Google CSV)"
+msgstr "Importovat kontakty (Google CSV)"
+
+#: solomon_property/navigation.py:179
+msgid "Export Contacts (Google CSV)"
+msgstr "Exportovat kontakty (Google CSV)"
+
+#: solomon_property/navigation.py:184
+msgid "Export"
+msgstr "Vývozní"
+
+#: solomon_property/tables.py:17 solomon_property/tables.py:38
+#: solomon_property/tables.py:103
+msgid "CUZK ID"
+msgstr "ID CUZK"
+
+#: solomon_property/tables.py:34
+msgid "House No"
+msgstr "Dům č.p"
+
+#: solomon_property/tables.py:36
+msgid "Units"
+msgstr "Jednotky"
+
+#: solomon_property/tables.py:52
+msgid "Flat No"
+msgstr "Byt č"
+
+#: solomon_property/tables.py:55
+msgid "Area m2"
+msgstr "Plocha m2"
+
+#: solomon_property/tables.py:72 solomon_property/tables.py:161
+msgid "Title"
+msgstr "Titul"
+
+#: solomon_property/tables.py:83 solomon_property/tables.py:102
+#: solomon_property/tables.py:172
+msgid "Address"
+msgstr "Adresa"
+
+#: solomon_property/tables.py:119 solomon_property/tables.py:189
+#: solomon_property/tables.py:204
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:98
+msgid "Share"
+msgstr "Podíl"
+
+#: solomon_property/tables.py:122 solomon_property/tables.py:140
+#: solomon_property/tables.py:207 solomon_property/ui/panels.py:178
+#: solomon_property/ui/panels.py:190
+msgid "Current"
+msgstr "Proud"
+
+#: solomon_property/tables.py:190
+msgid "Since"
+msgstr "Od"
+
+#: solomon_property/tables.py:201
+msgid "Owner record"
+msgstr "Záznam vlastníka"
+
+#: solomon_property/tables.py:205
+msgid "From"
+msgstr "Z"
+
+#: solomon_property/tables.py:206
+msgid "To"
+msgstr "Na"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:21
+msgid ""
+"Select which persons to include in the exported CSV file. You can combine "
+"multiple options."
+msgstr ""
+"Vyberte osoby, které chcete zahrnout do exportovaného souboru CSV. Můžete "
+"kombinovat více možností."
+
+#: solomon_property/templates/solomon_property/contacts_export.html:22
+msgid ""
+"Ownership and tenancy details will be included in the Notes field of each "
+"contact."
+msgstr ""
+"Podrobnosti o vlastnictví a pronájmu budou uvedeny v poli Poznámky každého "
+"kontaktu."
+
+#: solomon_property/templates/solomon_property/contacts_export.html:32
+msgid "Filter by building"
+msgstr "Filtrujte podle budovy"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:33
+msgid "leave empty to include all buildings"
+msgstr "ponechte prázdné, chcete-li zahrnout všechny budovy"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:58
+msgid "Select all"
+msgstr "Vyberte vše"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:59
+msgid "Deselect all"
+msgstr "Zrušte výběr všech"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:62
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:147
+msgid "No buildings found."
+msgstr "Nebyly nalezeny žádné budovy."
+
+#: solomon_property/templates/solomon_property/contacts_export.html:71
+msgid "Include persons by role"
+msgstr "Zahrnout osoby podle role"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:86
+msgid "Persons with ownership"
+msgstr "Osoby s vlastnictvím"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:87
+msgid "- linked to a flat as owners (via PropertyOwner)"
+msgstr "- spojené s bytem jako vlastníci (přes PropertyOwner)"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:101
+msgid "Persons with tenancy"
+msgstr "Osoby s nájmem"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:102
+msgid "- linked to a flat as tenants"
+msgstr "- vázaná na byt jako nájemníci"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:116
+msgid "Other persons"
+msgstr "Jiné osoby"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:117
+msgid "- not linked to any flat (standalone contacts)"
+msgstr "- není spojeno s žádným plochým (samostatné kontakty)"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:127
+msgid "About the export"
+msgstr "O exportu"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:128
+msgid ""
+"The downloaded file is a Google Contacts CSV. You can import it directly "
+"into Google Contacts."
+msgstr ""
+"Stažený soubor je CSV Kontaktů Google. Můžete jej importovat přímo do "
+"Kontaktů Google."
+
+#: solomon_property/templates/solomon_property/contacts_export.html:129
+msgid ""
+"Each contact's Notes field will contain their ownership/tenancy details "
+"(building and flat number)."
+msgstr ""
+"Pole Poznámky každého kontaktu bude obsahovat podrobnosti o jeho "
+"vlastnictví/nájmu (číslo budovy a bytu)."
+
+#: solomon_property/templates/solomon_property/contacts_export.html:130
+msgid ""
+"If a building filter is selected, only persons linked to those buildings are"
+" exported."
+msgstr ""
+"Pokud je vybrán filtr budov, exportují se pouze osoby spojené s těmito "
+"budovami."
+
+#: solomon_property/templates/solomon_property/contacts_export.html:138
+msgid "Download CSV"
+msgstr "Stáhnout CSV"
+
+#: solomon_property/templates/solomon_property/contacts_export.html:141
+#: solomon_property/templates/solomon_property/contacts_import.html:153
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:163
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:108
+#: solomon_property/templates/solomon_property/owners_import.html:127
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:14
+#: solomon_property/templates/solomon_property/owners_import.html:14
+#: solomon_property/templates/solomon_property/owners_import.html:172
+msgid "Preview"
+msgstr "Náhled"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:15
+msgid "matched"
+msgstr "sladěno"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:17
+msgid "ambiguous"
+msgstr "dvojznačný"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:19
+msgid "of"
+msgstr "z"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:19
+msgid "contacts with data"
+msgstr "kontakty s daty"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:19
+msgid "total"
+msgstr "celkový"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:29
+msgid "Merge mode"
+msgstr "Režim sloučení"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:33
+msgid "Append (add new emails/phones, keep existing)"
+msgstr "Připojit (přidat nové e-maily/telefony, zachovat stávající)"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:39
+msgid "Replace (overwrite existing emails/phones)"
+msgstr "Nahradit (přepsat stávající e-maily/telefony)"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:49
+msgid "Select / deselect all"
+msgstr "Vybrat/zrušit výběr všech"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:60
+msgid "CSV Name"
+msgstr "Název CSV"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:61
+msgid "Match"
+msgstr "Zápas"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:62
+msgid "Matched Person"
+msgstr "Shodná osoba"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:63
+msgid "Emails (CSV)"
+msgstr "E-maily (CSV)"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:64
+msgid "Phones (CSV)"
+msgstr "Telefony (CSV)"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:65
+msgid "Current Emails"
+msgstr "Aktuální e-maily"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:66
+msgid "Current Phones"
+msgstr "Aktuální telefony"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:89
+msgid "Matched"
+msgstr "Shoda"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:91
+msgid "fuzzy"
+msgstr "neostrý"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:94
+msgid "Ambiguous"
+msgstr "Dvojznačný"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:104
+msgid "Select person"
+msgstr "Vyberte osobu"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:150
+msgid "Import Selected"
+msgstr "Importovat vybrané"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:185
+msgid "Upload Google Contacts CSV"
+msgstr "Nahrajte CSV Kontakty Google"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:190
+msgid ""
+"Export your contacts from Google Contacts as CSV, then upload the file here."
+" Contacts will be matched to existing persons by first and last name."
+msgstr ""
+"Exportujte své kontakty z Kontaktů Google jako CSV a poté soubor nahrajte "
+"sem. Kontakty budou přiřazeny ke stávajícím osobám podle jména a příjmení."
+
+#: solomon_property/templates/solomon_property/contacts_import.html:196
+msgid "CSV File"
+msgstr "Soubor CSV"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:200
+msgid "Parse & Preview"
+msgstr "Analýza a náhled"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:211
+msgid "How it works"
+msgstr "Jak to funguje"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:216
+msgid "Go to Google Contacts and export as Google CSV"
+msgstr "Přejděte do Kontaktů Google a exportujte jako Google CSV"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:217
+msgid "Upload the CSV file here"
+msgstr "Nahrajte soubor CSV zde"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:218
+msgid "Review matched contacts in the preview"
+msgstr "Zkontrolujte odpovídající kontakty v náhledu"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:219
+msgid "Select which contacts to import and click Import"
+msgstr "Vyberte, které kontakty chcete importovat, a klikněte na Importovat"
+
+#: solomon_property/templates/solomon_property/contacts_import.html:222
+msgid ""
+"Only emails and phone numbers will be imported for persons that already "
+"exist in the system. Matching is done by first and last name."
+msgstr ""
+"Budou importovány pouze e-maily a telefonní čísla osob, které již v systému "
+"existují. Párování se provádí podle jména a příjmení."
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:8
+msgid "Back"
+msgstr "Zadní"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:21
+msgid "CUZK Building"
+msgstr "Budova ČZK"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:31
+msgid "Existing record"
+msgstr "Stávající záznam"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:32
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:100
+msgid "Action"
+msgstr "Akce"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:33
+msgid "Changes"
+msgstr "Změny"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:44
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:118
+msgid "New"
+msgstr "Nový"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:88
+msgid "Flats for house number"
+msgstr "Byty na číslo domu"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:96
+msgid "Unit"
+msgstr "Jednotka"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:99
+msgid "Existing"
+msgstr "Existující"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:148
+msgid "All units: Create"
+msgstr "Všechny jednotky: Vytvořte"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:151
+msgid "All units: Update existing"
+msgstr "Všechny jednotky: Aktualizovat stávající"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:154
+msgid "All units: Skip"
+msgstr "Všechny jednotky: Přeskočit"
+
+#: solomon_property/templates/solomon_property/cuzk_import_preview.html:160
+msgid "Execute Import"
+msgstr "Proveďte import"
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:13
+msgid "Import by CUZK Building ID"
+msgstr "Import podle CUZK Building ID"
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:17
+msgid ""
+"Enter the numeric ID of the stavba from the CUZK cadastral register (e.g. "
+"940255101)."
+msgstr "Zadejte číselné ID stavby z katastru CUZK (např. 940255101)."
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:31
+msgid "Load from CUZK"
+msgstr "Načíst z CUZK"
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:41
+msgid "Search by Address"
+msgstr "Vyhledávání podle adresy"
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:45
+msgid ""
+"Type a city part / district name to autocomplete, then enter the house "
+"number (číslo popisné)."
+msgstr ""
+"Zadejte název městské části / okresu pro automatické doplňování a poté "
+"zadejte číslo domu (číslo popisné)."
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:49
+msgid "City part (část obce)"
+msgstr "Městská část (část obce)"
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:54
+msgid "Start typing, e.g. Chodov…"
+msgstr "Začněte psát např. Chodov…"
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:62
+msgid "House number (číslo popisné)"
+msgstr "Číslo domu (číslo popisné)"
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:67
+msgid "Search CUZK"
+msgstr "Hledat CUZK"
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:71
+msgid "Results"
+msgstr "Výsledky"
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:133
+msgid "Please select a city part and enter a house number."
+msgstr "Vyberte prosím městskou část a zadejte číslo domu."
+
+#: solomon_property/templates/solomon_property/cuzk_import_search.html:173
+msgid "Error communicating with CUZK API."
+msgstr "Chyba při komunikaci s CUZK API."
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:8
+msgid "Back to Flats"
+msgstr "Zpět na Byty"
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:17
+msgid ""
+"No flats with CUZK share data (numerator and denominator) found. Import CUZK"
+" data first."
+msgstr ""
+"Nebyly nalezeny žádné byty s údaji o podílu v Kč (čitatel a jmenovatel). "
+"Nejprve importujte data CUZK."
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:26
+msgid "Area Calculation Preview"
+msgstr "Náhled výpočtu plochy"
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:31
+#, python-format
+msgid ""
+"\n"
+"        Largest share denominator in the database: <strong>%(denom)s</strong>\n"
+"      "
+msgstr ""
+"\n"
+"        Největší jmenovatel podílu v databázi: <strong>%(denom)s</strong>\n"
+"      "
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:36
+msgid ""
+"Formula: area = max_denominator / denominator * numerator * 10, rounded to 1"
+" decimal place"
+msgstr ""
+"Vzorec: plocha = max_jmenovatel / jmenovatel * čitatel * 10, zaokrouhleno na"
+" 1 desetinné místo"
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:53
+msgid "Highlighted rows will be updated."
+msgstr "Zvýrazněné řádky budou aktualizovány."
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:62
+msgid "CUZK Share"
+msgstr "Podíl CUZK"
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:63
+msgid "Current Area (m2)"
+msgstr "Současná plocha (m2)"
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:64
+msgid "Calculated Area (m2)"
+msgstr "Výpočtová plocha (m2)"
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:65
+msgid "Change?"
+msgstr "Přeměna?"
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:86
+msgid "Yes"
+msgstr "Ano"
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:88
+msgid "No change"
+msgstr "Žádná změna"
+
+#: solomon_property/templates/solomon_property/flat_area_calculation.html:105
+msgid "Apply Areas to All Flats"
+msgstr "Aplikujte oblasti na všechny plochy"
+
+#: solomon_property/templates/solomon_property/owners_import.html:14
+msgid "owner records parsed"
+msgstr "záznamy vlastníka analyzovány"
+
+#: solomon_property/templates/solomon_property/owners_import.html:21
+msgid "Owner (display name)"
+msgstr "Vlastník (zobrazované jméno)"
+
+#: solomon_property/templates/solomon_property/owners_import.html:25
+msgid "Imported total share"
+msgstr "Importovaný celkový podíl"
+
+#: solomon_property/templates/solomon_property/owners_import.html:26
+msgid "Sum of flats shares"
+msgstr "Součet podílů bytů"
+
+#: solomon_property/templates/solomon_property/owners_import.html:27
+msgid "Check"
+msgstr "Kontrola"
+
+#: solomon_property/templates/solomon_property/owners_import.html:38
+msgid "Legal"
+msgstr "Právní"
+
+#: solomon_property/templates/solomon_property/owners_import.html:40
+msgid "Natural"
+msgstr "Přírodní"
+
+#: solomon_property/templates/solomon_property/owners_import.html:63
+msgid "Missing flat"
+msgstr "Chybí byt"
+
+#: solomon_property/templates/solomon_property/owners_import.html:65
+msgid "Missing flat share"
+msgstr "Chybějící bytový podíl"
+
+#: solomon_property/templates/solomon_property/owners_import.html:67
+msgid "No imported share"
+msgstr "Žádný importovaný podíl"
+
+#: solomon_property/templates/solomon_property/owners_import.html:69
+#: solomon_property/templates/solomon_property/owners_import.html:99
+msgid "OK"
+msgstr "OK"
+
+#: solomon_property/templates/solomon_property/owners_import.html:71
+#: solomon_property/templates/solomon_property/owners_import.html:101
+msgid "Mismatch"
+msgstr "Neshoda"
+
+#: solomon_property/templates/solomon_property/owners_import.html:78
+msgid "Missing flats:"
+msgstr "Chybějící byty:"
+
+#: solomon_property/templates/solomon_property/owners_import.html:85
+msgid "Flats without CUZK share:"
+msgstr "Byty bez podílu v Kč:"
+
+#: solomon_property/templates/solomon_property/owners_import.html:94
+msgid "Co-owned flat"
+msgstr "Byt ve spoluvlastnictví"
+
+#: solomon_property/templates/solomon_property/owners_import.html:97
+msgid "sum"
+msgstr "součet"
+
+#: solomon_property/templates/solomon_property/owners_import.html:97
+msgid "vs CUZK"
+msgstr "proti CUZK"
+
+#: solomon_property/templates/solomon_property/owners_import.html:104
+msgid "CUZK"
+msgstr "CUZK"
+
+#: solomon_property/templates/solomon_property/owners_import.html:105
+msgid "Mixed co-ownership"
+msgstr "Smíšené spoluvlastnictví"
+
+#: solomon_property/templates/solomon_property/owners_import.html:113
+msgid "No records parsed."
+msgstr "Nebyly analyzovány žádné záznamy."
+
+#: solomon_property/templates/solomon_property/owners_import.html:124
+msgid "Import All"
+msgstr "Importovat vše"
+
+#: solomon_property/templates/solomon_property/owners_import.html:137
+msgid "Paste Owners Text"
+msgstr "Vložit text vlastníků"
+
+#: solomon_property/templates/solomon_property/owners_import.html:141
+msgid ""
+"Paste the contents of the owners list in the standard format (one owner "
+"block per entry, followed by a Jednotka: line)."
+msgstr ""
+"Vložte obsah seznamu vlastníků ve standardním formátu (jeden blok vlastníka "
+"na záznam a za ním řádek Jednotka:)."
+
+#: solomon_property/templates/solomon_property/owners_import.html:142
+msgid "Flats referenced in the text must already exist in the system."
+msgstr "Byty uvedené v textu již musí v systému existovat."
+
+#: solomon_property/templates/solomon_property/owners_import.html:149
+msgid "Effective from (ownership start date)"
+msgstr "Účinné od (datum zahájení vlastnictví)"
+
+#: solomon_property/templates/solomon_property/owners_import.html:157
+msgid "Leave blank to use today's date."
+msgstr "Chcete-li použít dnešní datum, ponechte prázdné."
+
+#: solomon_property/templates/solomon_property/owners_import.html:161
+msgid "Owners text"
+msgstr "Text vlastníků"
+
+#: solomon_property/ui/panels.py:22
+msgid "Type & Usage"
+msgstr "Typ a použití"
+
+#: solomon_property/ui/panels.py:29 solomon_property/ui/panels.py:97
+#: solomon_property/ui/panels.py:130 solomon_property/ui/panels.py:164
+#: solomon_property/ui/panels.py:194
+msgid "Notes"
+msgstr "Poznámky"
+
+#: solomon_property/ui/panels.py:53 solomon_property/ui/panels.py:159
+msgid "CUZK Integration"
+msgstr "Integrace CUZK"
+
+#: solomon_property/ui/panels.py:59
+msgid "Notes & Extras"
+msgstr "Poznámky a doplňky"
+
+#: solomon_property/ui/panels.py:79
+msgid "Installations & Features"
+msgstr "Instalace a funkce"
+
+#: solomon_property/ui/panels.py:90
+msgid "CUZK / Ownership"
+msgstr "CUZK / Vlastnictví"
+
+#: solomon_property/ui/panels.py:93
+msgid "CUZK common parts share"
+msgstr "Podíl společných částí CUZK"
+
+#: solomon_property/ui/panels.py:124 solomon_property/ui/panels.py:147
+msgid "Addresses"
+msgstr "Adresy"
+
+#: solomon_property/ui/panels.py:141
+msgid "Total active share"
+msgstr "Celkový aktivní podíl"
+
+#: solomon_property/ui/panels.py:153
+msgid "Deputy / Representative"
+msgstr "Zástupce / zástupce"
+
+#: solomon_property/ui/panels.py:175
+msgid "Ownership share"
+msgstr "Vlastnický podíl"
+
+#: solomon_property/views.py:161
+msgid "Current Owners"
+msgstr "Současní vlastníci"
+
+#: solomon_property/views.py:162
+msgid "Ownership History"
+msgstr "Historie vlastnictví"
+
+#: solomon_property/views.py:230
+msgid "Tenancies"
+msgstr "Nájemní smlouvy"
