@@ -2,7 +2,10 @@ import datetime
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from solomon_meetings.models import (
@@ -10,6 +13,8 @@ from solomon_meetings.models import (
     ATTENDANCE_EVENT_ARRIVAL,
     ATTENDANCE_EVENT_DEPARTURE,
     MEETING_PHASE_IN_PROGRESS,
+    MEETING_PHASE_FINISHED,
+    MEETING_STATUS_CLOSED,
     QUORUM_TYPE_BY_SHARE,
     AgendaItem,
     AgendaVoteBallot,
@@ -20,7 +25,7 @@ from solomon_meetings.models import (
     MeetingType,
     VoteWeightStyle,
 )
-from solomon_meetings.views import MeetingExportView, MeetingView
+from solomon_meetings.views import MeetingExportView, MeetingRefreshSnapshotsView, MeetingView
 from solomon_property.models import Building, BuildingObject, Flat, FlatOwner, PropertyOwner
 
 
@@ -122,32 +127,34 @@ class MeetingViewAttendanceRowsTests(TestCase):
         self.assertTrue(context["attendance_threshold_checks"][0]["is_met"])
         self.assertFalse(context["attendance_threshold_checks"][1]["is_met"])
 
-    def test_attendance_rows_use_current_vote_weight_style_colors(self):
-        VoteWeightStyle.objects.create(
+    def test_attendance_rows_use_meeting_snapshot_style_for_combined_share(self):
+        VoteWeightStyle.objects.update_or_create(
             voting_method=QUORUM_TYPE_BY_SHARE,
-            weight_value=Decimal("0.333333"),
-            label="Blue",
-            color="#1976d2",
+            weight_value=Decimal("0.500000"),
+            defaults={
+                "label": "Half",
+                "color": "#1976d2",
+                "is_current": True,
+            },
         )
-        VoteWeightStyle.objects.create(
-            voting_method=QUORUM_TYPE_BY_SHARE,
-            weight_value=Decimal("0.166667"),
-            label="Green",
-            color="#2e7d32",
-        )
+        self.meeting.snapshot_ballot_types(snapshot_taken_at=timezone.now(), refresh_existing=True)
 
         request = RequestFactory().get("/plugins/meetings/meetings/1/attendance/")
         context = MeetingView().get_extra_context(request, self.meeting)
 
         self.assertEqual(len(context["attendance_rows"]), 1)
         row = context["attendance_rows"][0]
-        self.assertEqual(row["ballot_label"], "Multiple")
-        self.assertEqual(row["ballot_color"], "")
+        self.assertEqual(row["ballot_label"], "Half")
+        self.assertEqual(row["ballot_color"], "#1976d2")
 
 
 class MeetingExportViewTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="export-user")
+        self.user = get_user_model().objects.create_superuser(
+            username="export-user",
+            email="export-user@example.com",
+            password="secret",
+        )
         self.building_object = BuildingObject.objects.create(name="Export Building Object")
         self.building = Building.objects.create(
             building_object=self.building_object,
@@ -245,6 +252,7 @@ class MeetingExportViewTests(TestCase):
                 "include_agenda_texts": "on",
             },
         )
+        request.user = self.user
 
         response = MeetingExportView.as_view()(request, pk=self.meeting.pk)
         self.assertEqual(response.status_code, 200)
@@ -259,3 +267,83 @@ class MeetingExportViewTests(TestCase):
         self.assertIn("Totals (weighted share): For 0.500000 (100.00%)", content)
         self.assertIn("Against 0.000000 (0.00%)", content)
         self.assertIn("Abstain 0.000000 (0.00%)", content)
+
+
+class MeetingSnapshotRefreshViewTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_superuser(
+            username="refresh-user",
+            email="refresh-user@example.com",
+            password="secret",
+        )
+        self.building_object = BuildingObject.objects.create(name="Refresh Building Object")
+        self.building = Building.objects.create(
+            building_object=self.building_object,
+            name="Refresh Building",
+            street="Refresh",
+            house_number="22",
+            city="Praha",
+            postal_code="10000",
+        )
+        self.owner = PropertyOwner.objects.create(display_name="Refresh Owner")
+        self.flat = Flat.objects.create(building=self.building, flat_number="2A")
+        self.flat_owner = FlatOwner.objects.create(
+            flat=self.flat,
+            owner=self.owner,
+            share_numerator=1,
+            share_denominator=2,
+            effective_from=datetime.date(2020, 1, 1),
+        )
+        self.meeting_type = MeetingType.objects.create(
+            name="Refresh Type",
+            quorum_type=QUORUM_TYPE_BY_SHARE,
+            default_quorum_threshold=Decimal("0.5"),
+        )
+        self.meeting = Meeting.objects.create(
+            meeting_type=self.meeting_type,
+            title="Refresh Meeting",
+            date_time=timezone.now(),
+            phase=MEETING_PHASE_IN_PROGRESS,
+            status="IN_PROGRESS",
+            quorum_threshold=Decimal("0.5"),
+        )
+        self.meeting.buildings.add(self.building)
+        self.meeting.snapshot_owners(started_at=timezone.now())
+
+    def _post_request(self):
+        request = RequestFactory().post(
+            reverse("plugins:solomon_meetings:meeting_refresh_snapshots", kwargs={"pk": self.meeting.pk})
+        )
+        request.user = self.user
+        session_middleware = SessionMiddleware(lambda req: None)
+        session_middleware.process_request(request)
+        request.session.save()
+        request._messages = FallbackStorage(request)
+        return request
+
+    def test_refresh_snapshots_rewrites_snapshot_share_before_finish(self):
+        self.flat_owner.share_numerator = 1
+        self.flat_owner.share_denominator = 3
+        self.flat_owner.save(update_fields=["share_numerator", "share_denominator", "last_updated"])
+
+        response = MeetingRefreshSnapshotsView.as_view()(self._post_request(), pk=self.meeting.pk)
+
+        self.assertEqual(response.status_code, 302)
+        snapshot = MeetingOwnerSnapshot.objects.get(meeting=self.meeting, flat_owner=self.flat_owner)
+        self.assertEqual(snapshot.share_numerator, 1)
+        self.assertEqual(snapshot.share_denominator, 3)
+
+    def test_refresh_snapshots_is_blocked_for_finished_meeting(self):
+        self.meeting.phase = MEETING_PHASE_FINISHED
+        self.meeting.status = MEETING_STATUS_CLOSED
+        self.meeting.save(update_fields=["phase", "status", "last_updated"])
+
+        self.flat_owner.share_numerator = 1
+        self.flat_owner.share_denominator = 4
+        self.flat_owner.save(update_fields=["share_numerator", "share_denominator", "last_updated"])
+
+        response = MeetingRefreshSnapshotsView.as_view()(self._post_request(), pk=self.meeting.pk)
+
+        self.assertEqual(response.status_code, 302)
+        snapshot = MeetingOwnerSnapshot.objects.get(meeting=self.meeting, flat_owner=self.flat_owner)
+        self.assertEqual(snapshot.share_denominator, 2)

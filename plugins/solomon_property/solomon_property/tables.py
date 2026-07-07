@@ -210,3 +210,4 @@ class PersonOwnershipTable(NetBoxTable):
         model = FlatOwner
         fields = ("owner", "flat", "share", "effective_from", "effective_to", "is_current")
         default_columns = ("owner", "flat", "share", "effective_from", "effective_to", "is_current")
+        order_by = ("-effective_from",)

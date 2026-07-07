@@ -1,7 +1,10 @@
 """Solomon Property - ModelForms for create/edit views."""
 
+import datetime
+
 from django import forms
 from django.contrib.postgres.forms import SimpleArrayField
+from django.forms.models import construct_instance
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import NetBoxModelForm
@@ -150,6 +153,33 @@ class FlatOwnerForm(NetBoxModelForm):
             "effective_from": forms.DateInput(attrs={"type": "date"}),
             "effective_to": forms.DateInput(attrs={"type": "date"}),
         }
+
+    def save(self, commit=True):
+        if self.instance.pk and commit:
+            original = FlatOwner.objects.get(pk=self.instance.pk)
+            history_fields = ("flat", "owner", "share_numerator", "share_denominator", "effective_from")
+            history_changed = any(
+                getattr(original, field) != self.cleaned_data[field]
+                for field in history_fields
+            )
+
+            if original.effective_to is None and history_changed:
+                new_effective_from = self.cleaned_data["effective_from"]
+                original.effective_to = max(
+                    original.effective_from,
+                    new_effective_from - datetime.timedelta(days=1),
+                )
+                original.snapshot()
+                original.save(update_fields=["effective_to"])
+
+                m2m_values = getattr(self.instance, "_m2m_values", {}).copy()
+                custom_field_data = self.instance.custom_field_data.copy()
+                self.instance = self._meta.model()
+                self.instance = construct_instance(self, self.instance, self._meta.fields, self._meta.exclude)
+                self.instance._m2m_values = m2m_values
+                self.instance.custom_field_data = custom_field_data
+
+        return super().save(commit=commit)
 
 
 class PropertyTenantForm(NetBoxModelForm):

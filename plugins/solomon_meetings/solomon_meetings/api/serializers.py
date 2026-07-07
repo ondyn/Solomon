@@ -241,6 +241,7 @@ class VoteWeightStyleSerializer(NetBoxModelSerializer):
             "weight_value",
             "label",
             "color",
+            "is_current",
             "tags",
             "custom_fields",
             "created",

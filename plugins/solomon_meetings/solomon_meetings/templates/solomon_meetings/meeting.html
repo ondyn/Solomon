@@ -411,10 +411,15 @@
 		<div class="card mb-3">
 			<h5 class="card-header d-flex justify-content-between align-items-center">
 				<span>{% trans "Ballot types at meeting" %}</span>
-				<form method="post" action="{% url 'plugins:solomon_meetings:meeting_sync_ballot_types' pk=object.pk %}">
-					{% csrf_token %}
-					<button type="submit" class="btn btn-sm btn-primary">{% trans "Get unique shares" %}</button>
-				</form>
+				<div class="d-flex gap-2">
+					{% if can_refresh_snapshots %}
+					<form method="post" action="{% url 'plugins:solomon_meetings:meeting_refresh_snapshots' pk=object.pk %}">
+						{% csrf_token %}
+						<button type="submit" class="btn btn-sm btn-primary">{% trans "Refresh snapshots" %}</button>
+					</form>
+					{% endif %}
+					<a href="{% url 'plugins:solomon_meetings:voteweightstyle_list' %}" class="btn btn-sm btn-outline-primary">{% trans "Manage style catalog" %}</a>
+				</div>
 			</h5>
 			<div class="table-responsive">
 				<table class="table table-hover mb-0">
@@ -423,7 +428,7 @@
 						{% for row in ballot_type_summary %}
 						<tr>
 							<td>{{ row.label|default:'-' }}</td>
-							<td>{% if row.color %}<span style="display:inline-block;width:1rem;height:1rem;border:1px solid #6c757d;border-radius:0.2rem;background-color: {{ row.color }};vertical-align:middle;margin-right:0.4rem;"></span>{{ row.color }}{% else %}{{ ''|placeholder }}{% endif %}</td>
+							<td>{% if row.color %}<span style="display:inline-block;width:1rem;height:1rem;border:1px solid #6c757d;border-radius:0.2rem;background-color: {{ row.color }};vertical-align:middle;margin-right:0.4rem;"></span>{% else %}{{ ''|placeholder }}{% endif %}</td>
 							<td>{{ row.share_fraction }}</td>
 							<td>{{ row.owner_count }}</td>
 							<td>{{ row.issued_count }}</td>

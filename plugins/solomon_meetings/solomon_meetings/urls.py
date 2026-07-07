@@ -38,6 +38,7 @@ urlpatterns = [
         name="meeting_publish_invitation",
     ),
     path("meetings/<int:pk>/toggle-attendance/", views.MeetingAttendanceToggleView.as_view(), name="meeting_toggle_attendance"),
+    path("meetings/<int:pk>/refresh-snapshots/", views.MeetingRefreshSnapshotsView.as_view(), name="meeting_refresh_snapshots"),
     path("meetings/<int:pk>/agenda/add/", views.MeetingAgendaAddView.as_view(), name="meeting_agenda_add"),
     path("meetings/<int:pk>/agenda/move/", views.MeetingAgendaMoveView.as_view(), name="meeting_agenda_move"),
     path("meetings/<int:pk>/sync-ballot-types/", views.MeetingSyncBallotStylesView.as_view(), name="meeting_sync_ballot_types"),
@@ -128,6 +129,11 @@ urlpatterns = [
     ),
 
     path("vote-weight-styles/", views.VoteWeightStyleListView.as_view(), name="voteweightstyle_list"),
+    path(
+        "vote-weight-styles/sync-current/",
+        views.VoteWeightStyleSyncCurrentView.as_view(),
+        name="voteweightstyle_sync_current",
+    ),
     path("vote-weight-styles/add/", views.VoteWeightStyleEditView.as_view(), name="voteweightstyle_add"),
     path("vote-weight-styles/delete/", views.VoteWeightStyleBulkDeleteView.as_view(), name="voteweightstyle_bulk_delete"),
     path("vote-weight-styles/<int:pk>/", views.VoteWeightStyleView.as_view(), name="voteweightstyle"),

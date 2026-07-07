@@ -17,5 +17,9 @@ class SolomonMeetingsConfig(PluginConfig):
 
     default_settings = {}
 
+    def ready(self):
+        super().ready()
+        from . import signals  # noqa: F401
+
 
 config = SolomonMeetingsConfig

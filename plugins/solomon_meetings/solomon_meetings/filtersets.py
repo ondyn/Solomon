@@ -80,7 +80,7 @@ class VoteFilterSet(NetBoxModelFilterSet):
 class VoteWeightStyleFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = VoteWeightStyle
-        fields = ["voting_method", "weight_value", "label"]
+        fields = ["voting_method", "weight_value", "label", "is_current"]
 
 
 class AgendaVoteSessionFilterSet(NetBoxModelFilterSet):

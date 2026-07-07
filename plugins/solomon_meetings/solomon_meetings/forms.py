@@ -159,6 +159,9 @@ class VoteWeightStyleForm(NetBoxModelForm):
             self.fields["weight_denominator"].initial = denominator
 
     def clean(self):
+        if self.instance and self.instance.pk and not self.instance.is_current:
+            raise forms.ValidationError(_("Historical vote styles are read-only and cannot be edited."))
+
         super().clean()
         cleaned = self.cleaned_data
         num = cleaned.get("weight_numerator")

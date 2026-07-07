@@ -193,6 +193,7 @@ class VoteTable(NetBoxTable):
 
 class VoteWeightStyleTable(NetBoxTable):
     label = tables.Column(linkify=True)
+    is_current = tables.BooleanColumn(verbose_name=_("Current"))
     color = tables.Column(verbose_name=_("Color"))
     share_count = tables.Column(verbose_name=_("Count"), orderable=False, empty_values=())
 
@@ -206,7 +207,9 @@ class VoteWeightStyleTable(NetBoxTable):
 
         numerator, denominator = record.weight_fraction_pair
         share_fraction = Fraction(numerator, denominator)
-        common_denominator = self._common_share_denominator or share_fraction.denominator
+        common_denominator = share_fraction.denominator
+        if self is not None:
+            common_denominator = self._common_share_denominator or share_fraction.denominator
         if common_denominator % share_fraction.denominator:
             common_denominator = _lcm(common_denominator, share_fraction.denominator)
 
@@ -235,8 +238,25 @@ class VoteWeightStyleTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = VoteWeightStyle
-        fields = ("pk", "voting_method", "weight_value", "label", "color", "share_count", "actions")
-        default_columns = ("voting_method", "weight_value", "label", "color", "share_count", "actions")
+        fields = (
+            "pk",
+            "voting_method",
+            "weight_value",
+            "label",
+            "color",
+            "is_current",
+            "share_count",
+            "actions",
+        )
+        default_columns = (
+            "voting_method",
+            "weight_value",
+            "label",
+            "color",
+            "is_current",
+            "share_count",
+            "actions",
+        )
 
 
 class MeetingMinutesTable(NetBoxTable):

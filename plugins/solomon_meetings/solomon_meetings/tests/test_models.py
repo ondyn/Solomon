@@ -109,11 +109,14 @@ class MeetingModelTests(TestCase):
             meeting.full_clean()
 
     def test_start_meeting_creates_owner_snapshots(self):
-        VoteWeightStyle.objects.create(
+        VoteWeightStyle.objects.update_or_create(
             voting_method=QUORUM_TYPE_BY_SHARE,
             weight_value=Decimal("1.0"),
-            label="A",
-            color="#0055AA",
+            defaults={
+                "label": "A",
+                "color": "#0055AA",
+                "is_current": True,
+            },
         )
         meeting = self._meeting(quorum_type=QUORUM_TYPE_BY_SHARE)
         started_at = timezone.now()
@@ -139,17 +142,17 @@ class MeetingModelTests(TestCase):
         second_arrival = start_time + datetime.timedelta(minutes=35)
 
         MeetingAttendanceEvent.objects.create(
-            snapshot=snapshot,
+            owner_snapshot=snapshot,
             event_type=ATTENDANCE_EVENT_ARRIVAL,
             event_time=first_arrival,
         )
         MeetingAttendanceEvent.objects.create(
-            snapshot=snapshot,
+            owner_snapshot=snapshot,
             event_type=ATTENDANCE_EVENT_DEPARTURE,
             event_time=first_departure,
         )
         MeetingAttendanceEvent.objects.create(
-            snapshot=snapshot,
+            owner_snapshot=snapshot,
             event_type=ATTENDANCE_EVENT_ARRIVAL,
             event_time=second_arrival,
         )
@@ -169,7 +172,7 @@ class MeetingModelTests(TestCase):
         self.assertEqual(meeting.calculate_quorum_ratio(), Decimal("0"))
 
         MeetingAttendanceEvent.objects.create(
-            snapshot=snapshot,
+            owner_snapshot=snapshot,
             event_type=ATTENDANCE_EVENT_ARRIVAL,
             event_time=start_time + datetime.timedelta(minutes=1),
         )
@@ -227,6 +230,112 @@ class MeetingModelTests(TestCase):
         # Component shares must not appear as separate holder rows.
         self.assertNotIn("1/4", rows_by_fraction)
         self.assertNotIn("1/5", rows_by_fraction)
+
+    def test_ballot_summary_and_quorum_remain_stable_after_ownership_change(self):
+        VoteWeightStyle.objects.update_or_create(
+            voting_method=QUORUM_TYPE_BY_SHARE,
+            weight_value=Decimal("1.0"),
+            defaults={
+                "label": "A",
+                "color": "#0055AA",
+                "is_current": True,
+            },
+        )
+        meeting = self._meeting(quorum_type=QUORUM_TYPE_BY_SHARE)
+        started_at = timezone.now()
+        meeting.start_meeting(started_at=started_at)
+
+        snapshot = MeetingOwnerSnapshot.objects.get(meeting=meeting, flat_owner=self.flat_owner)
+        MeetingAttendanceEvent.objects.create(
+            owner_snapshot=snapshot,
+            event_type=ATTENDANCE_EVENT_ARRIVAL,
+            event_time=started_at + datetime.timedelta(minutes=1),
+            source="test",
+        )
+
+        # Simulate ownership/style changes after voting history already exists.
+        self.flat_owner.share_numerator = 1
+        self.flat_owner.share_denominator = 2
+        self.flat_owner.save(update_fields=["share_numerator", "share_denominator", "last_updated"])
+        VoteWeightStyle.objects.filter(voting_method=QUORUM_TYPE_BY_SHARE, weight_value=Decimal("1.0")).update(
+            label="Changed",
+            color="#AA0000",
+        )
+        VoteWeightStyle.objects.update_or_create(
+            voting_method=QUORUM_TYPE_BY_SHARE,
+            weight_value=Decimal("0.5"),
+            defaults={
+                "label": "B",
+                "color": "#00AA55",
+                "is_current": True,
+            },
+        )
+
+        summary = meeting.get_ballot_type_summary()
+        self.assertEqual(len(summary), 1)
+        self.assertEqual(summary[0]["share_fraction"], "1/1")
+        self.assertEqual(summary[0]["label"], "A")
+        self.assertEqual(summary[0]["color"], "#0055AA")
+        self.assertEqual(meeting.calculate_quorum_ratio(), Decimal("1"))
+
+    def test_sync_current_share_styles_marks_missing_shares_as_historical(self):
+        stale_style = VoteWeightStyle.objects.create(
+            voting_method=QUORUM_TYPE_BY_SHARE,
+            weight_value=Decimal("0.750000"),
+            label="Stale",
+            color="#333333",
+            is_current=True,
+        )
+
+        created, current_count = VoteWeightStyle.sync_current_share_styles()
+
+        stale_style.refresh_from_db()
+        self.assertFalse(stale_style.is_current)
+        self.assertEqual(current_count, 1)
+        self.assertGreaterEqual(created, 0)
+        self.assertTrue(
+            VoteWeightStyle.objects.filter(
+                voting_method=QUORUM_TYPE_BY_SHARE,
+                weight_value=Decimal("1.000000"),
+                is_current=True,
+            ).exists()
+        )
+
+    def test_flat_owner_change_triggers_automatic_vote_style_sync(self):
+        stale_style = VoteWeightStyle.objects.create(
+            voting_method=QUORUM_TYPE_BY_SHARE,
+            weight_value=Decimal("0.750000"),
+            label="Old",
+            color="#333333",
+            is_current=True,
+        )
+
+        self.flat_owner.share_numerator = 1
+        self.flat_owner.share_denominator = 2
+        self.flat_owner.save(update_fields=["share_numerator", "share_denominator", "last_updated"])
+
+        stale_style.refresh_from_db()
+        self.assertFalse(stale_style.is_current)
+        self.assertTrue(
+            VoteWeightStyle.objects.filter(
+                voting_method=QUORUM_TYPE_BY_SHARE,
+                weight_value=Decimal("0.500000"),
+                is_current=True,
+            ).exists()
+        )
+
+    def test_historical_vote_style_is_not_editable(self):
+        historical_style = VoteWeightStyle.objects.create(
+            voting_method=QUORUM_TYPE_BY_SHARE,
+            weight_value=Decimal("0.250000"),
+            label="H1",
+            color="#111111",
+            is_current=False,
+        )
+
+        historical_style.label = "H2"
+        with self.assertRaises(ValidationError):
+            historical_style.save()
 
 
 class VotingModelTests(TestCase):
@@ -332,7 +441,18 @@ class VotingModelTests(TestCase):
         self.assertEqual(result, AGENDA_RESULT_REJECTED)
 
     def test_ballot_row_completes_third_value(self):
+        agenda = AgendaItem.objects.create(
+            meeting=self.meeting,
+            order=1,
+            title="Ballot completion",
+            voting_required=True,
+            voting_method=QUORUM_TYPE_BY_SHARE,
+            minimum_pass_percentage=Decimal("0.5"),
+            quorum_threshold=Decimal("0.5"),
+        )
+        session = AgendaVoteSession.objects.create(agenda_item=agenda)
         row = AgendaVoteBallot(
+            session=session,
             label="A",
             color="#0055AA",
             share_value=Decimal("0.5"),
@@ -349,7 +469,7 @@ class VotingModelTests(TestCase):
         self.meeting.start_meeting(started_at=timezone.now())
         snapshot = MeetingOwnerSnapshot.objects.get(meeting=self.meeting, flat_owner=self.flat_owner)
         MeetingAttendanceEvent.objects.create(
-            snapshot=snapshot,
+            owner_snapshot=snapshot,
             event_type=ATTENDANCE_EVENT_ARRIVAL,
             event_time=timezone.now(),
         )

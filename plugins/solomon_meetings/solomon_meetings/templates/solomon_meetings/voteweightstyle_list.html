@@ -1,0 +1,10 @@
+{% extends 'generic/object_list.html' %}
+{% load i18n %}
+
+{% block extra_controls %}
+{{ block.super }}
+<form method="post" action="{% url 'plugins:solomon_meetings:voteweightstyle_sync_current' %}" class="d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">{% trans "Sync current shares" %}</button>
+</form>
+{% endblock %}

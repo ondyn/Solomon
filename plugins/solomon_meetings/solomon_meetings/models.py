@@ -84,6 +84,44 @@ ATTENDANCE_EVENT_CHOICES = [
 def quantize_weight_fraction(numerator, denominator):
     return (Decimal(numerator) / Decimal(denominator)).quantize(Decimal("0.000001"))
 
+
+def build_holder_share_totals(ownerships):
+    flat_to_ownerships = defaultdict(list)
+    for ownership in ownerships:
+        flat_to_ownerships[ownership.flat_id].append(ownership)
+
+    holder_totals = defaultdict(lambda: Fraction(0, 1))
+    for flat_id, flat_ownerships in flat_to_ownerships.items():
+        if len(flat_ownerships) == 1:
+            ownership = flat_ownerships[0]
+            if not ownership.share_denominator:
+                continue
+
+            holder_key = ("owner", ownership.owner_id)
+            share_fraction = Fraction(ownership.share_numerator, ownership.share_denominator)
+        else:
+            flat = flat_ownerships[0].flat
+            holder_key = ("flat", flat_id)
+            if flat.cuzk_share_numerator and flat.cuzk_share_denominator:
+                share_fraction = Fraction(flat.cuzk_share_numerator, flat.cuzk_share_denominator)
+            else:
+                share_fraction = sum(
+                    (Fraction(o.share_numerator, o.share_denominator) for o in flat_ownerships),
+                    Fraction(0, 1),
+                )
+
+        holder_totals[holder_key] += share_fraction
+
+    return holder_totals
+
+
+def current_holder_share_totals(buildings=None):
+    ownerships = FlatOwner.objects.filter(effective_to__isnull=True)
+    if buildings is not None:
+        ownerships = ownerships.filter(flat__building__in=buildings)
+
+    return build_holder_share_totals(ownerships.select_related("flat"))
+
 BALLOT_ROLE_FOR = "FOR"
 BALLOT_ROLE_AGAINST = "AGAINST"
 BALLOT_ROLE_ABSTAIN = "ABSTAIN"
@@ -234,6 +272,10 @@ class Meeting(NetBoxModel):
     def get_absolute_url(self):
         return reverse("plugins:solomon_meetings:meeting", kwargs={"pk": self.pk})
 
+    @property
+    def can_refresh_snapshots(self):
+        return self.phase != MEETING_PHASE_FINISHED and self.status != MEETING_STATUS_CLOSED
+
     def clean(self):
         super().clean()
         if self.status == MEETING_STATUS_CLOSED and not self.quorum_achieved:
@@ -263,6 +305,19 @@ class Meeting(NetBoxModel):
         )
 
     def _total_weight(self, quorum_type):
+        snapshots = list(self.owner_snapshots.all())
+        if snapshots:
+            if quorum_type == QUORUM_TYPE_BY_UNITS:
+                return Decimal(str(len(snapshots)))
+
+            total_fraction = Fraction(0, 1)
+            for snapshot in snapshots:
+                if snapshot.share_denominator:
+                    total_fraction += Fraction(snapshot.share_numerator, snapshot.share_denominator)
+            if total_fraction.denominator == 0:
+                return Decimal("0")
+            return Decimal(total_fraction.numerator) / Decimal(total_fraction.denominator)
+
         buildings = self.buildings.all()
         active_ownerships = FlatOwner.objects.filter(
             flat__building__in=buildings,
@@ -377,6 +432,8 @@ class Meeting(NetBoxModel):
     def snapshot_owners(self, started_at=None, refresh_existing=False):
         started_at = started_at or timezone.now()
         if self.owner_snapshots.exists() and not refresh_existing:
+            if not self.ballot_type_snapshots.exists():
+                self.snapshot_ballot_types(snapshot_taken_at=started_at, refresh_existing=True)
             return
 
         active_ownerships = (
@@ -480,72 +537,85 @@ class Meeting(NetBoxModel):
         if refresh_existing:
             self.owner_snapshots.exclude(pk__in=processed_snapshot_ids).delete()
 
+        self.snapshot_ballot_types(snapshot_taken_at=started_at, refresh_existing=refresh_existing)
+
         self.owner_snapshot_taken_at = started_at
         self.save(update_fields=["owner_snapshot_taken_at", "last_updated"])
 
-    def get_ballot_type_summary(self):
-        active_ownerships = list(
-            FlatOwner.objects.filter(
-                flat__building__in=self.buildings.all(),
-                effective_to__isnull=True,
-            ).select_related("flat", "owner")
-        )
-
-        flat_to_ownerships = defaultdict(list)
-        for ownership in active_ownerships:
-            flat_to_ownerships[ownership.flat_id].append(ownership)
-
+    def snapshot_ballot_types(self, snapshot_taken_at=None, refresh_existing=False):
+        snapshot_taken_at = snapshot_taken_at or timezone.now()
         holder_totals = defaultdict(lambda: Fraction(0, 1))
-        for flat_id, ownerships in flat_to_ownerships.items():
-            if len(ownerships) == 1:
-                ownership = ownerships[0]
-                if not ownership.share_denominator:
-                    continue
-                holder_key = ("owner", ownership.owner_id)
-                share_fraction = Fraction(ownership.share_numerator, ownership.share_denominator)
-            else:
-                flat = ownerships[0].flat
-                holder_key = ("flat", flat_id)
-                if flat.cuzk_share_numerator and flat.cuzk_share_denominator:
-                    share_fraction = Fraction(flat.cuzk_share_numerator, flat.cuzk_share_denominator)
-                else:
-                    share_fraction = sum(
-                        (Fraction(o.share_numerator, o.share_denominator) for o in ownerships),
-                        Fraction(0, 1),
-                    )
 
-            holder_totals[holder_key] += share_fraction
-
-        denominators = [fraction.denominator for fraction in holder_totals.values()]
-        common_denom = reduce(lcm, denominators, 1) if denominators else 1
-
-        reference_time = timezone.now()
-        holder_presence = defaultdict(bool)
         for snapshot in self.owner_snapshots.select_related("flat_owner"):
-            if not snapshot.is_present_at(reference_time):
+            if not snapshot.share_denominator:
                 continue
-
             if snapshot.unit_count > 1 and snapshot.flat_owner_id:
                 holder_key = ("flat", snapshot.flat_owner.flat_id)
             else:
                 holder_key = ("owner", snapshot.owner_id)
+            holder_totals[holder_key] += Fraction(snapshot.share_numerator, snapshot.share_denominator)
 
-            holder_presence[holder_key] = True
+        share_fractions = sorted(set(holder_totals.values()))
+        share_values = {
+            quantize_weight_fraction(share_fraction.numerator, share_fraction.denominator)
+            for share_fraction in share_fractions
+        }
+        style_map = {
+            style.weight_value: (style.label, style.color)
+            for style in VoteWeightStyle.objects.filter(
+                voting_method=QUORUM_TYPE_BY_SHARE,
+                weight_value__in=share_values,
+            )
+        }
+
+        processed_snapshot_ids = set()
+        for share_fraction in share_fractions:
+            numerator = share_fraction.numerator
+            denominator = share_fraction.denominator
+            share_value = quantize_weight_fraction(numerator, denominator)
+            label, color = style_map.get(share_value, ("", ""))
+            defaults = {
+                "share_numerator": numerator,
+                "share_denominator": denominator,
+                "ballot_label": label,
+                "ballot_color": color,
+                "snapshot_taken_at": snapshot_taken_at,
+            }
+            ballot_snapshot, _ = MeetingBallotTypeSnapshot.objects.update_or_create(
+                meeting=self,
+                share_value=share_value,
+                defaults=defaults,
+            )
+            processed_snapshot_ids.add(ballot_snapshot.pk)
+
+        if refresh_existing:
+            self.ballot_type_snapshots.exclude(pk__in=processed_snapshot_ids).delete()
+
+    def _summaries_from_holder_totals(self, holder_totals, holder_presence):
+        denominators = [fraction.denominator for fraction in holder_totals.values()]
+        common_denom = reduce(lcm, denominators, 1) if denominators else 1
+
+        snapshot_style_map = {
+            row["share_value"]: (row["ballot_label"], row["ballot_color"])
+            for row in self.ballot_type_snapshots.values("share_value", "ballot_label", "ballot_color")
+        }
 
         summaries = {}
         for holder_key, share_fraction in holder_totals.items():
             share_value = quantize_weight_fraction(share_fraction.numerator, share_fraction.denominator)
-            style = VoteWeightStyle.objects.filter(
-                voting_method=QUORUM_TYPE_BY_SHARE,
-                weight_value=share_value,
-            ).first()
-            label = style.label if style else ""
-            color = style.color if style else ""
+            label, color = snapshot_style_map.get(share_value, ("", ""))
+            if not label and not color:
+                style = VoteWeightStyle.objects.filter(
+                    voting_method=QUORUM_TYPE_BY_SHARE,
+                    weight_value=share_value,
+                ).first()
+                if style:
+                    label = style.label
+                    color = style.color
 
-            key = f"{share_value}:{label}:{color}"
-            if key not in summaries:
+            if share_value not in summaries:
                 scaled_num = share_fraction.numerator * common_denom // share_fraction.denominator
-                summaries[key] = {
+                summaries[share_value] = {
                     "label": label,
                     "color": color,
                     "share_value": share_value,
@@ -554,11 +624,34 @@ class Meeting(NetBoxModel):
                     "issued_count": 0,
                 }
 
-            summaries[key]["owner_count"] += 1
+            summaries[share_value]["owner_count"] += 1
             if holder_presence.get(holder_key, False):
-                summaries[key]["issued_count"] += 1
+                summaries[share_value]["issued_count"] += 1
 
         return list(summaries.values())
+
+    def get_ballot_type_summary(self):
+        reference_time = timezone.now()
+        holder_presence = defaultdict(bool)
+        if self.owner_snapshots.exists():
+            holder_totals = defaultdict(lambda: Fraction(0, 1))
+            for snapshot in self.owner_snapshots.select_related("flat_owner"):
+                if not snapshot.share_denominator:
+                    continue
+
+                if snapshot.unit_count > 1 and snapshot.flat_owner_id:
+                    holder_key = ("flat", snapshot.flat_owner.flat_id)
+                else:
+                    holder_key = ("owner", snapshot.owner_id)
+
+                holder_totals[holder_key] += Fraction(snapshot.share_numerator, snapshot.share_denominator)
+                if snapshot.is_present_at(reference_time):
+                    holder_presence[holder_key] = True
+
+            return self._summaries_from_holder_totals(holder_totals, holder_presence)
+
+        holder_totals = current_holder_share_totals(buildings=self.buildings.all())
+        return self._summaries_from_holder_totals(holder_totals, holder_presence)
 
 
 class AgendaItem(NetBoxModel):
@@ -773,6 +866,11 @@ class VoteWeightStyle(NetBoxModel):
         verbose_name=_("Color"),
         help_text=_("Hex color, e.g. #1976D2."),
     )
+    is_current = models.BooleanField(
+        default=True,
+        verbose_name=_("Current style"),
+        help_text=_("Marks whether this style is used by current ownership shares."),
+    )
 
     class Meta:
         ordering = ["voting_method", "weight_value"]
@@ -798,6 +896,94 @@ class VoteWeightStyle(NetBoxModel):
 
     def get_absolute_url(self):
         return reverse("plugins:solomon_meetings:voteweightstyle", kwargs={"pk": self.pk})
+
+    def clean(self):
+        super().clean()
+        if not self.pk:
+            return
+
+        previous = VoteWeightStyle.objects.filter(pk=self.pk).values("is_current").first()
+        if previous and not previous["is_current"]:
+            raise ValidationError(_("Historical vote styles are read-only and cannot be edited."))
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            previous = VoteWeightStyle.objects.filter(pk=self.pk).values("is_current").first()
+            if previous and not previous["is_current"]:
+                raise ValidationError(_("Historical vote styles are read-only and cannot be edited."))
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def _next_share_label(cls):
+        index = 1
+        while cls.objects.filter(voting_method=QUORUM_TYPE_BY_SHARE, label=f"S{index}").exists():
+            index += 1
+        return f"S{index}"
+
+    @classmethod
+    def sync_current_share_styles(cls):
+        holder_totals = current_holder_share_totals()
+        fractions = sorted(set(holder_totals.values()))
+        current_values = {
+            quantize_weight_fraction(fraction.numerator, fraction.denominator)
+            for fraction in fractions
+        }
+
+        cls.objects.filter(voting_method=QUORUM_TYPE_BY_SHARE).exclude(weight_value__in=current_values).update(
+            is_current=False
+        )
+        if current_values:
+            cls.objects.filter(voting_method=QUORUM_TYPE_BY_SHARE, weight_value__in=current_values).update(
+                is_current=True
+            )
+
+        created = 0
+        for fraction in fractions:
+            share_value = quantize_weight_fraction(fraction.numerator, fraction.denominator)
+            if cls.objects.filter(voting_method=QUORUM_TYPE_BY_SHARE, weight_value=share_value).exists():
+                continue
+
+            cls.objects.create(
+                voting_method=QUORUM_TYPE_BY_SHARE,
+                weight_value=share_value,
+                weight_numerator=fraction.numerator,
+                weight_denominator=fraction.denominator,
+                label=cls._next_share_label(),
+                color="#1976D2",
+                is_current=True,
+            )
+            created += 1
+
+        return created, len(current_values)
+
+
+class MeetingBallotTypeSnapshot(NetBoxModel):
+    meeting = models.ForeignKey(
+        Meeting,
+        on_delete=models.CASCADE,
+        related_name="ballot_type_snapshots",
+        verbose_name=_("Meeting"),
+    )
+    share_numerator = models.PositiveIntegerField(verbose_name=_("Share numerator"))
+    share_denominator = models.PositiveIntegerField(verbose_name=_("Share denominator"))
+    share_value = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Share value"))
+    ballot_label = models.CharField(max_length=32, blank=True, verbose_name=_("Ballot label"))
+    ballot_color = models.CharField(max_length=7, blank=True, verbose_name=_("Ballot color"))
+    snapshot_taken_at = models.DateTimeField(verbose_name=_("Snapshot taken at"))
+
+    class Meta:
+        ordering = ["meeting", "share_value", "ballot_label"]
+        unique_together = [("meeting", "share_value")]
+        verbose_name = _("Meeting ballot type snapshot")
+        verbose_name_plural = _("Meeting ballot type snapshots")
+
+    def __str__(self):
+        fraction = f"{self.share_numerator}/{self.share_denominator}"
+        return _("{meeting}: {fraction} ({label})").format(
+            meeting=self.meeting,
+            fraction=fraction,
+            label=self.ballot_label or _("Unlabeled"),
+        )
 
 
 class MeetingOwnerSnapshot(NetBoxModel):

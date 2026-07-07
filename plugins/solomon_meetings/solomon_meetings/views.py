@@ -15,8 +15,6 @@ from django.views import View
 from netbox.views import generic
 from utilities.views import ViewTab, register_model_view
 
-from solomon_property.models import FlatOwner
-
 from . import filterforms, filtersets, forms, models, tables
 
 
@@ -83,14 +81,10 @@ class MeetingView(generic.ObjectView):
             return Decimal("0")
         return Decimal(numerator) / Decimal(denominator)
 
-    @staticmethod
-    def _build_attendance_rows(snapshots):
+    def _build_attendance_rows(self, meeting, snapshots):
         style_map = {
-            style.weight_value: (style.label, style.color)
-            for style in models.VoteWeightStyle.objects.filter(
-                voting_method=models.QUORUM_TYPE_BY_SHARE,
-                weight_value__in={snapshot.share_value for snapshot in snapshots},
-            )
+            snapshot.share_value: (snapshot.ballot_label, snapshot.ballot_color)
+            for snapshot in meeting.ballot_type_snapshots.all()
         }
         snapshots_by_owner = defaultdict(list)
         for snapshot in snapshots:
@@ -109,17 +103,17 @@ class MeetingView(generic.ObjectView):
             first_arrivals = [snapshot.first_arrived_at for snapshot in owner_snapshots if snapshot.first_arrived_at]
             last_departures = [snapshot.last_left_at for snapshot in owner_snapshots if snapshot.last_left_at]
             flat_labels = [snapshot.flat_label for snapshot in owner_snapshots if snapshot.flat_label]
-            ballot_options = {
-                style_map.get(
-                    snapshot.share_value,
-                    (snapshot.ballot_label or "-", snapshot.ballot_color or ""),
-                )
-                for snapshot in owner_snapshots
-            }
-            ballot_label, ballot_color = next(iter(ballot_options))
-            if len(ballot_options) > 1:
-                ballot_label = _("Multiple")
-                ballot_color = ""
+            combined_share_value = models.quantize_weight_fraction(share_numerator, share_denominator)
+            ballot_label, ballot_color = style_map.get(combined_share_value, ("", ""))
+            if not ballot_label and not ballot_color:
+                ballot_options = {
+                    (snapshot.ballot_label or "-", snapshot.ballot_color or "")
+                    for snapshot in owner_snapshots
+                }
+                ballot_label, ballot_color = next(iter(ballot_options))
+                if len(ballot_options) > 1:
+                    ballot_label = _("Multiple")
+                    ballot_color = ""
 
             rows.append(
                 {
@@ -132,7 +126,7 @@ class MeetingView(generic.ObjectView):
                     ),
                     "share_fraction_numerator": share_numerator,
                     "share_fraction_denominator": share_denominator,
-                    "share_value": sum((snapshot.share_value for snapshot in owner_snapshots), Decimal("0")),
+                    "share_value": combined_share_value,
                     "ballot_label": ballot_label,
                     "ballot_color": ballot_color,
                     "is_currently_present": any(snapshot.is_currently_present for snapshot in owner_snapshots),
@@ -147,7 +141,7 @@ class MeetingView(generic.ObjectView):
 
     def get_extra_context(self, request, instance):
         snapshots = list(instance.owner_snapshots.select_related("owner", "flat_owner").prefetch_related("events"))
-        attendance_rows = self._build_attendance_rows(snapshots)
+        attendance_rows = self._build_attendance_rows(instance, snapshots)
         agenda_items = list(instance.agenda_items.all().order_by("order", "title"))
 
         present_count = sum(1 for row in attendance_rows if row["is_currently_present"])
@@ -197,6 +191,7 @@ class MeetingView(generic.ObjectView):
         ballot_type_summary = instance.get_ballot_type_summary()
         return {
             "active_tab": self.active_tab,
+            "can_refresh_snapshots": instance.can_refresh_snapshots,
             "agenda_items": agenda_items,
             "attendance_rows": attendance_rows,
             "present_count": present_count,
@@ -420,6 +415,22 @@ class MeetingAgendaMoveView(PermissionRequiredMixin, View):
         return redirect(get_meeting_tab_url(meeting, "agenda"))
 
 
+class MeetingRefreshSnapshotsView(PermissionRequiredMixin, View):
+    queryset = models.Meeting.objects.all()
+    permission_required = "solomon_meetings.manage_meeting_workflow"
+    raise_exception = True
+
+    def post(self, request, pk):
+        meeting = get_object_or_404(self.queryset, pk=pk)
+        if not meeting.can_refresh_snapshots:
+            messages.error(request, _("Snapshots cannot be refreshed for finished meetings."))
+            return redirect(meeting.get_absolute_url())
+
+        meeting.snapshot_owners(started_at=timezone.now(), refresh_existing=True)
+        messages.success(request, _("Meeting ownership and ballot snapshots were refreshed."))
+        return redirect(meeting.get_absolute_url())
+
+
 class AgendaItemStartVotingView(PermissionRequiredMixin, View):
     queryset = models.AgendaItem.objects.select_related("meeting")
     permission_required = "solomon_meetings.run_voting_session"
@@ -540,73 +551,27 @@ class MeetingSyncBallotStylesView(PermissionRequiredMixin, View):
 
     def post(self, request, pk):
         meeting = get_object_or_404(self.queryset, pk=pk)
-        ownerships = FlatOwner.objects.filter(
-            flat__building__in=meeting.buildings.all(),
-            effective_to__isnull=True,
-        ).select_related("flat")
-
-        # Group by flat: co-owned flats use flat CUZK share; sole-owned use FlatOwner share
-        flat_to_ownerships = defaultdict(list)
-        for ownership in ownerships:
-            flat_to_ownerships[ownership.flat_id].append(ownership)
-
-        holder_totals = defaultdict(lambda: Fraction(0, 1))
-        for flat_id, flat_ownerships in flat_to_ownerships.items():
-            if len(flat_ownerships) == 1:
-                ownership = flat_ownerships[0]
-                if not ownership.share_denominator:
-                    continue
-
-                holder_key = ("owner", ownership.owner_id)
-                share_fraction = Fraction(ownership.share_numerator, ownership.share_denominator)
-            else:
-                flat = flat_ownerships[0].flat
-                holder_key = ("flat", flat_id)
-                if flat.cuzk_share_numerator and flat.cuzk_share_denominator:
-                    share_fraction = Fraction(flat.cuzk_share_numerator, flat.cuzk_share_denominator)
-                else:
-                    share_fraction = sum(
-                        (Fraction(o.share_numerator, o.share_denominator) for o in flat_ownerships),
-                        Fraction(0, 1),
-                    )
-
-            holder_totals[holder_key] += share_fraction
-
-        unique_shares = sorted(set(holder_totals.values()))
-
-        created = 0
-        for share_fraction in unique_shares:
-            numerator = share_fraction.numerator
-            denominator = share_fraction.denominator
-            share = models.quantize_weight_fraction(numerator, denominator)
-            exists = models.VoteWeightStyle.objects.filter(
-                voting_method=models.QUORUM_TYPE_BY_SHARE,
-                weight_value=share,
-            ).exists()
-            if exists:
-                continue
-
-            label = f"S{created + 1}"
-            while models.VoteWeightStyle.objects.filter(
-                voting_method=models.QUORUM_TYPE_BY_SHARE,
-                label=label,
-            ).exists():
-                created += 1
-                label = f"S{created + 1}"
-
-            models.VoteWeightStyle.objects.create(
-                voting_method=models.QUORUM_TYPE_BY_SHARE,
-                weight_value=share,
-                weight_numerator=numerator,
-                weight_denominator=denominator,
-                label=label,
-                color="#1976D2",
-            )
-            created += 1
-
-        meeting.snapshot_owners(refresh_existing=True)
-        messages.success(request, _("Ballot types synchronized from ownership shares."))
+        created, current_count = models.VoteWeightStyle.sync_current_share_styles()
+        messages.success(
+            request,
+            _("Vote weight styles synchronized. Created %(created)s new styles, %(count)s are current.")
+            % {"created": created, "count": current_count},
+        )
         return redirect(get_meeting_tab_url(meeting, "ballots"))
+
+
+class VoteWeightStyleSyncCurrentView(PermissionRequiredMixin, View):
+    permission_required = "solomon_meetings.sync_ballot_styles"
+    raise_exception = True
+
+    def post(self, request):
+        created, current_count = models.VoteWeightStyle.sync_current_share_styles()
+        messages.success(
+            request,
+            _("Vote weight styles synchronized. Created %(created)s new styles, %(count)s are current.")
+            % {"created": created, "count": current_count},
+        )
+        return redirect("plugins:solomon_meetings:voteweightstyle_list")
 
 
 class MeetingExportView(PermissionRequiredMixin, View):
@@ -894,6 +859,8 @@ class VoteWeightStyleListView(generic.ObjectListView):
     queryset = models.VoteWeightStyle.objects.all()
     table = tables.VoteWeightStyleTable
     filterset = filtersets.VoteWeightStyleFilterSet
+    filterset_form = filterforms.VoteWeightStyleFilterForm
+    template_name = "solomon_meetings/voteweightstyle_list.html"
 
 
 class VoteWeightStyleView(generic.ObjectView):

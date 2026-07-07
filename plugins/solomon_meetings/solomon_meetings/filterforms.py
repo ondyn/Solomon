@@ -5,7 +5,7 @@ from netbox.forms import NetBoxModelFilterSetForm
 from utilities.forms.fields import DynamicModelChoiceField
 from utilities.forms.rendering import FieldSet
 
-from .models import AgendaItem, Meeting, MeetingAttendance, MeetingType
+from .models import AgendaItem, Meeting, MeetingAttendance, MeetingType, VoteWeightStyle
 
 
 class MeetingTypeFilterForm(NetBoxModelFilterSetForm):
@@ -26,3 +26,8 @@ class AgendaItemFilterForm(NetBoxModelFilterSetForm):
 class MeetingAttendanceFilterForm(NetBoxModelFilterSetForm):
     model = MeetingAttendance
     fieldsets = (FieldSet("meeting", "owner", "representation", name=_("Filters")),)
+
+
+class VoteWeightStyleFilterForm(NetBoxModelFilterSetForm):
+    model = VoteWeightStyle
+    fieldsets = (FieldSet("voting_method", "weight_value", "label", "is_current", name=_("Filters")),)

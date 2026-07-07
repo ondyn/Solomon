@@ -172,7 +172,7 @@ class FlatView(generic.ObjectView):
         current_owner_table.configure(request)
 
         owner_table = tables.FlatOwnerTable(
-            instance.flat_owners.select_related("owner"), orderable=False
+            instance.flat_owners.select_related("owner").order_by("-effective_from", "-pk"), orderable=False
         )
         owner_table.configure(request)
         tenant_table = tables.PropertyTenantTable(
@@ -240,7 +240,7 @@ class PersonView(generic.ObjectView):
         )
         flat_owners_qs = models.FlatOwner.objects.filter(
             pk__in=flat_owner_ids
-        ).select_related("owner", "flat__building")
+        ).select_related("owner", "flat__building").order_by("-effective_from", "-pk")
         ownership_table = tables.PersonOwnershipTable(flat_owners_qs, orderable=False)
         ownership_table.configure(request)
 

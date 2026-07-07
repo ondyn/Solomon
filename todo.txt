@@ -28,3 +28,7 @@ Future plugins:
 
 ?
 homeowners association vs housing cooperative - how to suuprt both, how to switch
+
+
+- datetime format - 07/07/2026 is for EN/US, 7. 7. 2026 is for CZ - change it everywhere to follow user settings
+- order Ownership History by "Effective from" to have actual ownership on top
