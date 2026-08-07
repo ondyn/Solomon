@@ -5,19 +5,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('solomon_meetings', '0005_meetingtype_attendance_thresholds'),
+        ("solomon_meetings", "0005_meetingtype_attendance_thresholds"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='meetingattendanceevent',
-            options={'ordering': ['owner_snapshot', 'event_time', 'created']},
+            name="meetingattendanceevent",
+            options={"ordering": ["owner_snapshot", "event_time", "created"]},
         ),
         migrations.AlterField(
-            model_name='agendavotesession',
-            name='started_at',
+            model_name="agendavotesession",
+            name="started_at",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
     ]

@@ -27,7 +27,13 @@ from solomon_meetings.models import (
     Vote,
     VoteWeightStyle,
 )
-from solomon_property.models import Building, BuildingObject, Flat, FlatOwner, PropertyOwner
+from solomon_property.models import (
+    Building,
+    BuildingObject,
+    Flat,
+    FlatOwner,
+    PropertyOwner,
+)
 
 
 class MeetingModelTests(TestCase):
@@ -90,7 +96,9 @@ class MeetingModelTests(TestCase):
         self.assertEqual(ratio, Decimal("1"))
 
     def test_refresh_quorum_sets_fields(self):
-        meeting = self._meeting(quorum_type=QUORUM_TYPE_BY_SHARE, threshold=Decimal("0.75"))
+        meeting = self._meeting(
+            quorum_type=QUORUM_TYPE_BY_SHARE, threshold=Decimal("0.75")
+        )
         MeetingAttendance.objects.create(
             meeting=meeting,
             owner=self.owner,
@@ -124,7 +132,9 @@ class MeetingModelTests(TestCase):
         meeting.start_meeting(started_at=started_at)
 
         meeting.refresh_from_db()
-        snapshot = MeetingOwnerSnapshot.objects.get(meeting=meeting, flat_owner=self.flat_owner)
+        snapshot = MeetingOwnerSnapshot.objects.get(
+            meeting=meeting, flat_owner=self.flat_owner
+        )
         self.assertEqual(meeting.phase, MEETING_PHASE_IN_PROGRESS)
         self.assertEqual(snapshot.ballot_label, "A")
         self.assertEqual(snapshot.ballot_color, "#0055AA")
@@ -135,7 +145,9 @@ class MeetingModelTests(TestCase):
         meeting = self._meeting(quorum_type=QUORUM_TYPE_BY_SHARE)
         start_time = timezone.now()
         meeting.start_meeting(started_at=start_time)
-        snapshot = MeetingOwnerSnapshot.objects.get(meeting=meeting, flat_owner=self.flat_owner)
+        snapshot = MeetingOwnerSnapshot.objects.get(
+            meeting=meeting, flat_owner=self.flat_owner
+        )
 
         first_arrival = start_time + datetime.timedelta(minutes=5)
         first_departure = start_time + datetime.timedelta(minutes=20)
@@ -158,15 +170,23 @@ class MeetingModelTests(TestCase):
         )
 
         snapshot.refresh_from_db()
-        self.assertTrue(snapshot.is_present_at(first_arrival + datetime.timedelta(minutes=1)))
-        self.assertFalse(snapshot.is_present_at(first_departure + datetime.timedelta(minutes=1)))
-        self.assertTrue(snapshot.is_present_at(second_arrival + datetime.timedelta(minutes=1)))
+        self.assertTrue(
+            snapshot.is_present_at(first_arrival + datetime.timedelta(minutes=1))
+        )
+        self.assertFalse(
+            snapshot.is_present_at(first_departure + datetime.timedelta(minutes=1))
+        )
+        self.assertTrue(
+            snapshot.is_present_at(second_arrival + datetime.timedelta(minutes=1))
+        )
 
     def test_arrival_event_updates_quorum_even_if_representation_is_absent(self):
         meeting = self._meeting(quorum_type=QUORUM_TYPE_BY_SHARE)
         start_time = timezone.now()
         meeting.start_meeting(started_at=start_time)
-        snapshot = MeetingOwnerSnapshot.objects.get(meeting=meeting, flat_owner=self.flat_owner)
+        snapshot = MeetingOwnerSnapshot.objects.get(
+            meeting=meeting, flat_owner=self.flat_owner
+        )
 
         self.assertEqual(snapshot.representation, "ABSENT")
         self.assertEqual(meeting.calculate_quorum_ratio(), Decimal("0"))
@@ -245,7 +265,9 @@ class MeetingModelTests(TestCase):
         started_at = timezone.now()
         meeting.start_meeting(started_at=started_at)
 
-        snapshot = MeetingOwnerSnapshot.objects.get(meeting=meeting, flat_owner=self.flat_owner)
+        snapshot = MeetingOwnerSnapshot.objects.get(
+            meeting=meeting, flat_owner=self.flat_owner
+        )
         MeetingAttendanceEvent.objects.create(
             owner_snapshot=snapshot,
             event_type=ATTENDANCE_EVENT_ARRIVAL,
@@ -256,8 +278,12 @@ class MeetingModelTests(TestCase):
         # Simulate ownership/style changes after voting history already exists.
         self.flat_owner.share_numerator = 1
         self.flat_owner.share_denominator = 2
-        self.flat_owner.save(update_fields=["share_numerator", "share_denominator", "last_updated"])
-        VoteWeightStyle.objects.filter(voting_method=QUORUM_TYPE_BY_SHARE, weight_value=Decimal("1.0")).update(
+        self.flat_owner.save(
+            update_fields=["share_numerator", "share_denominator", "last_updated"]
+        )
+        VoteWeightStyle.objects.filter(
+            voting_method=QUORUM_TYPE_BY_SHARE, weight_value=Decimal("1.0")
+        ).update(
             label="Changed",
             color="#AA0000",
         )
@@ -312,7 +338,9 @@ class MeetingModelTests(TestCase):
 
         self.flat_owner.share_numerator = 1
         self.flat_owner.share_denominator = 2
-        self.flat_owner.save(update_fields=["share_numerator", "share_denominator", "last_updated"])
+        self.flat_owner.save(
+            update_fields=["share_numerator", "share_denominator", "last_updated"]
+        )
 
         stale_style.refresh_from_db()
         self.assertFalse(stale_style.is_current)
@@ -385,7 +413,9 @@ class VotingModelTests(TestCase):
             voting_method=QUORUM_TYPE_BY_SHARE,
             minimum_pass_percentage=Decimal("0.5"),
         )
-        vote = Vote.objects.create(agenda_item=agenda, attendance=self.attendance, vote=VOTE_FOR)
+        vote = Vote.objects.create(
+            agenda_item=agenda, attendance=self.attendance, vote=VOTE_FOR
+        )
         self.assertEqual(vote.vote_weight, Decimal("0.5"))
 
     def test_vote_attendance_must_match_meeting(self):
@@ -423,7 +453,9 @@ class VotingModelTests(TestCase):
             voting_method=QUORUM_TYPE_BY_SHARE,
             minimum_pass_percentage=Decimal("0.5"),
         )
-        Vote.objects.create(agenda_item=agenda, attendance=self.attendance, vote=VOTE_FOR)
+        Vote.objects.create(
+            agenda_item=agenda, attendance=self.attendance, vote=VOTE_FOR
+        )
         result = agenda.resolve_result()
         self.assertEqual(result, AGENDA_RESULT_APPROVED)
 
@@ -436,7 +468,9 @@ class VotingModelTests(TestCase):
             voting_method=QUORUM_TYPE_BY_SHARE,
             minimum_pass_percentage=Decimal("0.75"),
         )
-        Vote.objects.create(agenda_item=agenda, attendance=self.attendance, vote=VOTE_AGAINST)
+        Vote.objects.create(
+            agenda_item=agenda, attendance=self.attendance, vote=VOTE_AGAINST
+        )
         result = agenda.resolve_result(negative_form=True)
         self.assertEqual(result, AGENDA_RESULT_REJECTED)
 
@@ -467,7 +501,9 @@ class VotingModelTests(TestCase):
 
     def test_vote_session_finalize_uses_ballot_rows(self):
         self.meeting.start_meeting(started_at=timezone.now())
-        snapshot = MeetingOwnerSnapshot.objects.get(meeting=self.meeting, flat_owner=self.flat_owner)
+        snapshot = MeetingOwnerSnapshot.objects.get(
+            meeting=self.meeting, flat_owner=self.flat_owner
+        )
         MeetingAttendanceEvent.objects.create(
             owner_snapshot=snapshot,
             event_type=ATTENDANCE_EVENT_ARRIVAL,

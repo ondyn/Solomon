@@ -1,8 +1,6 @@
-from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import NetBoxModelFilterSetForm
-from utilities.forms.fields import DynamicModelChoiceField
 from utilities.forms.rendering import FieldSet
 
 from .models import AgendaItem, Meeting, MeetingAttendance, MeetingType, VoteWeightStyle
@@ -20,7 +18,9 @@ class MeetingFilterForm(NetBoxModelFilterSetForm):
 
 class AgendaItemFilterForm(NetBoxModelFilterSetForm):
     model = AgendaItem
-    fieldsets = (FieldSet("q", "meeting", "voting_method", "result", name=_("Filters")),)
+    fieldsets = (
+        FieldSet("q", "meeting", "voting_method", "result", name=_("Filters")),
+    )
 
 
 class MeetingAttendanceFilterForm(NetBoxModelFilterSetForm):
@@ -30,4 +30,8 @@ class MeetingAttendanceFilterForm(NetBoxModelFilterSetForm):
 
 class VoteWeightStyleFilterForm(NetBoxModelFilterSetForm):
     model = VoteWeightStyle
-    fieldsets = (FieldSet("voting_method", "weight_value", "label", "is_current", name=_("Filters")),)
+    fieldsets = (
+        FieldSet(
+            "voting_method", "weight_value", "label", "is_current", name=_("Filters")
+        ),
+    )

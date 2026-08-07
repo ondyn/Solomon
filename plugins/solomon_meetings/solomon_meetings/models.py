@@ -98,15 +98,22 @@ def build_holder_share_totals(ownerships):
                 continue
 
             holder_key = ("owner", ownership.owner_id)
-            share_fraction = Fraction(ownership.share_numerator, ownership.share_denominator)
+            share_fraction = Fraction(
+                ownership.share_numerator, ownership.share_denominator
+            )
         else:
             flat = flat_ownerships[0].flat
             holder_key = ("flat", flat_id)
             if flat.cuzk_share_numerator and flat.cuzk_share_denominator:
-                share_fraction = Fraction(flat.cuzk_share_numerator, flat.cuzk_share_denominator)
+                share_fraction = Fraction(
+                    flat.cuzk_share_numerator, flat.cuzk_share_denominator
+                )
             else:
                 share_fraction = sum(
-                    (Fraction(o.share_numerator, o.share_denominator) for o in flat_ownerships),
+                    (
+                        Fraction(o.share_numerator, o.share_denominator)
+                        for o in flat_ownerships
+                    ),
                     Fraction(0, 1),
                 )
 
@@ -121,6 +128,7 @@ def current_holder_share_totals(buildings=None):
         ownerships = ownerships.filter(flat__building__in=buildings)
 
     return build_holder_share_totals(ownerships.select_related("flat"))
+
 
 BALLOT_ROLE_FOR = "FOR"
 BALLOT_ROLE_AGAINST = "AGAINST"
@@ -216,7 +224,9 @@ class Meeting(NetBoxModel):
         verbose_name=_("Quorum threshold"),
         help_text=_("Decimal value from 0 to 1, e.g. 0.5 for 50%."),
     )
-    quorum_achieved = models.BooleanField(default=False, verbose_name=_("Quorum achieved"))
+    quorum_achieved = models.BooleanField(
+        default=False, verbose_name=_("Quorum achieved")
+    )
     quorum_updated_at = models.DateTimeField(
         null=True,
         blank=True,
@@ -231,7 +241,9 @@ class Meeting(NetBoxModel):
         verbose_name=_("Moderator"),
     )
     note = models.TextField(blank=True, verbose_name=_("Note"))
-    started_at = models.DateTimeField(null=True, blank=True, verbose_name=_("Started at"))
+    started_at = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("Started at")
+    )
     ended_at = models.DateTimeField(null=True, blank=True, verbose_name=_("Ended at"))
     phase = models.CharField(
         max_length=20,
@@ -274,25 +286,38 @@ class Meeting(NetBoxModel):
 
     @property
     def can_refresh_snapshots(self):
-        return self.phase != MEETING_PHASE_FINISHED and self.status != MEETING_STATUS_CLOSED
+        return (
+            self.phase != MEETING_PHASE_FINISHED
+            and self.status != MEETING_STATUS_CLOSED
+        )
 
     def clean(self):
         super().clean()
         if self.status == MEETING_STATUS_CLOSED and not self.quorum_achieved:
-            raise ValidationError({"status": _("Meeting cannot be closed before quorum is achieved.")})
+            raise ValidationError(
+                {"status": _("Meeting cannot be closed before quorum is achieved.")}
+            )
         if self.started_at and self.ended_at and self.ended_at <= self.started_at:
-            raise ValidationError({"ended_at": _("Meeting end must be after meeting start.")})
+            raise ValidationError(
+                {"ended_at": _("Meeting end must be after meeting start.")}
+            )
         if self.phase == MEETING_PHASE_PLANNING and self.started_at:
-            raise ValidationError({"phase": _("Planning meetings cannot already be started.")})
+            raise ValidationError(
+                {"phase": _("Planning meetings cannot already be started.")}
+            )
         if self.phase == MEETING_PHASE_FINISHED and not self.ended_at:
-            raise ValidationError({"phase": _("Finished meetings must have an end time.")})
+            raise ValidationError(
+                {"phase": _("Finished meetings must have an end time.")}
+            )
 
     def _active_attendance(self, at_time=None):
         if self.owner_snapshots.exists():
             queryset = self.owner_snapshots.all()
             if at_time is None:
                 return queryset.filter(is_currently_present=True)
-            return [snapshot for snapshot in queryset if snapshot.is_present_at(at_time)]
+            return [
+                snapshot for snapshot in queryset if snapshot.is_present_at(at_time)
+            ]
 
         queryset = self.attendances.filter(
             representation__in=[REPRESENTATION_PRESENT, REPRESENTATION_PROXY]
@@ -313,10 +338,14 @@ class Meeting(NetBoxModel):
             total_fraction = Fraction(0, 1)
             for snapshot in snapshots:
                 if snapshot.share_denominator:
-                    total_fraction += Fraction(snapshot.share_numerator, snapshot.share_denominator)
+                    total_fraction += Fraction(
+                        snapshot.share_numerator, snapshot.share_denominator
+                    )
             if total_fraction.denominator == 0:
                 return Decimal("0")
-            return Decimal(total_fraction.numerator) / Decimal(total_fraction.denominator)
+            return Decimal(total_fraction.numerator) / Decimal(
+                total_fraction.denominator
+            )
 
         buildings = self.buildings.all()
         active_ownerships = FlatOwner.objects.filter(
@@ -338,15 +367,22 @@ class Meeting(NetBoxModel):
                 ownership = flat_ownerships[0]
                 if not ownership.share_denominator:
                     continue
-                total_fraction += Fraction(ownership.share_numerator, ownership.share_denominator)
+                total_fraction += Fraction(
+                    ownership.share_numerator, ownership.share_denominator
+                )
                 continue
 
             flat = flat_ownerships[0].flat
             if flat.cuzk_share_numerator and flat.cuzk_share_denominator:
-                total_fraction += Fraction(flat.cuzk_share_numerator, flat.cuzk_share_denominator)
+                total_fraction += Fraction(
+                    flat.cuzk_share_numerator, flat.cuzk_share_denominator
+                )
             else:
                 total_fraction += sum(
-                    (Fraction(o.share_numerator, o.share_denominator) for o in flat_ownerships),
+                    (
+                        Fraction(o.share_numerator, o.share_denominator)
+                        for o in flat_ownerships
+                    ),
                     Fraction(0, 1),
                 )
 
@@ -356,7 +392,9 @@ class Meeting(NetBoxModel):
         attendance = self._active_attendance(at_time=at_time)
         if quorum_type == QUORUM_TYPE_BY_UNITS:
             if hasattr(attendance, "values"):
-                return Decimal(str(attendance.values("flat_owner__flat_id").distinct().count()))
+                return Decimal(
+                    str(attendance.values("flat_owner__flat_id").distinct().count())
+                )
             return Decimal(str(sum(snapshot.unit_count for snapshot in attendance)))
 
         # If attendance is built from owner snapshots, each row already carries
@@ -365,13 +403,19 @@ class Meeting(NetBoxModel):
             total_fraction = Fraction(0, 1)
             for snapshot in attendance:
                 if snapshot.share_denominator:
-                    total_fraction += Fraction(snapshot.share_numerator, snapshot.share_denominator)
-            return Decimal(total_fraction.numerator) / Decimal(total_fraction.denominator)
+                    total_fraction += Fraction(
+                        snapshot.share_numerator, snapshot.share_denominator
+                    )
+            return Decimal(total_fraction.numerator) / Decimal(
+                total_fraction.denominator
+            )
 
         total = Decimal("0")
         if hasattr(attendance, "select_related"):
             for record in attendance.select_related("flat_owner"):
-                total += Decimal(record.flat_owner.share_numerator) / Decimal(record.flat_owner.share_denominator)
+                total += Decimal(record.flat_owner.share_numerator) / Decimal(
+                    record.flat_owner.share_denominator
+                )
             return total
 
         for snapshot in attendance:
@@ -390,7 +434,9 @@ class Meeting(NetBoxModel):
         ratio = self.calculate_quorum_ratio(at_time=at_time)
         self.quorum_achieved = ratio >= self.quorum_threshold
         self.quorum_updated_at = timezone.now()
-        self.save(update_fields=["quorum_achieved", "quorum_updated_at", "last_updated"])
+        self.save(
+            update_fields=["quorum_achieved", "quorum_updated_at", "last_updated"]
+        )
         return ratio
 
     def get_present_weight(self, voting_method):
@@ -420,9 +466,13 @@ class Meeting(NetBoxModel):
     def finish_meeting(self, ended_at=None):
         ended_at = ended_at or timezone.now()
         if self.phase != MEETING_PHASE_IN_PROGRESS:
-            raise ValidationError({"phase": _("Only meetings in progress can be finished.")})
+            raise ValidationError(
+                {"phase": _("Only meetings in progress can be finished.")}
+            )
         if not self.quorum_achieved:
-            raise ValidationError({"quorum_achieved": _("Meeting cannot be finished without quorum.")})
+            raise ValidationError(
+                {"quorum_achieved": _("Meeting cannot be finished without quorum.")}
+            )
 
         self.ended_at = ended_at
         self.phase = MEETING_PHASE_FINISHED
@@ -433,7 +483,9 @@ class Meeting(NetBoxModel):
         started_at = started_at or timezone.now()
         if self.owner_snapshots.exists() and not refresh_existing:
             if not self.ballot_type_snapshots.exists():
-                self.snapshot_ballot_types(snapshot_taken_at=started_at, refresh_existing=True)
+                self.snapshot_ballot_types(
+                    snapshot_taken_at=started_at, refresh_existing=True
+                )
             return
 
         active_ownerships = (
@@ -442,7 +494,11 @@ class Meeting(NetBoxModel):
                 effective_to__isnull=True,
             )
             .select_related("owner", "flat")
-            .order_by("flat__building__house_number", "flat__flat_number", "owner__display_name")
+            .order_by(
+                "flat__building__house_number",
+                "flat__flat_number",
+                "owner__display_name",
+            )
         )
 
         # Group by flat: co-owners of the same flat become ONE voting unit
@@ -470,7 +526,10 @@ class Meeting(NetBoxModel):
                     share_den = flat.cuzk_share_denominator
                 else:
                     total = sum(
-                        (Fraction(o.share_numerator, o.share_denominator) for o in ownerships),
+                        (
+                            Fraction(o.share_numerator, o.share_denominator)
+                            for o in ownerships
+                        ),
                         Fraction(0, 1),
                     )
                     share_num = total.numerator
@@ -497,7 +556,9 @@ class Meeting(NetBoxModel):
 
             snapshot = None
             if refresh_existing:
-                snapshot = self.owner_snapshots.filter(flat_owner__flat_id=flat_id).first()
+                snapshot = self.owner_snapshots.filter(
+                    flat_owner__flat_id=flat_id
+                ).first()
 
             if snapshot is None:
                 snapshot, _ = MeetingOwnerSnapshot.objects.get_or_create(
@@ -537,7 +598,9 @@ class Meeting(NetBoxModel):
         if refresh_existing:
             self.owner_snapshots.exclude(pk__in=processed_snapshot_ids).delete()
 
-        self.snapshot_ballot_types(snapshot_taken_at=started_at, refresh_existing=refresh_existing)
+        self.snapshot_ballot_types(
+            snapshot_taken_at=started_at, refresh_existing=refresh_existing
+        )
 
         self.owner_snapshot_taken_at = started_at
         self.save(update_fields=["owner_snapshot_taken_at", "last_updated"])
@@ -553,11 +616,15 @@ class Meeting(NetBoxModel):
                 holder_key = ("flat", snapshot.flat_owner.flat_id)
             else:
                 holder_key = ("owner", snapshot.owner_id)
-            holder_totals[holder_key] += Fraction(snapshot.share_numerator, snapshot.share_denominator)
+            holder_totals[holder_key] += Fraction(
+                snapshot.share_numerator, snapshot.share_denominator
+            )
 
         share_fractions = sorted(set(holder_totals.values()))
         share_values = {
-            quantize_weight_fraction(share_fraction.numerator, share_fraction.denominator)
+            quantize_weight_fraction(
+                share_fraction.numerator, share_fraction.denominator
+            )
             for share_fraction in share_fractions
         }
         style_map = {
@@ -597,12 +664,16 @@ class Meeting(NetBoxModel):
 
         snapshot_style_map = {
             row["share_value"]: (row["ballot_label"], row["ballot_color"])
-            for row in self.ballot_type_snapshots.values("share_value", "ballot_label", "ballot_color")
+            for row in self.ballot_type_snapshots.values(
+                "share_value", "ballot_label", "ballot_color"
+            )
         }
 
         summaries = {}
         for holder_key, share_fraction in holder_totals.items():
-            share_value = quantize_weight_fraction(share_fraction.numerator, share_fraction.denominator)
+            share_value = quantize_weight_fraction(
+                share_fraction.numerator, share_fraction.denominator
+            )
             label, color = snapshot_style_map.get(share_value, ("", ""))
             if not label and not color:
                 style = VoteWeightStyle.objects.filter(
@@ -614,7 +685,11 @@ class Meeting(NetBoxModel):
                     color = style.color
 
             if share_value not in summaries:
-                scaled_num = share_fraction.numerator * common_denom // share_fraction.denominator
+                scaled_num = (
+                    share_fraction.numerator
+                    * common_denom
+                    // share_fraction.denominator
+                )
                 summaries[share_value] = {
                     "label": label,
                     "color": color,
@@ -644,7 +719,9 @@ class Meeting(NetBoxModel):
                 else:
                     holder_key = ("owner", snapshot.owner_id)
 
-                holder_totals[holder_key] += Fraction(snapshot.share_numerator, snapshot.share_denominator)
+                holder_totals[holder_key] += Fraction(
+                    snapshot.share_numerator, snapshot.share_denominator
+                )
                 if snapshot.is_present_at(reference_time):
                     holder_presence[holder_key] = True
 
@@ -664,8 +741,12 @@ class AgendaItem(NetBoxModel):
     order = models.PositiveIntegerField(default=1, verbose_name=_("Order"))
     title = models.CharField(max_length=255, verbose_name=_("Title"))
     description = models.TextField(blank=True, verbose_name=_("Description"))
-    presenter = models.CharField(max_length=255, blank=True, verbose_name=_("Presenter"))
-    voting_required = models.BooleanField(default=True, verbose_name=_("Voting required"))
+    presenter = models.CharField(
+        max_length=255, blank=True, verbose_name=_("Presenter")
+    )
+    voting_required = models.BooleanField(
+        default=True, verbose_name=_("Voting required")
+    )
     voting_method = models.CharField(
         max_length=20,
         choices=QUORUM_TYPE_CHOICES,
@@ -699,9 +780,7 @@ class AgendaItem(NetBoxModel):
         unique_together = [("meeting", "order")]
         verbose_name = _("Agenda item")
         verbose_name_plural = _("Agenda items")
-        permissions = (
-            ("run_voting_session", "Can create and update voting sessions"),
-        )
+        permissions = (("run_voting_session", "Can create and update voting sessions"),)
 
     def __str__(self):
         return f"{self.meeting.title} - {self.order}. {self.title}"
@@ -738,7 +817,10 @@ class AgendaItem(NetBoxModel):
         present_weight = self.meeting.get_present_weight(self.voting_method)
 
         if negative_form:
-            totals[VOTE_FOR] = max(Decimal("0"), present_weight - totals[VOTE_AGAINST] - totals[VOTE_ABSTAIN])
+            totals[VOTE_FOR] = max(
+                Decimal("0"),
+                present_weight - totals[VOTE_AGAINST] - totals[VOTE_ABSTAIN],
+            )
 
         if present_weight <= 0:
             self.result = AGENDA_RESULT_REJECTED
@@ -779,8 +861,12 @@ class MeetingAttendance(NetBoxModel):
         default=REPRESENTATION_PRESENT,
         verbose_name=_("Representation"),
     )
-    proxy_name = models.CharField(max_length=255, blank=True, verbose_name=_("Proxy name"))
-    arrived_at = models.DateTimeField(null=True, blank=True, verbose_name=_("Arrived at"))
+    proxy_name = models.CharField(
+        max_length=255, blank=True, verbose_name=_("Proxy name")
+    )
+    arrived_at = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("Arrived at")
+    )
     left_at = models.DateTimeField(null=True, blank=True, verbose_name=_("Left at"))
 
     class Meta:
@@ -793,7 +879,9 @@ class MeetingAttendance(NetBoxModel):
         return f"{self.owner} @ {self.meeting}"
 
     def get_absolute_url(self):
-        return reverse("plugins:solomon_meetings:meetingattendance", kwargs={"pk": self.pk})
+        return reverse(
+            "plugins:solomon_meetings:meetingattendance", kwargs={"pk": self.pk}
+        )
 
     @property
     def vote_weight_by_units(self):
@@ -801,19 +889,27 @@ class MeetingAttendance(NetBoxModel):
 
     @property
     def vote_weight_by_share(self):
-        return Decimal(self.flat_owner.share_numerator) / Decimal(self.flat_owner.share_denominator)
+        return Decimal(self.flat_owner.share_numerator) / Decimal(
+            self.flat_owner.share_denominator
+        )
 
     def clean(self):
         super().clean()
         if self.flat_owner.owner_id != self.owner_id:
-            raise ValidationError({"flat_owner": _("Flat ownership must belong to the selected owner.")})
+            raise ValidationError(
+                {"flat_owner": _("Flat ownership must belong to the selected owner.")}
+            )
         if self.representation == REPRESENTATION_PROXY and not self.proxy_name:
-            raise ValidationError({"proxy_name": _("Proxy name is required for proxy representation.")})
+            raise ValidationError(
+                {"proxy_name": _("Proxy name is required for proxy representation.")}
+            )
         if self.left_at and self.arrived_at and self.left_at <= self.arrived_at:
             raise ValidationError({"left_at": _("Left at must be after arrived at.")})
 
     def sync_snapshot(self):
-        snapshot = self.meeting.owner_snapshots.filter(flat_owner=self.flat_owner).first()
+        snapshot = self.meeting.owner_snapshots.filter(
+            flat_owner=self.flat_owner
+        ).first()
         if not snapshot:
             return
 
@@ -848,7 +944,9 @@ class VoteWeightStyle(NetBoxModel):
         default=QUORUM_TYPE_BY_SHARE,
         verbose_name=_("Voting method"),
     )
-    weight_value = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Weight value"))
+    weight_value = models.DecimalField(
+        max_digits=12, decimal_places=6, verbose_name=_("Weight value")
+    )
     weight_numerator = models.PositiveIntegerField(
         null=True,
         blank=True,
@@ -859,7 +957,11 @@ class VoteWeightStyle(NetBoxModel):
         blank=True,
         verbose_name=_("Weight denominator"),
     )
-    label = models.CharField(max_length=16, verbose_name=_("Label"), help_text=_("Display marker, e.g. 1, A, B."))
+    label = models.CharField(
+        max_length=16,
+        verbose_name=_("Label"),
+        help_text=_("Display marker, e.g. 1, A, B."),
+    )
     color = models.CharField(
         max_length=7,
         default="#1976D2",
@@ -874,7 +976,10 @@ class VoteWeightStyle(NetBoxModel):
 
     class Meta:
         ordering = ["voting_method", "weight_value"]
-        unique_together = [("voting_method", "weight_value"), ("voting_method", "label")]
+        unique_together = [
+            ("voting_method", "weight_value"),
+            ("voting_method", "label"),
+        ]
         verbose_name = _("Vote weight style")
         verbose_name_plural = _("Vote weight styles")
 
@@ -895,28 +1000,40 @@ class VoteWeightStyle(NetBoxModel):
         return f"{self.voting_method}: {self.weight_fraction} ({self.label})"
 
     def get_absolute_url(self):
-        return reverse("plugins:solomon_meetings:voteweightstyle", kwargs={"pk": self.pk})
+        return reverse(
+            "plugins:solomon_meetings:voteweightstyle", kwargs={"pk": self.pk}
+        )
 
     def clean(self):
         super().clean()
         if not self.pk:
             return
 
-        previous = VoteWeightStyle.objects.filter(pk=self.pk).values("is_current").first()
+        previous = (
+            VoteWeightStyle.objects.filter(pk=self.pk).values("is_current").first()
+        )
         if previous and not previous["is_current"]:
-            raise ValidationError(_("Historical vote styles are read-only and cannot be edited."))
+            raise ValidationError(
+                _("Historical vote styles are read-only and cannot be edited.")
+            )
 
     def save(self, *args, **kwargs):
         if self.pk:
-            previous = VoteWeightStyle.objects.filter(pk=self.pk).values("is_current").first()
+            previous = (
+                VoteWeightStyle.objects.filter(pk=self.pk).values("is_current").first()
+            )
             if previous and not previous["is_current"]:
-                raise ValidationError(_("Historical vote styles are read-only and cannot be edited."))
+                raise ValidationError(
+                    _("Historical vote styles are read-only and cannot be edited.")
+                )
         super().save(*args, **kwargs)
 
     @classmethod
     def _next_share_label(cls):
         index = 1
-        while cls.objects.filter(voting_method=QUORUM_TYPE_BY_SHARE, label=f"S{index}").exists():
+        while cls.objects.filter(
+            voting_method=QUORUM_TYPE_BY_SHARE, label=f"S{index}"
+        ).exists():
             index += 1
         return f"S{index}"
 
@@ -929,18 +1046,22 @@ class VoteWeightStyle(NetBoxModel):
             for fraction in fractions
         }
 
-        cls.objects.filter(voting_method=QUORUM_TYPE_BY_SHARE).exclude(weight_value__in=current_values).update(
-            is_current=False
-        )
+        cls.objects.filter(voting_method=QUORUM_TYPE_BY_SHARE).exclude(
+            weight_value__in=current_values
+        ).update(is_current=False)
         if current_values:
-            cls.objects.filter(voting_method=QUORUM_TYPE_BY_SHARE, weight_value__in=current_values).update(
-                is_current=True
-            )
+            cls.objects.filter(
+                voting_method=QUORUM_TYPE_BY_SHARE, weight_value__in=current_values
+            ).update(is_current=True)
 
         created = 0
         for fraction in fractions:
-            share_value = quantize_weight_fraction(fraction.numerator, fraction.denominator)
-            if cls.objects.filter(voting_method=QUORUM_TYPE_BY_SHARE, weight_value=share_value).exists():
+            share_value = quantize_weight_fraction(
+                fraction.numerator, fraction.denominator
+            )
+            if cls.objects.filter(
+                voting_method=QUORUM_TYPE_BY_SHARE, weight_value=share_value
+            ).exists():
                 continue
 
             cls.objects.create(
@@ -966,9 +1087,15 @@ class MeetingBallotTypeSnapshot(NetBoxModel):
     )
     share_numerator = models.PositiveIntegerField(verbose_name=_("Share numerator"))
     share_denominator = models.PositiveIntegerField(verbose_name=_("Share denominator"))
-    share_value = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Share value"))
-    ballot_label = models.CharField(max_length=32, blank=True, verbose_name=_("Ballot label"))
-    ballot_color = models.CharField(max_length=7, blank=True, verbose_name=_("Ballot color"))
+    share_value = models.DecimalField(
+        max_digits=12, decimal_places=6, verbose_name=_("Share value")
+    )
+    ballot_label = models.CharField(
+        max_length=32, blank=True, verbose_name=_("Ballot label")
+    )
+    ballot_color = models.CharField(
+        max_length=7, blank=True, verbose_name=_("Ballot color")
+    )
     snapshot_taken_at = models.DateTimeField(verbose_name=_("Snapshot taken at"))
 
     class Meta:
@@ -1005,25 +1132,43 @@ class MeetingOwnerSnapshot(NetBoxModel):
         related_name="meeting_owner_snapshots",
         verbose_name=_("Flat ownership"),
     )
-    owner_display_name = models.CharField(max_length=255, verbose_name=_("Owner display name"))
-    flat_label = models.CharField(max_length=255, blank=True, verbose_name=_("Flat label"))
+    owner_display_name = models.CharField(
+        max_length=255, verbose_name=_("Owner display name")
+    )
+    flat_label = models.CharField(
+        max_length=255, blank=True, verbose_name=_("Flat label")
+    )
     representation = models.CharField(
         max_length=10,
         choices=REPRESENTATION_CHOICES,
         default=REPRESENTATION_ABSENT,
         verbose_name=_("Representation"),
     )
-    proxy_name = models.CharField(max_length=255, blank=True, verbose_name=_("Proxy name"))
+    proxy_name = models.CharField(
+        max_length=255, blank=True, verbose_name=_("Proxy name")
+    )
     share_numerator = models.PositiveIntegerField(verbose_name=_("Share numerator"))
     share_denominator = models.PositiveIntegerField(verbose_name=_("Share denominator"))
-    share_value = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Share value"))
+    share_value = models.DecimalField(
+        max_digits=12, decimal_places=6, verbose_name=_("Share value")
+    )
     unit_count = models.PositiveIntegerField(default=1, verbose_name=_("Unit count"))
-    ballot_label = models.CharField(max_length=32, blank=True, verbose_name=_("Ballot label"))
-    ballot_color = models.CharField(max_length=7, blank=True, verbose_name=_("Ballot color"))
+    ballot_label = models.CharField(
+        max_length=32, blank=True, verbose_name=_("Ballot label")
+    )
+    ballot_color = models.CharField(
+        max_length=7, blank=True, verbose_name=_("Ballot color")
+    )
     snapshot_taken_at = models.DateTimeField(verbose_name=_("Snapshot taken at"))
-    first_arrived_at = models.DateTimeField(null=True, blank=True, verbose_name=_("First arrived at"))
-    last_left_at = models.DateTimeField(null=True, blank=True, verbose_name=_("Last left at"))
-    is_currently_present = models.BooleanField(default=False, verbose_name=_("Currently present"))
+    first_arrived_at = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("First arrived at")
+    )
+    last_left_at = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("Last left at")
+    )
+    is_currently_present = models.BooleanField(
+        default=False, verbose_name=_("Currently present")
+    )
 
     class Meta:
         ordering = ["meeting", "owner_display_name", "flat_label"]
@@ -1088,18 +1233,39 @@ class MeetingAttendanceEvent(NetBoxModel):
             .first()
         )
         if previous and previous.event_type == self.event_type:
-            raise ValidationError({"event_type": _("Attendance events must alternate arrival and departure.")})
+            raise ValidationError(
+                {
+                    "event_type": _(
+                        "Attendance events must alternate arrival and departure."
+                    )
+                }
+            )
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         ordered = list(self.owner_snapshot.events.order_by("event_time", "created"))
-        arrivals = [event.event_time for event in ordered if event.event_type == ATTENDANCE_EVENT_ARRIVAL]
-        departures = [event.event_time for event in ordered if event.event_type == ATTENDANCE_EVENT_DEPARTURE]
+        arrivals = [
+            event.event_time
+            for event in ordered
+            if event.event_type == ATTENDANCE_EVENT_ARRIVAL
+        ]
+        departures = [
+            event.event_time
+            for event in ordered
+            if event.event_type == ATTENDANCE_EVENT_DEPARTURE
+        ]
         self.owner_snapshot.first_arrived_at = arrivals[0] if arrivals else None
         self.owner_snapshot.last_left_at = departures[-1] if departures else None
-        self.owner_snapshot.is_currently_present = bool(ordered and ordered[-1].event_type == ATTENDANCE_EVENT_ARRIVAL)
+        self.owner_snapshot.is_currently_present = bool(
+            ordered and ordered[-1].event_type == ATTENDANCE_EVENT_ARRIVAL
+        )
         self.owner_snapshot.save(
-            update_fields=["first_arrived_at", "last_left_at", "is_currently_present", "last_updated"]
+            update_fields=[
+                "first_arrived_at",
+                "last_left_at",
+                "is_currently_present",
+                "last_updated",
+            ]
         )
         self.owner_snapshot.meeting.refresh_quorum(at_time=self.event_time)
 
@@ -1111,9 +1277,15 @@ class AgendaVoteSession(NetBoxModel):
         related_name="vote_sessions",
         verbose_name=_("Agenda item"),
     )
-    started_at = models.DateTimeField(default=timezone.now, verbose_name=_("Started at"))
-    completed_at = models.DateTimeField(null=True, blank=True, verbose_name=_("Completed at"))
-    negative_form = models.BooleanField(default=False, verbose_name=_("Negative form voting"))
+    started_at = models.DateTimeField(
+        default=timezone.now, verbose_name=_("Started at")
+    )
+    completed_at = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("Completed at")
+    )
+    negative_form = models.BooleanField(
+        default=False, verbose_name=_("Negative form voting")
+    )
     present_weight = models.DecimalField(
         max_digits=12,
         decimal_places=6,
@@ -1163,7 +1335,9 @@ class AgendaVoteSession(NetBoxModel):
         if self.negative_form:
             totals[BALLOT_ROLE_FOR] = max(
                 Decimal("0"),
-                self.present_weight - totals[BALLOT_ROLE_AGAINST] - totals[BALLOT_ROLE_ABSTAIN],
+                self.present_weight
+                - totals[BALLOT_ROLE_AGAINST]
+                - totals[BALLOT_ROLE_ABSTAIN],
             )
 
         if not self.quorum_met or self.present_weight <= 0:
@@ -1199,11 +1373,19 @@ class AgendaVoteBallot(NetBoxModel):
     )
     label = models.CharField(max_length=32, blank=True, verbose_name=_("Ballot label"))
     color = models.CharField(max_length=7, blank=True, verbose_name=_("Ballot color"))
-    share_value = models.DecimalField(max_digits=12, decimal_places=6, verbose_name=_("Share value"))
-    issued_count = models.PositiveIntegerField(default=0, verbose_name=_("Issued count"))
+    share_value = models.DecimalField(
+        max_digits=12, decimal_places=6, verbose_name=_("Share value")
+    )
+    issued_count = models.PositiveIntegerField(
+        default=0, verbose_name=_("Issued count")
+    )
     for_count = models.PositiveIntegerField(default=0, verbose_name=_("For count"))
-    against_count = models.PositiveIntegerField(default=0, verbose_name=_("Against count"))
-    abstain_count = models.PositiveIntegerField(default=0, verbose_name=_("Abstain count"))
+    against_count = models.PositiveIntegerField(
+        default=0, verbose_name=_("Against count")
+    )
+    abstain_count = models.PositiveIntegerField(
+        default=0, verbose_name=_("Abstain count")
+    )
 
     class Meta:
         ordering = ["session", "share_value", "label"]
@@ -1211,7 +1393,9 @@ class AgendaVoteBallot(NetBoxModel):
         verbose_name_plural = _("Agenda vote ballot rows")
 
     def __str__(self):
-        return _("{label} ({share})").format(label=self.label or _("Unlabeled"), share=self.share_value)
+        return _("{label} ({share})").format(
+            label=self.label or _("Unlabeled"), share=self.share_value
+        )
 
     def clean(self):
         super().clean()
@@ -1279,7 +1463,11 @@ class Vote(NetBoxModel):
         super().clean()
         if self.attendance.meeting_id != self.agenda_item.meeting_id:
             raise ValidationError(
-                {"attendance": _("Attendance must belong to the same meeting as agenda item.")}
+                {
+                    "attendance": _(
+                        "Attendance must belong to the same meeting as agenda item."
+                    )
+                }
             )
 
     def save(self, *args, **kwargs):
@@ -1307,9 +1495,13 @@ class MeetingMinutes(NetBoxModel):
         related_name="approved_minutes",
         verbose_name=_("Approved by"),
     )
-    approved_at = models.DateTimeField(null=True, blank=True, verbose_name=_("Approved at"))
+    approved_at = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("Approved at")
+    )
     cms_published = models.BooleanField(default=False, verbose_name=_("CMS published"))
-    cms_published_at = models.DateTimeField(null=True, blank=True, verbose_name=_("CMS published at"))
+    cms_published_at = models.DateTimeField(
+        null=True, blank=True, verbose_name=_("CMS published at")
+    )
 
     class Meta:
         ordering = ["-created"]
@@ -1320,7 +1512,9 @@ class MeetingMinutes(NetBoxModel):
         return _("Minutes for {meeting}").format(meeting=self.meeting)
 
     def get_absolute_url(self):
-        return reverse("plugins:solomon_meetings:meetingminutes", kwargs={"pk": self.pk})
+        return reverse(
+            "plugins:solomon_meetings:meetingminutes", kwargs={"pk": self.pk}
+        )
 
 
 class MeetingInvitation(NetBoxModel):
@@ -1352,7 +1546,11 @@ class MeetingInvitation(NetBoxModel):
         verbose_name_plural = _("Meeting invitations")
 
     def __str__(self):
-        return _("Invitation for {owner} ({meeting})").format(owner=self.owner, meeting=self.meeting)
+        return _("Invitation for {owner} ({meeting})").format(
+            owner=self.owner, meeting=self.meeting
+        )
 
     def get_absolute_url(self):
-        return reverse("plugins:solomon_meetings:meetinginvitation", kwargs={"pk": self.pk})
+        return reverse(
+            "plugins:solomon_meetings:meetinginvitation", kwargs={"pk": self.pk}
+        )

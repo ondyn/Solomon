@@ -16,7 +16,9 @@ def backfill_vote_weight_style_fractions(apps, schema_editor):
     FlatOwner = apps.get_model("solomon_property", "FlatOwner")
 
     exact_fraction_by_weight = {}
-    ownerships = FlatOwner.objects.filter(effective_to__isnull=True).select_related("flat")
+    ownerships = FlatOwner.objects.filter(effective_to__isnull=True).select_related(
+        "flat"
+    )
     flat_to_ownerships = defaultdict(list)
     for ownership in ownerships:
         flat_to_ownerships[ownership.flat_id].append(ownership)
@@ -35,7 +37,10 @@ def backfill_vote_weight_style_fractions(apps, schema_editor):
             denominator = flat.cuzk_share_denominator
         else:
             total = sum(
-                (Fraction(o.share_numerator, o.share_denominator) for o in flat_ownerships),
+                (
+                    Fraction(o.share_numerator, o.share_denominator)
+                    for o in flat_ownerships
+                ),
                 Fraction(0, 1),
             )
             numerator = total.numerator
@@ -57,7 +62,9 @@ def backfill_vote_weight_style_fractions(apps, schema_editor):
                 numerator = integral_value
                 denominator = 1
         else:
-            numerator, denominator = exact_fraction_by_weight.get(style.weight_value, (None, None))
+            numerator, denominator = exact_fraction_by_weight.get(
+                style.weight_value, (None, None)
+            )
 
         if not numerator or not denominator:
             fallback = Fraction(style.weight_value).limit_denominator(200000)
@@ -70,7 +77,6 @@ def backfill_vote_weight_style_fractions(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("solomon_meetings", "0002_meeting_workflow_rework"),
         ("solomon_property", "0002_convert_person_email_phone_to_arrays"),
@@ -80,12 +86,18 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="voteweightstyle",
             name="weight_denominator",
-            field=models.PositiveIntegerField(blank=True, null=True, verbose_name="Weight denominator"),
+            field=models.PositiveIntegerField(
+                blank=True, null=True, verbose_name="Weight denominator"
+            ),
         ),
         migrations.AddField(
             model_name="voteweightstyle",
             name="weight_numerator",
-            field=models.PositiveIntegerField(blank=True, null=True, verbose_name="Weight numerator"),
+            field=models.PositiveIntegerField(
+                blank=True, null=True, verbose_name="Weight numerator"
+            ),
         ),
-        migrations.RunPython(backfill_vote_weight_style_fractions, migrations.RunPython.noop),
+        migrations.RunPython(
+            backfill_vote_weight_style_fractions, migrations.RunPython.noop
+        ),
     ]

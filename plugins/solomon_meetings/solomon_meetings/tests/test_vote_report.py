@@ -21,7 +21,13 @@ from solomon_meetings.models import (
     VOTE_FOR,
 )
 from solomon_meetings.views import MeetingView
-from solomon_property.models import Building, BuildingObject, Flat, FlatOwner, PropertyOwner
+from solomon_property.models import (
+    Building,
+    BuildingObject,
+    Flat,
+    FlatOwner,
+    PropertyOwner,
+)
 
 
 REPORT_BALLOTS = [
@@ -43,7 +49,9 @@ REPORT_BALLOTS = [
 class MeetingReportSpreadsheetTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="moderator")
-        self.building_object = BuildingObject.objects.create(name="Report Building Object")
+        self.building_object = BuildingObject.objects.create(
+            name="Report Building Object"
+        )
         self.building = Building.objects.create(
             building_object=self.building_object,
             name="Report Building",
@@ -71,7 +79,9 @@ class MeetingReportSpreadsheetTests(TestCase):
 
     def _create_report_fixtures(self):
         groups = {}
-        for index, (label, color, share_value, total_count, present_count) in enumerate(REPORT_BALLOTS, start=1):
+        for index, (label, color, share_value, total_count, present_count) in enumerate(
+            REPORT_BALLOTS, start=1
+        ):
             VoteWeightStyle.objects.create(
                 voting_method=QUORUM_TYPE_BY_SHARE,
                 weight_value=share_value,
@@ -190,10 +200,14 @@ class MeetingReportSpreadsheetTests(TestCase):
             quorum_threshold=Decimal("0.5"),
         )
 
-    def test_report_fixture_matches_share_summary_and_recomputes_after_extra_attendance(self):
+    def test_report_fixture_matches_share_summary_and_recomputes_after_extra_attendance(
+        self,
+    ):
         agenda_item = self._agenda_item("Report resolution")
 
-        first_session = self._record_vote_session(agenda_item, self._ballot_rows_from_counts())
+        first_session = self._record_vote_session(
+            agenda_item, self._ballot_rows_from_counts()
+        )
         context = self._meeting_context()
         rows_by_label = {row["label"]: row for row in context["ballot_type_summary"]}
 
@@ -201,7 +215,9 @@ class MeetingReportSpreadsheetTests(TestCase):
         self.assertEqual(context["total_count"], 82)
         self.assertEqual(context["present_share"], "39155/1000")
         self.assertEqual(context["total_share"], "54534/1000")
-        self.assertEqual(context["quorum_ratio_percent"].quantize(Decimal("0.01")), Decimal("71.80"))
+        self.assertEqual(
+            context["quorum_ratio_percent"].quantize(Decimal("0.01")), Decimal("71.80")
+        )
         self.assertEqual(rows_by_label["Bílá"]["owner_count"], 29)
         self.assertEqual(rows_by_label["Bílá"]["issued_count"], 20)
         self.assertEqual(rows_by_label["Červená"]["owner_count"], 6)
@@ -214,10 +230,17 @@ class MeetingReportSpreadsheetTests(TestCase):
         latest_session = context["agenda_items"][0].latest_vote_session
         self.assertIsNotNone(latest_session)
         self.assertEqual(latest_session.present_weight, Decimal("39.155000"))
-        self.assertEqual(context["agenda_items"][0].latest_vote_percentages["for"].quantize(Decimal("0.01")), Decimal("100.00"))
+        self.assertEqual(
+            context["agenda_items"][0]
+            .latest_vote_percentages["for"]
+            .quantize(Decimal("0.01")),
+            Decimal("100.00"),
+        )
 
         white_group = self.groups["Bílá"]
-        extra_owner, extra_flat_owner = white_group["holders"][white_group["present_count"]]
+        extra_owner, extra_flat_owner = white_group["holders"][
+            white_group["present_count"]
+        ]
         MeetingAttendance.objects.create(
             meeting=self.meeting,
             owner=extra_owner,
@@ -235,7 +258,9 @@ class MeetingReportSpreadsheetTests(TestCase):
         self.assertEqual(context["total_count"], 82)
         self.assertEqual(context["present_share"], "39934/1000")
         self.assertEqual(context["total_share"], "54534/1000")
-        self.assertEqual(context["quorum_ratio_percent"].quantize(Decimal("0.01")), Decimal("73.23"))
+        self.assertEqual(
+            context["quorum_ratio_percent"].quantize(Decimal("0.01")), Decimal("73.23")
+        )
         self.assertEqual(rows_by_label["Bílá"]["issued_count"], 21)
 
         self.assertEqual(second_session.present_weight, Decimal("39.934000"))
@@ -245,7 +270,12 @@ class MeetingReportSpreadsheetTests(TestCase):
         latest_session = context["agenda_items"][0].latest_vote_session
         self.assertIsNotNone(latest_session)
         self.assertEqual(latest_session.present_weight, Decimal("39.934000"))
-        self.assertEqual(context["agenda_items"][0].latest_vote_percentages["for"].quantize(Decimal("0.01")), Decimal("100.00"))
+        self.assertEqual(
+            context["agenda_items"][0]
+            .latest_vote_percentages["for"]
+            .quantize(Decimal("0.01")),
+            Decimal("100.00"),
+        )
 
     def test_negative_form_session_reconstructs_for_votes_from_remainder(self):
         agenda_item = self._agenda_item("Negative form resolution")
@@ -308,6 +338,8 @@ class MeetingReportSpreadsheetTests(TestCase):
             quorum_threshold=Decimal("0.5"),
         )
 
-        vote = Vote.objects.create(agenda_item=agenda_item, attendance=attendance, vote=VOTE_FOR)
+        vote = Vote.objects.create(
+            agenda_item=agenda_item, attendance=attendance, vote=VOTE_FOR
+        )
 
         self.assertEqual(vote.vote_weight, Decimal("1"))

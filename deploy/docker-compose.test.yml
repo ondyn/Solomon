@@ -1,0 +1,8 @@
+services:
+  netbox:
+    image: solomon-netbox:production-check
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      args:
+        NETBOX_VERSION: ${NETBOX_VERSION}

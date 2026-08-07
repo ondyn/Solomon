@@ -1,0 +1,16 @@
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  plugins:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare test environment
+        run: cp .env.example .env
+      - name: Lint, format, build, and test
+        run: sh deploy/check.sh

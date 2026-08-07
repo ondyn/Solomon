@@ -11,198 +11,467 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('extras', '0134_owner'),
-        ('solomon_property', '0002_convert_person_email_phone_to_arrays'),
+        ("extras", "0134_owner"),
+        ("solomon_property", "0002_convert_person_email_phone_to_arrays"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Meeting',
+            name="Meeting",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('custom_field_data', models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
-                ('title', models.CharField(max_length=255)),
-                ('date_time', models.DateTimeField()),
-                ('location', models.CharField(blank=True, max_length=255)),
-                ('status', models.CharField(default='PLANNED', max_length=20)),
-                ('quorum_threshold', models.DecimalField(decimal_places=4, default=Decimal('0.5000'), max_digits=5, validators=[django.core.validators.MinValueValidator(Decimal('0')), django.core.validators.MaxValueValidator(Decimal('1'))])),
-                ('quorum_achieved', models.BooleanField(default=False)),
-                ('quorum_updated_at', models.DateTimeField(blank=True, null=True)),
-                ('note', models.TextField(blank=True)),
-                ('buildings', models.ManyToManyField(related_name='meetings', to='solomon_property.building')),
-                ('moderator', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='moderated_meetings', to=settings.AUTH_USER_MODEL)),
-                ('tags', taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, null=True)),
+                ("last_updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "custom_field_data",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("date_time", models.DateTimeField()),
+                ("location", models.CharField(blank=True, max_length=255)),
+                ("status", models.CharField(default="PLANNED", max_length=20)),
+                (
+                    "quorum_threshold",
+                    models.DecimalField(
+                        decimal_places=4,
+                        default=Decimal("0.5000"),
+                        max_digits=5,
+                        validators=[
+                            django.core.validators.MinValueValidator(Decimal("0")),
+                            django.core.validators.MaxValueValidator(Decimal("1")),
+                        ],
+                    ),
+                ),
+                ("quorum_achieved", models.BooleanField(default=False)),
+                ("quorum_updated_at", models.DateTimeField(blank=True, null=True)),
+                ("note", models.TextField(blank=True)),
+                (
+                    "buildings",
+                    models.ManyToManyField(
+                        related_name="meetings", to="solomon_property.building"
+                    ),
+                ),
+                (
+                    "moderator",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="moderated_meetings",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Meeting',
-                'verbose_name_plural': 'Meetings',
-                'ordering': ['-date_time', 'title'],
+                "verbose_name": "Meeting",
+                "verbose_name_plural": "Meetings",
+                "ordering": ["-date_time", "title"],
             },
             bases=(netbox.models.deletion.DeleteMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='AgendaItem',
+            name="AgendaItem",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('custom_field_data', models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
-                ('order', models.PositiveIntegerField(default=1)),
-                ('title', models.CharField(max_length=255)),
-                ('description', models.TextField(blank=True)),
-                ('voting_required', models.BooleanField(default=True)),
-                ('voting_method', models.CharField(default='BY_SHARE', max_length=20)),
-                ('minimum_pass_percentage', models.DecimalField(decimal_places=4, default=Decimal('0.5000'), max_digits=5, validators=[django.core.validators.MinValueValidator(Decimal('0')), django.core.validators.MaxValueValidator(Decimal('1'))])),
-                ('result', models.CharField(default='N/A', max_length=20)),
-                ('tags', taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag')),
-                ('meeting', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='agenda_items', to='solomon_meetings.meeting')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, null=True)),
+                ("last_updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "custom_field_data",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
+                ),
+                ("order", models.PositiveIntegerField(default=1)),
+                ("title", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True)),
+                ("voting_required", models.BooleanField(default=True)),
+                ("voting_method", models.CharField(default="BY_SHARE", max_length=20)),
+                (
+                    "minimum_pass_percentage",
+                    models.DecimalField(
+                        decimal_places=4,
+                        default=Decimal("0.5000"),
+                        max_digits=5,
+                        validators=[
+                            django.core.validators.MinValueValidator(Decimal("0")),
+                            django.core.validators.MaxValueValidator(Decimal("1")),
+                        ],
+                    ),
+                ),
+                ("result", models.CharField(default="N/A", max_length=20)),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
+                (
+                    "meeting",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="agenda_items",
+                        to="solomon_meetings.meeting",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Agenda item',
-                'verbose_name_plural': 'Agenda items',
-                'ordering': ['meeting', 'order', 'title'],
-                'unique_together': {('meeting', 'order')},
+                "verbose_name": "Agenda item",
+                "verbose_name_plural": "Agenda items",
+                "ordering": ["meeting", "order", "title"],
+                "unique_together": {("meeting", "order")},
             },
             bases=(netbox.models.deletion.DeleteMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='MeetingAttendance',
+            name="MeetingAttendance",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('custom_field_data', models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
-                ('representation', models.CharField(default='PRESENT', max_length=10)),
-                ('proxy_name', models.CharField(blank=True, max_length=255)),
-                ('arrived_at', models.DateTimeField(blank=True, null=True)),
-                ('left_at', models.DateTimeField(blank=True, null=True)),
-                ('flat_owner', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='meeting_attendances', to='solomon_property.flatowner')),
-                ('meeting', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='attendances', to='solomon_meetings.meeting')),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='meeting_attendances', to='solomon_property.propertyowner')),
-                ('tags', taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, null=True)),
+                ("last_updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "custom_field_data",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
+                ),
+                ("representation", models.CharField(default="PRESENT", max_length=10)),
+                ("proxy_name", models.CharField(blank=True, max_length=255)),
+                ("arrived_at", models.DateTimeField(blank=True, null=True)),
+                ("left_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "flat_owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="meeting_attendances",
+                        to="solomon_property.flatowner",
+                    ),
+                ),
+                (
+                    "meeting",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="attendances",
+                        to="solomon_meetings.meeting",
+                    ),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="meeting_attendances",
+                        to="solomon_property.propertyowner",
+                    ),
+                ),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Meeting attendance',
-                'verbose_name_plural': 'Meeting attendances',
-                'ordering': ['meeting', 'owner'],
-                'unique_together': {('meeting', 'flat_owner')},
+                "verbose_name": "Meeting attendance",
+                "verbose_name_plural": "Meeting attendances",
+                "ordering": ["meeting", "owner"],
+                "unique_together": {("meeting", "flat_owner")},
             },
             bases=(netbox.models.deletion.DeleteMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='MeetingMinutes',
+            name="MeetingMinutes",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('custom_field_data', models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
-                ('content', models.TextField()),
-                ('approved_at', models.DateTimeField(blank=True, null=True)),
-                ('cms_published', models.BooleanField(default=False)),
-                ('cms_published_at', models.DateTimeField(blank=True, null=True)),
-                ('approved_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='approved_minutes', to=settings.AUTH_USER_MODEL)),
-                ('meeting', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='minutes', to='solomon_meetings.meeting')),
-                ('tags', taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, null=True)),
+                ("last_updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "custom_field_data",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
+                ),
+                ("content", models.TextField()),
+                ("approved_at", models.DateTimeField(blank=True, null=True)),
+                ("cms_published", models.BooleanField(default=False)),
+                ("cms_published_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "approved_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="approved_minutes",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "meeting",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="minutes",
+                        to="solomon_meetings.meeting",
+                    ),
+                ),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Meeting minutes',
-                'verbose_name_plural': 'Meeting minutes',
-                'ordering': ['-created'],
+                "verbose_name": "Meeting minutes",
+                "verbose_name_plural": "Meeting minutes",
+                "ordering": ["-created"],
             },
             bases=(netbox.models.deletion.DeleteMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='MeetingType',
+            name="MeetingType",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('custom_field_data', models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
-                ('name', models.CharField(max_length=200, unique=True)),
-                ('quorum_type', models.CharField(default='BY_SHARE', max_length=20)),
-                ('default_quorum_threshold', models.DecimalField(decimal_places=4, default=Decimal('0.5000'), max_digits=5, validators=[django.core.validators.MinValueValidator(Decimal('0')), django.core.validators.MaxValueValidator(Decimal('1'))])),
-                ('tags', taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, null=True)),
+                ("last_updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "custom_field_data",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
+                ),
+                ("name", models.CharField(max_length=200, unique=True)),
+                ("quorum_type", models.CharField(default="BY_SHARE", max_length=20)),
+                (
+                    "default_quorum_threshold",
+                    models.DecimalField(
+                        decimal_places=4,
+                        default=Decimal("0.5000"),
+                        max_digits=5,
+                        validators=[
+                            django.core.validators.MinValueValidator(Decimal("0")),
+                            django.core.validators.MaxValueValidator(Decimal("1")),
+                        ],
+                    ),
+                ),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Meeting type',
-                'verbose_name_plural': 'Meeting types',
-                'ordering': ['name'],
+                "verbose_name": "Meeting type",
+                "verbose_name_plural": "Meeting types",
+                "ordering": ["name"],
             },
             bases=(netbox.models.deletion.DeleteMixin, models.Model),
         ),
         migrations.AddField(
-            model_name='meeting',
-            name='meeting_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='meetings', to='solomon_meetings.meetingtype'),
+            model_name="meeting",
+            name="meeting_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="meetings",
+                to="solomon_meetings.meetingtype",
+            ),
         ),
         migrations.CreateModel(
-            name='MeetingInvitation',
+            name="MeetingInvitation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('custom_field_data', models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
-                ('sent_at', models.DateTimeField(blank=True, null=True)),
-                ('delivery_method', models.CharField(default='EMAIL', max_length=20)),
-                ('confirmed', models.BooleanField(default=False)),
-                ('meeting', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='invitations', to='solomon_meetings.meeting')),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='meeting_invitations', to='solomon_property.propertyowner')),
-                ('tags', taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, null=True)),
+                ("last_updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "custom_field_data",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
+                ),
+                ("sent_at", models.DateTimeField(blank=True, null=True)),
+                ("delivery_method", models.CharField(default="EMAIL", max_length=20)),
+                ("confirmed", models.BooleanField(default=False)),
+                (
+                    "meeting",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="invitations",
+                        to="solomon_meetings.meeting",
+                    ),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="meeting_invitations",
+                        to="solomon_property.propertyowner",
+                    ),
+                ),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Meeting invitation',
-                'verbose_name_plural': 'Meeting invitations',
-                'ordering': ['meeting', 'owner'],
-                'unique_together': {('meeting', 'owner')},
+                "verbose_name": "Meeting invitation",
+                "verbose_name_plural": "Meeting invitations",
+                "ordering": ["meeting", "owner"],
+                "unique_together": {("meeting", "owner")},
             },
             bases=(netbox.models.deletion.DeleteMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='Vote',
+            name="Vote",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('custom_field_data', models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
-                ('vote', models.CharField(max_length=10)),
-                ('vote_weight', models.DecimalField(decimal_places=6, default=Decimal('0'), editable=False, max_digits=12)),
-                ('agenda_item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='votes', to='solomon_meetings.agendaitem')),
-                ('attendance', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='votes', to='solomon_meetings.meetingattendance')),
-                ('tags', taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, null=True)),
+                ("last_updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "custom_field_data",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
+                ),
+                ("vote", models.CharField(max_length=10)),
+                (
+                    "vote_weight",
+                    models.DecimalField(
+                        decimal_places=6,
+                        default=Decimal("0"),
+                        editable=False,
+                        max_digits=12,
+                    ),
+                ),
+                (
+                    "agenda_item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="votes",
+                        to="solomon_meetings.agendaitem",
+                    ),
+                ),
+                (
+                    "attendance",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="votes",
+                        to="solomon_meetings.meetingattendance",
+                    ),
+                ),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Vote',
-                'verbose_name_plural': 'Votes',
-                'ordering': ['agenda_item', 'attendance'],
-                'unique_together': {('agenda_item', 'attendance')},
+                "verbose_name": "Vote",
+                "verbose_name_plural": "Votes",
+                "ordering": ["agenda_item", "attendance"],
+                "unique_together": {("agenda_item", "attendance")},
             },
             bases=(netbox.models.deletion.DeleteMixin, models.Model),
         ),
         migrations.CreateModel(
-            name='VoteWeightStyle',
+            name="VoteWeightStyle",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True, null=True)),
-                ('last_updated', models.DateTimeField(auto_now=True, null=True)),
-                ('custom_field_data', models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
-                ('voting_method', models.CharField(default='BY_SHARE', max_length=20)),
-                ('weight_value', models.DecimalField(decimal_places=6, max_digits=12)),
-                ('label', models.CharField(max_length=16)),
-                ('color', models.CharField(default='#1976D2', max_length=7)),
-                ('tags', taggit.managers.TaggableManager(through='extras.TaggedItem', to='extras.Tag')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True, null=True)),
+                ("last_updated", models.DateTimeField(auto_now=True, null=True)),
+                (
+                    "custom_field_data",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
+                ),
+                ("voting_method", models.CharField(default="BY_SHARE", max_length=20)),
+                ("weight_value", models.DecimalField(decimal_places=6, max_digits=12)),
+                ("label", models.CharField(max_length=16)),
+                ("color", models.CharField(default="#1976D2", max_length=7)),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Vote weight style',
-                'verbose_name_plural': 'Vote weight styles',
-                'ordering': ['voting_method', 'weight_value'],
-                'unique_together': {('voting_method', 'label'), ('voting_method', 'weight_value')},
+                "verbose_name": "Vote weight style",
+                "verbose_name_plural": "Vote weight styles",
+                "ordering": ["voting_method", "weight_value"],
+                "unique_together": {
+                    ("voting_method", "label"),
+                    ("voting_method", "weight_value"),
+                },
             },
             bases=(netbox.models.deletion.DeleteMixin, models.Model),
         ),

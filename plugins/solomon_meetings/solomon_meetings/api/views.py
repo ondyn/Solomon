@@ -37,19 +37,25 @@ class AgendaItemViewSet(NetBoxModelViewSet):
 
 
 class MeetingAttendanceViewSet(NetBoxModelViewSet):
-    queryset = models.MeetingAttendance.objects.select_related("meeting", "owner", "flat_owner")
+    queryset = models.MeetingAttendance.objects.select_related(
+        "meeting", "owner", "flat_owner"
+    )
     serializer_class = MeetingAttendanceSerializer
     filterset_class = filtersets.MeetingAttendanceFilterSet
 
 
 class MeetingOwnerSnapshotViewSet(NetBoxModelViewSet):
-    queryset = models.MeetingOwnerSnapshot.objects.select_related("meeting", "owner", "flat_owner")
+    queryset = models.MeetingOwnerSnapshot.objects.select_related(
+        "meeting", "owner", "flat_owner"
+    )
     serializer_class = MeetingOwnerSnapshotSerializer
     filterset_class = filtersets.MeetingOwnerSnapshotFilterSet
 
 
 class MeetingAttendanceEventViewSet(NetBoxModelViewSet):
-    queryset = models.MeetingAttendanceEvent.objects.select_related("owner_snapshot", "owner_snapshot__meeting")
+    queryset = models.MeetingAttendanceEvent.objects.select_related(
+        "owner_snapshot", "owner_snapshot__meeting"
+    )
     serializer_class = MeetingAttendanceEventSerializer
     filterset_class = filtersets.MeetingAttendanceEventFilterSet
 
@@ -67,13 +73,17 @@ class VoteWeightStyleViewSet(NetBoxModelViewSet):
 
 
 class AgendaVoteSessionViewSet(NetBoxModelViewSet):
-    queryset = models.AgendaVoteSession.objects.select_related("agenda_item", "agenda_item__meeting")
+    queryset = models.AgendaVoteSession.objects.select_related(
+        "agenda_item", "agenda_item__meeting"
+    )
     serializer_class = AgendaVoteSessionSerializer
     filterset_class = filtersets.AgendaVoteSessionFilterSet
 
 
 class AgendaVoteBallotViewSet(NetBoxModelViewSet):
-    queryset = models.AgendaVoteBallot.objects.select_related("session", "session__agenda_item")
+    queryset = models.AgendaVoteBallot.objects.select_related(
+        "session", "session__agenda_item"
+    )
     serializer_class = AgendaVoteBallotSerializer
     filterset_class = filtersets.AgendaVoteBallotFilterSet
 

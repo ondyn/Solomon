@@ -8,7 +8,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("solomon_meetings", "0007_model_permissions"),
     ]
@@ -26,19 +25,52 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="MeetingBallotTypeSnapshot",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
                 ("created", models.DateTimeField(auto_now_add=True, null=True)),
                 ("last_updated", models.DateTimeField(auto_now=True, null=True)),
                 (
                     "custom_field_data",
-                    models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder),
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
                 ),
-                ("share_numerator", models.PositiveIntegerField(verbose_name="Share numerator")),
-                ("share_denominator", models.PositiveIntegerField(verbose_name="Share denominator")),
-                ("share_value", models.DecimalField(decimal_places=6, max_digits=12, verbose_name="Share value")),
-                ("ballot_label", models.CharField(blank=True, max_length=32, verbose_name="Ballot label")),
-                ("ballot_color", models.CharField(blank=True, max_length=7, verbose_name="Ballot color")),
-                ("snapshot_taken_at", models.DateTimeField(verbose_name="Snapshot taken at")),
+                (
+                    "share_numerator",
+                    models.PositiveIntegerField(verbose_name="Share numerator"),
+                ),
+                (
+                    "share_denominator",
+                    models.PositiveIntegerField(verbose_name="Share denominator"),
+                ),
+                (
+                    "share_value",
+                    models.DecimalField(
+                        decimal_places=6, max_digits=12, verbose_name="Share value"
+                    ),
+                ),
+                (
+                    "ballot_label",
+                    models.CharField(
+                        blank=True, max_length=32, verbose_name="Ballot label"
+                    ),
+                ),
+                (
+                    "ballot_color",
+                    models.CharField(
+                        blank=True, max_length=7, verbose_name="Ballot color"
+                    ),
+                ),
+                (
+                    "snapshot_taken_at",
+                    models.DateTimeField(verbose_name="Snapshot taken at"),
+                ),
                 (
                     "meeting",
                     models.ForeignKey(
@@ -48,7 +80,12 @@ class Migration(migrations.Migration):
                         verbose_name="Meeting",
                     ),
                 ),
-                ("tags", taggit.managers.TaggableManager(through="extras.TaggedItem", to="extras.Tag")),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
                 "verbose_name": "Meeting ballot type snapshot",

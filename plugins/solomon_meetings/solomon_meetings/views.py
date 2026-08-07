@@ -19,7 +19,9 @@ from . import filterforms, filtersets, forms, models, tables
 
 
 def get_meeting_tab_url(meeting, tab_name):
-    return reverse(f"plugins:solomon_meetings:meeting_{tab_name}", kwargs={"pk": meeting.pk})
+    return reverse(
+        f"plugins:solomon_meetings:meeting_{tab_name}", kwargs={"pk": meeting.pk}
+    )
 
 
 class MeetingTypeListView(generic.ObjectListView):
@@ -55,7 +57,9 @@ class MeetingListView(generic.ObjectListView):
 
 
 class MeetingView(generic.ObjectView):
-    queryset = models.Meeting.objects.select_related("meeting_type", "moderator").prefetch_related("buildings")
+    queryset = models.Meeting.objects.select_related(
+        "meeting_type", "moderator"
+    ).prefetch_related("buildings")
     active_tab = "meeting"
 
     @staticmethod
@@ -65,7 +69,7 @@ class MeetingView(generic.ObjectView):
             return 0, 1
 
         common_denominator = valid_pairs[0][1]
-        for _, denominator in valid_pairs[1:]:
+        for _numerator, denominator in valid_pairs[1:]:
             common_denominator = models.lcm(common_denominator, denominator)
 
         numerator = sum(num * common_denominator // den for num, den in valid_pairs)
@@ -100,10 +104,24 @@ class MeetingView(generic.ObjectView):
                 ]
             )
 
-            first_arrivals = [snapshot.first_arrived_at for snapshot in owner_snapshots if snapshot.first_arrived_at]
-            last_departures = [snapshot.last_left_at for snapshot in owner_snapshots if snapshot.last_left_at]
-            flat_labels = [snapshot.flat_label for snapshot in owner_snapshots if snapshot.flat_label]
-            combined_share_value = models.quantize_weight_fraction(share_numerator, share_denominator)
+            first_arrivals = [
+                snapshot.first_arrived_at
+                for snapshot in owner_snapshots
+                if snapshot.first_arrived_at
+            ]
+            last_departures = [
+                snapshot.last_left_at
+                for snapshot in owner_snapshots
+                if snapshot.last_left_at
+            ]
+            flat_labels = [
+                snapshot.flat_label
+                for snapshot in owner_snapshots
+                if snapshot.flat_label
+            ]
+            combined_share_value = models.quantize_weight_fraction(
+                share_numerator, share_denominator
+            )
             ballot_label, ballot_color = style_map.get(combined_share_value, ("", ""))
             if not ballot_label and not ballot_color:
                 ballot_options = {
@@ -129,7 +147,9 @@ class MeetingView(generic.ObjectView):
                     "share_value": combined_share_value,
                     "ballot_label": ballot_label,
                     "ballot_color": ballot_color,
-                    "is_currently_present": any(snapshot.is_currently_present for snapshot in owner_snapshots),
+                    "is_currently_present": any(
+                        snapshot.is_currently_present for snapshot in owner_snapshots
+                    ),
                     "first_arrived_at": min(first_arrivals) if first_arrivals else None,
                     "last_left_at": max(last_departures) if last_departures else None,
                     "event_snapshot_id": owner_snapshots[0].pk,
@@ -140,7 +160,11 @@ class MeetingView(generic.ObjectView):
         return rows
 
     def get_extra_context(self, request, instance):
-        snapshots = list(instance.owner_snapshots.select_related("owner", "flat_owner").prefetch_related("events"))
+        snapshots = list(
+            instance.owner_snapshots.select_related(
+                "owner", "flat_owner"
+            ).prefetch_related("events")
+        )
         attendance_rows = self._build_attendance_rows(instance, snapshots)
         agenda_items = list(instance.agenda_items.all().order_by("order", "title"))
 
@@ -159,32 +183,46 @@ class MeetingView(generic.ObjectView):
                 for row in attendance_rows
             ]
         )
-        present_share_ratio = self._fraction_to_decimal(present_share_numerator, present_share_denominator)
+        present_share_ratio = self._fraction_to_decimal(
+            present_share_numerator, present_share_denominator
+        )
         attendance_threshold_checks = [
             {
                 "label": _("50%% of shares present"),
                 "threshold": instance.meeting_type.attendance_threshold_50,
-                "threshold_percent": instance.meeting_type.attendance_threshold_50 * Decimal("100"),
-                "is_met": present_share_ratio >= instance.meeting_type.attendance_threshold_50,
+                "threshold_percent": instance.meeting_type.attendance_threshold_50
+                * Decimal("100"),
+                "is_met": present_share_ratio
+                >= instance.meeting_type.attendance_threshold_50,
             },
             {
                 "label": _("2/3 of shares present"),
                 "threshold": instance.meeting_type.attendance_threshold_two_thirds,
-                "threshold_percent": instance.meeting_type.attendance_threshold_two_thirds * Decimal("100"),
-                "is_met": present_share_ratio >= instance.meeting_type.attendance_threshold_two_thirds,
+                "threshold_percent": instance.meeting_type.attendance_threshold_two_thirds
+                * Decimal("100"),
+                "is_met": present_share_ratio
+                >= instance.meeting_type.attendance_threshold_two_thirds,
             },
         ]
 
         for agenda_item in agenda_items:
-            agenda_item.latest_vote_session = agenda_item.vote_sessions.order_by("-created").first()
+            agenda_item.latest_vote_session = agenda_item.vote_sessions.order_by(
+                "-created"
+            ).first()
             agenda_item.latest_vote_percentages = None
-            if agenda_item.latest_vote_session and agenda_item.latest_vote_session.present_weight > 0:
+            if (
+                agenda_item.latest_vote_session
+                and agenda_item.latest_vote_session.present_weight > 0
+            ):
                 totals = agenda_item.latest_vote_session.totals_by_role()
                 present_weight = agenda_item.latest_vote_session.present_weight
                 agenda_item.latest_vote_percentages = {
-                    "for": (totals[models.BALLOT_ROLE_FOR] / present_weight) * Decimal("100"),
-                    "against": (totals[models.BALLOT_ROLE_AGAINST] / present_weight) * Decimal("100"),
-                    "abstain": (totals[models.BALLOT_ROLE_ABSTAIN] / present_weight) * Decimal("100"),
+                    "for": (totals[models.BALLOT_ROLE_FOR] / present_weight)
+                    * Decimal("100"),
+                    "against": (totals[models.BALLOT_ROLE_AGAINST] / present_weight)
+                    * Decimal("100"),
+                    "abstain": (totals[models.BALLOT_ROLE_ABSTAIN] / present_weight)
+                    * Decimal("100"),
                 }
 
         quorum_ratio = instance.calculate_quorum_ratio()
@@ -321,7 +359,10 @@ class MeetingAttendanceToggleView(PermissionRequiredMixin, View):
         meeting = get_object_or_404(self.queryset, pk=pk)
 
         if meeting.phase != models.MEETING_PHASE_IN_PROGRESS:
-            messages.error(request, _("Attendance can be changed only while the meeting is in progress."))
+            messages.error(
+                request,
+                _("Attendance can be changed only while the meeting is in progress."),
+            )
             return redirect(get_meeting_tab_url(meeting, "attendance"))
 
         snapshots = models.MeetingOwnerSnapshot.objects.filter(meeting=meeting)
@@ -363,10 +404,17 @@ class MeetingAgendaAddView(PermissionRequiredMixin, View):
         meeting = get_object_or_404(self.queryset, pk=pk)
         form = forms.MeetingAgendaInlineForm(request.POST)
         if not form.is_valid():
-            messages.error(request, _("Agenda point could not be created. Check input values."))
+            messages.error(
+                request, _("Agenda point could not be created. Check input values.")
+            )
             return redirect(get_meeting_tab_url(meeting, "agenda"))
 
-        next_order = (meeting.agenda_items.order_by("-order").values_list("order", flat=True).first() or 0) + 1
+        next_order = (
+            meeting.agenda_items.order_by("-order")
+            .values_list("order", flat=True)
+            .first()
+            or 0
+        ) + 1
         models.AgendaItem.objects.create(
             meeting=meeting,
             order=next_order,
@@ -389,7 +437,9 @@ class MeetingAgendaMoveView(PermissionRequiredMixin, View):
 
     def post(self, request, pk):
         meeting = get_object_or_404(self.queryset, pk=pk)
-        agenda_item = get_object_or_404(models.AgendaItem, pk=request.POST.get("agenda_item_id"), meeting=meeting)
+        agenda_item = get_object_or_404(
+            models.AgendaItem, pk=request.POST.get("agenda_item_id"), meeting=meeting
+        )
         direction = request.POST.get("direction")
 
         if direction == "up":
@@ -423,11 +473,15 @@ class MeetingRefreshSnapshotsView(PermissionRequiredMixin, View):
     def post(self, request, pk):
         meeting = get_object_or_404(self.queryset, pk=pk)
         if not meeting.can_refresh_snapshots:
-            messages.error(request, _("Snapshots cannot be refreshed for finished meetings."))
+            messages.error(
+                request, _("Snapshots cannot be refreshed for finished meetings.")
+            )
             return redirect(meeting.get_absolute_url())
 
         meeting.snapshot_owners(started_at=timezone.now(), refresh_existing=True)
-        messages.success(request, _("Meeting ownership and ballot snapshots were refreshed."))
+        messages.success(
+            request, _("Meeting ownership and ballot snapshots were refreshed.")
+        )
         return redirect(meeting.get_absolute_url())
 
 
@@ -456,7 +510,9 @@ class AgendaItemStartVotingView(PermissionRequiredMixin, View):
                     "label": row.label,
                     "color": row.color,
                     "share_value": row.share_value,
-                    "share_fraction": self._share_fraction_from_decimal(row.share_value),
+                    "share_fraction": self._share_fraction_from_decimal(
+                        row.share_value
+                    ),
                     "issued_count": row.issued_count,
                     "for_count": row.for_count,
                     "against_count": row.against_count,
@@ -512,7 +568,9 @@ class AgendaItemStartVotingView(PermissionRequiredMixin, View):
 
         session_id = request.POST.get("session_id")
         if session_id:
-            session = get_object_or_404(models.AgendaVoteSession, pk=session_id, agenda_item=agenda_item)
+            session = get_object_or_404(
+                models.AgendaVoteSession, pk=session_id, agenda_item=agenda_item
+            )
             session.negative_form = False
             session.save(update_fields=["negative_form", "last_updated"])
             session.ballot_rows.all().delete()
@@ -538,9 +596,13 @@ class AgendaItemStartVotingView(PermissionRequiredMixin, View):
 
         session.finalize()
         if created_new_session:
-            messages.success(request, _("Voting has been recorded for this agenda point."))
+            messages.success(
+                request, _("Voting has been recorded for this agenda point.")
+            )
         else:
-            messages.success(request, _("Voting has been updated for this agenda point."))
+            messages.success(
+                request, _("Voting has been updated for this agenda point.")
+            )
         return redirect(get_meeting_tab_url(meeting, "agenda"))
 
 
@@ -554,7 +616,9 @@ class MeetingSyncBallotStylesView(PermissionRequiredMixin, View):
         created, current_count = models.VoteWeightStyle.sync_current_share_styles()
         messages.success(
             request,
-            _("Vote weight styles synchronized. Created %(created)s new styles, %(count)s are current.")
+            _(
+                "Vote weight styles synchronized. Created %(created)s new styles, %(count)s are current."
+            )
             % {"created": created, "count": current_count},
         )
         return redirect(get_meeting_tab_url(meeting, "ballots"))
@@ -568,7 +632,9 @@ class VoteWeightStyleSyncCurrentView(PermissionRequiredMixin, View):
         created, current_count = models.VoteWeightStyle.sync_current_share_styles()
         messages.success(
             request,
-            _("Vote weight styles synchronized. Created %(created)s new styles, %(count)s are current.")
+            _(
+                "Vote weight styles synchronized. Created %(created)s new styles, %(count)s are current."
+            )
             % {"created": created, "count": current_count},
         )
         return redirect("plugins:solomon_meetings:voteweightstyle_list")
@@ -602,10 +668,16 @@ class MeetingExportView(PermissionRequiredMixin, View):
 
         if form.cleaned_data["include_attendance"]:
             lines.append("Attendance snapshots")
-            snapshots = meeting.owner_snapshots.prefetch_related("events").order_by("owner_display_name", "flat_label")
+            snapshots = meeting.owner_snapshots.prefetch_related("events").order_by(
+                "owner_display_name", "flat_label"
+            )
             for snapshot in snapshots:
-                share_fraction = f"{snapshot.share_numerator}/{snapshot.share_denominator}"
-                current_status = "present" if snapshot.is_currently_present else "absent"
+                share_fraction = (
+                    f"{snapshot.share_numerator}/{snapshot.share_denominator}"
+                )
+                current_status = (
+                    "present" if snapshot.is_currently_present else "absent"
+                )
                 lines.append(
                     f"- {snapshot.owner_display_name} | Flat: {snapshot.flat_label or '-'} | "
                     f"Share: {share_fraction} ({snapshot.share_value:.6f}) | "
@@ -627,7 +699,9 @@ class MeetingExportView(PermissionRequiredMixin, View):
             lines.append("")
             lines.append("Attendance event timeline")
             timeline_events = (
-                models.MeetingAttendanceEvent.objects.filter(owner_snapshot__meeting=meeting)
+                models.MeetingAttendanceEvent.objects.filter(
+                    owner_snapshot__meeting=meeting
+                )
                 .select_related("owner_snapshot")
                 .order_by("event_time", "created")
             )
@@ -645,14 +719,18 @@ class MeetingExportView(PermissionRequiredMixin, View):
 
         if form.cleaned_data["include_voting"]:
             lines.append("Voting sessions")
-            agenda_items = meeting.agenda_items.prefetch_related("vote_sessions__ballot_rows").order_by("order", "title")
+            agenda_items = meeting.agenda_items.prefetch_related(
+                "vote_sessions__ballot_rows"
+            ).order_by("order", "title")
             for agenda_item in agenda_items:
                 lines.append(f"- {agenda_item.order}. {agenda_item.title}")
                 lines.append(
                     f"  Thresholds: quorum >= {agenda_item.quorum_threshold * Decimal('100'):.2f}% | "
                     f"pass >= {agenda_item.minimum_pass_percentage * Decimal('100'):.2f}%"
                 )
-                sessions = list(agenda_item.vote_sessions.all().order_by("started_at", "created"))
+                sessions = list(
+                    agenda_item.vote_sessions.all().order_by("started_at", "created")
+                )
                 if not sessions:
                     lines.append("  No vote sessions recorded.")
                     continue
@@ -660,13 +738,19 @@ class MeetingExportView(PermissionRequiredMixin, View):
                 for session in sessions:
                     totals = session.totals_by_role()
                     present_weight = session.present_weight
-                    attendance_share_percent = (
-                        meeting.calculate_quorum_ratio(at_time=session.started_at) * Decimal("100")
-                    )
+                    attendance_share_percent = meeting.calculate_quorum_ratio(
+                        at_time=session.started_at
+                    ) * Decimal("100")
                     if present_weight > 0:
-                        for_percent = (totals[models.BALLOT_ROLE_FOR] / present_weight) * Decimal("100")
-                        against_percent = (totals[models.BALLOT_ROLE_AGAINST] / present_weight) * Decimal("100")
-                        abstain_percent = (totals[models.BALLOT_ROLE_ABSTAIN] / present_weight) * Decimal("100")
+                        for_percent = (
+                            totals[models.BALLOT_ROLE_FOR] / present_weight
+                        ) * Decimal("100")
+                        against_percent = (
+                            totals[models.BALLOT_ROLE_AGAINST] / present_weight
+                        ) * Decimal("100")
+                        abstain_percent = (
+                            totals[models.BALLOT_ROLE_ABSTAIN] / present_weight
+                        ) * Decimal("100")
                     else:
                         for_percent = Decimal("0")
                         against_percent = Decimal("0")
@@ -679,8 +763,12 @@ class MeetingExportView(PermissionRequiredMixin, View):
                     lines.append(
                         f"  Result: {session.get_result_display()} | Quorum met: {'yes' if session.quorum_met else 'no'}"
                     )
-                    lines.append(f"  Attendance share at vote start: {attendance_share_percent:.2f}%")
-                    lines.append(f"  Present weighted share in session: {present_weight:.6f}")
+                    lines.append(
+                        f"  Attendance share at vote start: {attendance_share_percent:.2f}%"
+                    )
+                    lines.append(
+                        f"  Present weighted share in session: {present_weight:.6f}"
+                    )
                     lines.append(
                         f"  Totals (weighted share): For {totals[models.BALLOT_ROLE_FOR]:.6f} ({for_percent:.2f}%), "
                         f"Against {totals[models.BALLOT_ROLE_AGAINST]:.6f} ({against_percent:.2f}%), "
@@ -688,7 +776,9 @@ class MeetingExportView(PermissionRequiredMixin, View):
                     )
 
                     lines.append("  Ballot rows:")
-                    for row in session.ballot_rows.all().order_by("share_value", "label"):
+                    for row in session.ballot_rows.all().order_by(
+                        "share_value", "label"
+                    ):
                         weighted = row.weight_totals()
                         lines.append(
                             f"    - Label: {row.label or '-'} | Color: {row.color or '-'} | "
@@ -707,8 +797,12 @@ class MeetingExportView(PermissionRequiredMixin, View):
                 if agenda_item.description:
                     lines.append(f"  {agenda_item.description}")
 
-        response = HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
-        response["Content-Disposition"] = f'attachment; filename="meeting-{meeting.pk}-export.txt"'
+        response = HttpResponse(
+            "\n".join(lines), content_type="text/plain; charset=utf-8"
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="meeting-{meeting.pk}-export.txt"'
+        )
         return response
 
 
@@ -723,21 +817,36 @@ class AgendaItemView(generic.ObjectView):
     queryset = models.AgendaItem.objects.select_related("meeting")
 
     def get_extra_context(self, request, instance):
-        vote_sessions = list(instance.vote_sessions.prefetch_related("ballot_rows").order_by("-started_at", "-created"))
+        vote_sessions = list(
+            instance.vote_sessions.prefetch_related("ballot_rows").order_by(
+                "-started_at", "-created"
+            )
+        )
         latest_session = vote_sessions[0] if vote_sessions else None
         latest_totals = latest_session.totals_by_role() if latest_session else None
         latest_vote_percentages = None
         latest_attendance_share_percent = None
         if latest_session and latest_session.present_weight > 0:
             latest_vote_percentages = {
-                "for": (latest_totals[models.BALLOT_ROLE_FOR] / latest_session.present_weight) * Decimal("100"),
-                "against": (latest_totals[models.BALLOT_ROLE_AGAINST] / latest_session.present_weight) * Decimal("100"),
-                "abstain": (latest_totals[models.BALLOT_ROLE_ABSTAIN] / latest_session.present_weight)
+                "for": (
+                    latest_totals[models.BALLOT_ROLE_FOR]
+                    / latest_session.present_weight
+                )
+                * Decimal("100"),
+                "against": (
+                    latest_totals[models.BALLOT_ROLE_AGAINST]
+                    / latest_session.present_weight
+                )
+                * Decimal("100"),
+                "abstain": (
+                    latest_totals[models.BALLOT_ROLE_ABSTAIN]
+                    / latest_session.present_weight
+                )
                 * Decimal("100"),
             }
-            latest_attendance_share_percent = (
-                instance.meeting.calculate_quorum_ratio(at_time=latest_session.started_at) * Decimal("100")
-            )
+            latest_attendance_share_percent = instance.meeting.calculate_quorum_ratio(
+                at_time=latest_session.started_at
+            ) * Decimal("100")
         return {
             "vote_sessions": vote_sessions,
             "latest_vote_session": latest_session,
@@ -762,14 +871,18 @@ class AgendaItemBulkDeleteView(generic.BulkDeleteView):
 
 
 class MeetingAttendanceListView(generic.ObjectListView):
-    queryset = models.MeetingAttendance.objects.select_related("meeting", "owner", "flat_owner")
+    queryset = models.MeetingAttendance.objects.select_related(
+        "meeting", "owner", "flat_owner"
+    )
     table = tables.MeetingAttendanceTable
     filterset = filtersets.MeetingAttendanceFilterSet
     filterset_form = filterforms.MeetingAttendanceFilterForm
 
 
 class MeetingAttendanceView(generic.ObjectView):
-    queryset = models.MeetingAttendance.objects.select_related("meeting", "owner", "flat_owner")
+    queryset = models.MeetingAttendance.objects.select_related(
+        "meeting", "owner", "flat_owner"
+    )
 
 
 class MeetingAttendanceEditView(generic.ObjectEditView):
@@ -787,16 +900,22 @@ class MeetingAttendanceBulkDeleteView(generic.BulkDeleteView):
 
 
 class MeetingOwnerSnapshotListView(generic.ObjectListView):
-    queryset = models.MeetingOwnerSnapshot.objects.select_related("meeting", "owner", "flat_owner")
+    queryset = models.MeetingOwnerSnapshot.objects.select_related(
+        "meeting", "owner", "flat_owner"
+    )
     table = tables.MeetingOwnerSnapshotTable
 
 
 class MeetingOwnerSnapshotView(generic.ObjectView):
-    queryset = models.MeetingOwnerSnapshot.objects.select_related("meeting", "owner", "flat_owner")
+    queryset = models.MeetingOwnerSnapshot.objects.select_related(
+        "meeting", "owner", "flat_owner"
+    )
 
 
 class MeetingAttendanceEventListView(generic.ObjectListView):
-    queryset = models.MeetingAttendanceEvent.objects.select_related("owner_snapshot", "owner_snapshot__meeting")
+    queryset = models.MeetingAttendanceEvent.objects.select_related(
+        "owner_snapshot", "owner_snapshot__meeting"
+    )
     table = tables.MeetingAttendanceEventTable
 
     def get_queryset(self, request):
@@ -814,7 +933,9 @@ class MeetingAttendanceEventListView(generic.ObjectListView):
 
 
 class MeetingAttendanceEventView(generic.ObjectView):
-    queryset = models.MeetingAttendanceEvent.objects.select_related("owner_snapshot", "owner_snapshot__meeting")
+    queryset = models.MeetingAttendanceEvent.objects.select_related(
+        "owner_snapshot", "owner_snapshot__meeting"
+    )
 
 
 class MeetingAttendanceEventEditView(generic.ObjectEditView):
@@ -827,7 +948,9 @@ class MeetingAttendanceEventDeleteView(generic.ObjectDeleteView):
 
 
 class MeetingAttendanceEventBulkDeleteView(generic.BulkDeleteView):
-    queryset = models.MeetingAttendanceEvent.objects.select_related("owner_snapshot", "owner_snapshot__meeting")
+    queryset = models.MeetingAttendanceEvent.objects.select_related(
+        "owner_snapshot", "owner_snapshot__meeting"
+    )
     table = tables.MeetingAttendanceEventTable
 
 
@@ -882,12 +1005,16 @@ class VoteWeightStyleBulkDeleteView(generic.BulkDeleteView):
 
 
 class AgendaVoteSessionListView(generic.ObjectListView):
-    queryset = models.AgendaVoteSession.objects.select_related("agenda_item", "agenda_item__meeting")
+    queryset = models.AgendaVoteSession.objects.select_related(
+        "agenda_item", "agenda_item__meeting"
+    )
     table = tables.AgendaVoteSessionTable
 
 
 class AgendaVoteSessionView(generic.ObjectView):
-    queryset = models.AgendaVoteSession.objects.select_related("agenda_item", "agenda_item__meeting")
+    queryset = models.AgendaVoteSession.objects.select_related(
+        "agenda_item", "agenda_item__meeting"
+    )
 
 
 class AgendaVoteSessionDeleteView(generic.ObjectDeleteView):
@@ -895,12 +1022,16 @@ class AgendaVoteSessionDeleteView(generic.ObjectDeleteView):
 
 
 class AgendaVoteBallotListView(generic.ObjectListView):
-    queryset = models.AgendaVoteBallot.objects.select_related("session", "session__agenda_item")
+    queryset = models.AgendaVoteBallot.objects.select_related(
+        "session", "session__agenda_item"
+    )
     table = tables.AgendaVoteBallotTable
 
 
 class AgendaVoteBallotView(generic.ObjectView):
-    queryset = models.AgendaVoteBallot.objects.select_related("session", "session__agenda_item")
+    queryset = models.AgendaVoteBallot.objects.select_related(
+        "session", "session__agenda_item"
+    )
 
 
 class AgendaVoteBallotDeleteView(generic.ObjectDeleteView):

@@ -2,7 +2,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("solomon_meetings", "0006_alter_meetingattendanceevent_options_and_more"),
     ]
@@ -26,7 +25,10 @@ class Migration(migrations.Migration):
                 "permissions": (
                     ("manage_meeting_workflow", "Can manage meeting workflow actions"),
                     ("manage_attendance_live", "Can toggle live meeting attendance"),
-                    ("sync_ballot_styles", "Can synchronize ballot styles from ownership"),
+                    (
+                        "sync_ballot_styles",
+                        "Can synchronize ballot styles from ownership",
+                    ),
                     ("export_meeting_data", "Can export meeting reports"),
                 ),
                 "verbose_name": "Meeting",

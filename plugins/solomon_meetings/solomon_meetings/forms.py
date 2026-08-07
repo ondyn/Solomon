@@ -1,10 +1,10 @@
-from decimal import Decimal
-from fractions import Fraction
-
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from netbox.forms import NetBoxModelForm
-from utilities.forms.fields import DynamicModelChoiceField, DynamicModelMultipleChoiceField
+from utilities.forms.fields import (
+    DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
+)
 
 from solomon_property.models import Building, FlatOwner, PropertyOwner
 
@@ -68,9 +68,15 @@ class MeetingForm(NetBoxModelForm):
             "quorum_updated_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
             "started_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
             "ended_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
-            "invitation_pdf_generated_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
-            "invitation_published_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
-            "owner_snapshot_taken_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "invitation_pdf_generated_at": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}
+            ),
+            "invitation_published_at": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}
+            ),
+            "owner_snapshot_taken_at": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}
+            ),
             "note": forms.Textarea(attrs={"rows": 3}),
         }
 
@@ -148,7 +154,12 @@ class VoteWeightStyleForm(NetBoxModelForm):
         fields = ["voting_method", "weight_value", "label", "color", "tags"]
         widgets = {
             "weight_value": forms.HiddenInput(),
-            "color": forms.TextInput(attrs={"type": "color", "style": "width:6rem;height:2.5rem;padding:0.2rem;cursor:pointer;"}),
+            "color": forms.TextInput(
+                attrs={
+                    "type": "color",
+                    "style": "width:6rem;height:2.5rem;padding:0.2rem;cursor:pointer;",
+                }
+            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -160,7 +171,9 @@ class VoteWeightStyleForm(NetBoxModelForm):
 
     def clean(self):
         if self.instance and self.instance.pk and not self.instance.is_current:
-            raise forms.ValidationError(_("Historical vote styles are read-only and cannot be edited."))
+            raise forms.ValidationError(
+                _("Historical vote styles are read-only and cannot be edited.")
+            )
 
         super().clean()
         cleaned = self.cleaned_data
@@ -207,11 +220,20 @@ class MeetingInvitationForm(NetBoxModelForm):
 
 
 class MeetingAttendanceEventForm(NetBoxModelForm):
-    owner_snapshot = DynamicModelChoiceField(queryset=MeetingOwnerSnapshot.objects.all())
+    owner_snapshot = DynamicModelChoiceField(
+        queryset=MeetingOwnerSnapshot.objects.all()
+    )
 
     class Meta:
         model = MeetingAttendanceEvent
-        fields = ["owner_snapshot", "event_type", "event_time", "source", "note", "tags"]
+        fields = [
+            "owner_snapshot",
+            "event_type",
+            "event_time",
+            "source",
+            "note",
+            "tags",
+        ]
         widgets = {
             "event_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
@@ -219,12 +241,18 @@ class MeetingAttendanceEventForm(NetBoxModelForm):
 
 class MeetingAgendaInlineForm(forms.Form):
     title = forms.CharField(max_length=255)
-    description = forms.CharField(widget=forms.Textarea(attrs={"rows": 3}), required=False)
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={"rows": 3}), required=False
+    )
     presenter = forms.CharField(max_length=255, required=False)
     voting_required = forms.BooleanField(required=False, initial=True)
     voting_method = forms.ChoiceField(choices=QUORUM_TYPE_CHOICES)
-    quorum_threshold = forms.DecimalField(max_digits=5, decimal_places=4, initial="0.5000")
-    minimum_pass_percentage = forms.DecimalField(max_digits=5, decimal_places=4, initial="0.5000")
+    quorum_threshold = forms.DecimalField(
+        max_digits=5, decimal_places=4, initial="0.5000"
+    )
+    minimum_pass_percentage = forms.DecimalField(
+        max_digits=5, decimal_places=4, initial="0.5000"
+    )
 
 
 class MeetingExportForm(forms.Form):
@@ -267,7 +295,11 @@ class AgendaVoteSessionForm(forms.Form):
 
             row_data = row_form.cleaned_data
             issued = row_data["issued_count"]
-            values = [row_data.get("for_count"), row_data.get("against_count"), row_data.get("abstain_count")]
+            values = [
+                row_data.get("for_count"),
+                row_data.get("against_count"),
+                row_data.get("abstain_count"),
+            ]
             provided = [value for value in values if value is not None]
             total = sum(provided)
 
@@ -289,7 +321,11 @@ class AgendaVoteSessionForm(forms.Form):
             row_data["against_count"] = row_data.get("against_count") or 0
             row_data["abstain_count"] = row_data.get("abstain_count") or 0
 
-            total_votes = row_data["for_count"] + row_data["against_count"] + row_data["abstain_count"]
+            total_votes = (
+                row_data["for_count"]
+                + row_data["against_count"]
+                + row_data["abstain_count"]
+            )
             if total_votes > issued:
                 raise forms.ValidationError(
                     f"Row {index + 1}: vote totals cannot exceed issued ballots."

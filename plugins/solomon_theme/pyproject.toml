@@ -26,3 +26,6 @@ Homepage = "https://github.com/ondyn/Solomon"
 
 [tool.setuptools.packages.find]
 include = ["solomon_theme*"]
+
+[tool.setuptools.package-data]
+solomon_theme = ["static/**/*", "locale/**/*"]

@@ -32,7 +32,9 @@ def _lcm(a, b):
 
 
 def _build_current_share_stats():
-    ownerships = FlatOwner.objects.filter(effective_to__isnull=True).select_related("flat")
+    ownerships = FlatOwner.objects.filter(effective_to__isnull=True).select_related(
+        "flat"
+    )
 
     flat_to_ownerships = defaultdict(list)
     for ownership in ownerships:
@@ -47,15 +49,22 @@ def _build_current_share_stats():
                 continue
 
             holder_key = ("owner", ownership.owner_id)
-            share_fraction = Fraction(ownership.share_numerator, ownership.share_denominator)
+            share_fraction = Fraction(
+                ownership.share_numerator, ownership.share_denominator
+            )
         else:
             flat = flat_ownerships[0].flat
             holder_key = ("flat", flat_id)
             if flat.cuzk_share_numerator and flat.cuzk_share_denominator:
-                share_fraction = Fraction(flat.cuzk_share_numerator, flat.cuzk_share_denominator)
+                share_fraction = Fraction(
+                    flat.cuzk_share_numerator, flat.cuzk_share_denominator
+                )
             else:
                 share_fraction = sum(
-                    (Fraction(o.share_numerator, o.share_denominator) for o in flat_ownerships),
+                    (
+                        Fraction(o.share_numerator, o.share_denominator)
+                        for o in flat_ownerships
+                    ),
                     Fraction(0, 1),
                 )
 
@@ -188,18 +197,28 @@ class VoteTable(NetBoxTable):
     class Meta(NetBoxTable.Meta):
         model = Vote
         fields = ("pk", "agenda_item", "attendance", "vote", "vote_weight", "actions")
-        default_columns = ("agenda_item", "attendance", "vote", "vote_weight", "actions")
+        default_columns = (
+            "agenda_item",
+            "attendance",
+            "vote",
+            "vote_weight",
+            "actions",
+        )
 
 
 class VoteWeightStyleTable(NetBoxTable):
     label = tables.Column(linkify=True)
     is_current = tables.BooleanColumn(verbose_name=_("Current"))
     color = tables.Column(verbose_name=_("Color"))
-    share_count = tables.Column(verbose_name=_("Count"), orderable=False, empty_values=())
+    share_count = tables.Column(
+        verbose_name=_("Count"), orderable=False, empty_values=()
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._share_counts, self._common_share_denominator = _build_current_share_stats()
+        self._share_counts, self._common_share_denominator = (
+            _build_current_share_stats()
+        )
 
     def render_weight_value(self, record):
         if record.voting_method != "BY_SHARE":
@@ -209,26 +228,34 @@ class VoteWeightStyleTable(NetBoxTable):
         share_fraction = Fraction(numerator, denominator)
         common_denominator = share_fraction.denominator
         if self is not None:
-            common_denominator = self._common_share_denominator or share_fraction.denominator
+            common_denominator = (
+                self._common_share_denominator or share_fraction.denominator
+            )
         if common_denominator % share_fraction.denominator:
             common_denominator = _lcm(common_denominator, share_fraction.denominator)
 
-        common_numerator = share_fraction.numerator * common_denominator // share_fraction.denominator
+        common_numerator = (
+            share_fraction.numerator * common_denominator // share_fraction.denominator
+        )
         return f"{common_numerator}/{common_denominator}"
 
     def render_color(self, value):
         color = (value or "").strip() or "#000000"
         return format_html(
             '<span style="display:inline-block;width:1rem;height:1rem;border:1px solid #6c757d;'
-            'border-radius:0.2rem;background-color:{};vertical-align:middle;margin-right:0.4rem;"></span>{}',
-            color,
+            'border-radius:0.2rem;background-color:{};vertical-align:middle;"></span>',
             color,
         )
 
     def render_share_count(self, value, record):
         if record.voting_method == "BY_UNITS":
             if Decimal(str(record.weight_value)) == Decimal("1"):
-                count = FlatOwner.objects.filter(effective_to__isnull=True).values("owner_id").distinct().count()
+                count = (
+                    FlatOwner.objects.filter(effective_to__isnull=True)
+                    .values("owner_id")
+                    .distinct()
+                    .count()
+                )
             else:
                 count = 0
         else:
@@ -288,8 +315,23 @@ class MeetingInvitationTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = MeetingInvitation
-        fields = ("pk", "meeting", "owner", "sent_at", "delivery_method", "confirmed", "actions")
-        default_columns = ("meeting", "owner", "sent_at", "delivery_method", "confirmed", "actions")
+        fields = (
+            "pk",
+            "meeting",
+            "owner",
+            "sent_at",
+            "delivery_method",
+            "confirmed",
+            "actions",
+        )
+        default_columns = (
+            "meeting",
+            "owner",
+            "sent_at",
+            "delivery_method",
+            "confirmed",
+            "actions",
+        )
 
 
 class MeetingOwnerSnapshotTable(NetBoxTable):
@@ -321,8 +363,23 @@ class MeetingAttendanceEventTable(NetBoxTable):
 
     class Meta(NetBoxTable.Meta):
         model = MeetingAttendanceEvent
-        fields = ("pk", "owner_snapshot", "event_type", "event_time", "source", "note", "actions")
-        default_columns = ("owner_snapshot", "event_type", "event_time", "source", "note", "actions")
+        fields = (
+            "pk",
+            "owner_snapshot",
+            "event_type",
+            "event_time",
+            "source",
+            "note",
+            "actions",
+        )
+        default_columns = (
+            "owner_snapshot",
+            "event_type",
+            "event_time",
+            "source",
+            "note",
+            "actions",
+        )
 
 
 class AgendaVoteSessionTable(NetBoxTable):

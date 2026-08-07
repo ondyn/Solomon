@@ -46,7 +46,9 @@ class AgendaItemFilterSet(NetBoxModelFilterSet):
     q = django_filters.CharFilter(method="search", label=_("Search"))
 
     def search(self, queryset, name, value):
-        return queryset.filter(Q(title__icontains=value) | Q(description__icontains=value))
+        return queryset.filter(
+            Q(title__icontains=value) | Q(description__icontains=value)
+        )
 
     class Meta:
         model = AgendaItem
@@ -62,7 +64,13 @@ class MeetingAttendanceFilterSet(NetBoxModelFilterSet):
 class MeetingOwnerSnapshotFilterSet(NetBoxModelFilterSet):
     class Meta:
         model = MeetingOwnerSnapshot
-        fields = ["meeting", "owner", "flat_owner", "representation", "is_currently_present"]
+        fields = [
+            "meeting",
+            "owner",
+            "flat_owner",
+            "representation",
+            "is_currently_present",
+        ]
 
 
 class MeetingAttendanceEventFilterSet(NetBoxModelFilterSet):

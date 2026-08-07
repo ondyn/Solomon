@@ -1,0 +1,42 @@
+ARG NETBOX_VERSION=latest
+
+FROM python:3.12-alpine AS plugin-builder
+
+RUN pip install --no-cache-dir build
+
+WORKDIR /build
+COPY plugins/solomon_theme plugins/solomon_theme
+COPY plugins/solomon_property plugins/solomon_property
+COPY plugins/solomon_meetings plugins/solomon_meetings
+
+RUN mkdir /wheels && \
+    python -m build --wheel --outdir /wheels plugins/solomon_theme && \
+    python -m build --wheel --outdir /wheels plugins/solomon_property && \
+    python -m build --wheel --outdir /wheels plugins/solomon_meetings
+
+FROM docker.io/netboxcommunity/netbox:${NETBOX_VERSION}
+
+USER root
+
+COPY docker/configuration /etc/netbox/config
+COPY plugin-requirements.txt /tmp/plugin-requirements.txt
+COPY --from=plugin-builder /wheels /tmp/wheels
+
+RUN if [ -s /tmp/plugin-requirements.txt ]; then \
+        /usr/local/bin/uv pip install --python /opt/netbox/venv/bin/python \
+            -r /tmp/plugin-requirements.txt; \
+    fi && \
+    /usr/local/bin/uv pip install --python /opt/netbox/venv/bin/python \
+        /tmp/wheels/*.whl && \
+    rm -rf /tmp/plugin-requirements.txt /tmp/wheels
+
+RUN SECRET_KEY=build-only-secret-not-used-at-runtime-000000000000000000000000 \
+    /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py collectstatic --no-input && \
+    cp /opt/netbox/netbox/static/solomon_theme/img/logo_netbox_bright_teal.svg \
+        /opt/netbox/netbox/static/logo_netbox_bright_teal.svg && \
+    cp /opt/netbox/netbox/static/solomon_theme/img/logo_netbox_dark_teal.svg \
+        /opt/netbox/netbox/static/logo_netbox_dark_teal.svg && \
+    cp /opt/netbox/netbox/static/solomon_theme/img/favicon.svg \
+        /opt/netbox/netbox/static/netbox.ico
+
+USER netbox

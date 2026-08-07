@@ -25,14 +25,26 @@ from solomon_meetings.models import (
     MeetingType,
     VoteWeightStyle,
 )
-from solomon_meetings.views import MeetingExportView, MeetingRefreshSnapshotsView, MeetingView
-from solomon_property.models import Building, BuildingObject, Flat, FlatOwner, PropertyOwner
+from solomon_meetings.views import (
+    MeetingExportView,
+    MeetingRefreshSnapshotsView,
+    MeetingView,
+)
+from solomon_property.models import (
+    Building,
+    BuildingObject,
+    Flat,
+    FlatOwner,
+    PropertyOwner,
+)
 
 
 class MeetingViewAttendanceRowsTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="moderator")
-        self.building_object = BuildingObject.objects.create(name="View Building Object")
+        self.building_object = BuildingObject.objects.create(
+            name="View Building Object"
+        )
         self.building = Building.objects.create(
             building_object=self.building_object,
             name="View Building",
@@ -137,7 +149,9 @@ class MeetingViewAttendanceRowsTests(TestCase):
                 "is_current": True,
             },
         )
-        self.meeting.snapshot_ballot_types(snapshot_taken_at=timezone.now(), refresh_existing=True)
+        self.meeting.snapshot_ballot_types(
+            snapshot_taken_at=timezone.now(), refresh_existing=True
+        )
 
         request = RequestFactory().get("/plugins/meetings/meetings/1/attendance/")
         context = MeetingView().get_extra_context(request, self.meeting)
@@ -155,7 +169,9 @@ class MeetingExportViewTests(TestCase):
             email="export-user@example.com",
             password="secret",
         )
-        self.building_object = BuildingObject.objects.create(name="Export Building Object")
+        self.building_object = BuildingObject.objects.create(
+            name="Export Building Object"
+        )
         self.building = Building.objects.create(
             building_object=self.building_object,
             name="Export Building",
@@ -230,7 +246,9 @@ class MeetingExportViewTests(TestCase):
             minimum_pass_percentage=Decimal("0.5"),
             quorum_threshold=Decimal("0.5"),
         )
-        session = AgendaVoteSession.objects.create(agenda_item=agenda_item, started_at=session_started_at)
+        session = AgendaVoteSession.objects.create(
+            agenda_item=agenda_item, started_at=session_started_at
+        )
         AgendaVoteBallot.objects.create(
             session=session,
             label="A",
@@ -276,7 +294,9 @@ class MeetingSnapshotRefreshViewTests(TestCase):
             email="refresh-user@example.com",
             password="secret",
         )
-        self.building_object = BuildingObject.objects.create(name="Refresh Building Object")
+        self.building_object = BuildingObject.objects.create(
+            name="Refresh Building Object"
+        )
         self.building = Building.objects.create(
             building_object=self.building_object,
             name="Refresh Building",
@@ -312,7 +332,10 @@ class MeetingSnapshotRefreshViewTests(TestCase):
 
     def _post_request(self):
         request = RequestFactory().post(
-            reverse("plugins:solomon_meetings:meeting_refresh_snapshots", kwargs={"pk": self.meeting.pk})
+            reverse(
+                "plugins:solomon_meetings:meeting_refresh_snapshots",
+                kwargs={"pk": self.meeting.pk},
+            )
         )
         request.user = self.user
         session_middleware = SessionMiddleware(lambda req: None)
@@ -324,12 +347,18 @@ class MeetingSnapshotRefreshViewTests(TestCase):
     def test_refresh_snapshots_rewrites_snapshot_share_before_finish(self):
         self.flat_owner.share_numerator = 1
         self.flat_owner.share_denominator = 3
-        self.flat_owner.save(update_fields=["share_numerator", "share_denominator", "last_updated"])
+        self.flat_owner.save(
+            update_fields=["share_numerator", "share_denominator", "last_updated"]
+        )
 
-        response = MeetingRefreshSnapshotsView.as_view()(self._post_request(), pk=self.meeting.pk)
+        response = MeetingRefreshSnapshotsView.as_view()(
+            self._post_request(), pk=self.meeting.pk
+        )
 
         self.assertEqual(response.status_code, 302)
-        snapshot = MeetingOwnerSnapshot.objects.get(meeting=self.meeting, flat_owner=self.flat_owner)
+        snapshot = MeetingOwnerSnapshot.objects.get(
+            meeting=self.meeting, flat_owner=self.flat_owner
+        )
         self.assertEqual(snapshot.share_numerator, 1)
         self.assertEqual(snapshot.share_denominator, 3)
 
@@ -340,10 +369,16 @@ class MeetingSnapshotRefreshViewTests(TestCase):
 
         self.flat_owner.share_numerator = 1
         self.flat_owner.share_denominator = 4
-        self.flat_owner.save(update_fields=["share_numerator", "share_denominator", "last_updated"])
+        self.flat_owner.save(
+            update_fields=["share_numerator", "share_denominator", "last_updated"]
+        )
 
-        response = MeetingRefreshSnapshotsView.as_view()(self._post_request(), pk=self.meeting.pk)
+        response = MeetingRefreshSnapshotsView.as_view()(
+            self._post_request(), pk=self.meeting.pk
+        )
 
         self.assertEqual(response.status_code, 302)
-        snapshot = MeetingOwnerSnapshot.objects.get(meeting=self.meeting, flat_owner=self.flat_owner)
+        snapshot = MeetingOwnerSnapshot.objects.get(
+            meeting=self.meeting, flat_owner=self.flat_owner
+        )
         self.assertEqual(snapshot.share_denominator, 2)

@@ -1,0 +1,14 @@
+.git
+.github
+.venv
+.env
+.env.*
+backup
+netbox
+netbox-docker
+support
+**/__pycache__
+**/*.pyc
+**/*.egg-info
+**/build
+**/dist

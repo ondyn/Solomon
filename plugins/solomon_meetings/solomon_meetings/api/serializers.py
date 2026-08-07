@@ -2,7 +2,10 @@ from rest_framework import serializers
 
 from netbox.api.serializers import NetBoxModelSerializer
 
-from solomon_property.api.serializers import FlatOwnerSerializer, PropertyOwnerSerializer
+from solomon_property.api.serializers import (
+    FlatOwnerSerializer,
+    PropertyOwnerSerializer,
+)
 
 from solomon_meetings.models import (
     AgendaItem,

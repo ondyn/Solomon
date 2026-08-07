@@ -10,7 +10,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("solomon_meetings", "0001_initial"),
     ]
@@ -67,17 +66,31 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="AgendaVoteSession",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
                 ("created", models.DateTimeField(auto_now_add=True, null=True)),
                 ("last_updated", models.DateTimeField(auto_now=True, null=True)),
                 (
                     "custom_field_data",
-                    models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder),
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
                 ),
                 ("started_at", models.DateTimeField()),
                 ("completed_at", models.DateTimeField(blank=True, null=True)),
                 ("negative_form", models.BooleanField(default=False)),
-                ("present_weight", models.DecimalField(decimal_places=6, default=Decimal("0"), max_digits=12)),
+                (
+                    "present_weight",
+                    models.DecimalField(
+                        decimal_places=6, default=Decimal("0"), max_digits=12
+                    ),
+                ),
                 ("quorum_met", models.BooleanField(default=False)),
                 ("result", models.CharField(default="N/A", max_length=20)),
                 (
@@ -88,7 +101,12 @@ class Migration(migrations.Migration):
                         to="solomon_meetings.agendaitem",
                     ),
                 ),
-                ("tags", taggit.managers.TaggableManager(through="extras.TaggedItem", to="extras.Tag")),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
                 "verbose_name": "Agenda vote session",
@@ -100,12 +118,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="MeetingOwnerSnapshot",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
                 ("created", models.DateTimeField(auto_now_add=True, null=True)),
                 ("last_updated", models.DateTimeField(auto_now=True, null=True)),
                 (
                     "custom_field_data",
-                    models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder),
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
                 ),
                 ("owner_display_name", models.CharField(max_length=255)),
                 ("flat_label", models.CharField(blank=True, max_length=255)),
@@ -145,7 +172,12 @@ class Migration(migrations.Migration):
                         to="solomon_property.propertyowner",
                     ),
                 ),
-                ("tags", taggit.managers.TaggableManager(through="extras.TaggedItem", to="extras.Tag")),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
                 "verbose_name": "Meeting owner snapshot",
@@ -158,12 +190,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="AgendaVoteBallot",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
                 ("created", models.DateTimeField(auto_now_add=True, null=True)),
                 ("last_updated", models.DateTimeField(auto_now=True, null=True)),
                 (
                     "custom_field_data",
-                    models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder),
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
                 ),
                 ("label", models.CharField(blank=True, max_length=32)),
                 ("color", models.CharField(blank=True, max_length=7)),
@@ -180,7 +221,12 @@ class Migration(migrations.Migration):
                         to="solomon_meetings.agendavotesession",
                     ),
                 ),
-                ("tags", taggit.managers.TaggableManager(through="extras.TaggedItem", to="extras.Tag")),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
                 "verbose_name": "Agenda vote ballot row",
@@ -192,12 +238,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="MeetingAttendanceEvent",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
                 ("created", models.DateTimeField(auto_now_add=True, null=True)),
                 ("last_updated", models.DateTimeField(auto_now=True, null=True)),
                 (
                     "custom_field_data",
-                    models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder),
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
                 ),
                 ("event_type", models.CharField(max_length=10)),
                 ("event_time", models.DateTimeField()),
@@ -211,7 +266,12 @@ class Migration(migrations.Migration):
                         to="solomon_meetings.meetingownersnapshot",
                     ),
                 ),
-                ("tags", taggit.managers.TaggableManager(through="extras.TaggedItem", to="extras.Tag")),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
                 "verbose_name": "Meeting attendance event",
