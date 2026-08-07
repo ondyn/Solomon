@@ -118,10 +118,7 @@ class ContactsImportViewTest(TestCase):
     def test_uploaded_csv_is_still_parsed_and_saved_for_preview(self):
         csv_file = SimpleUploadedFile(
             "contacts.csv",
-            (
-                b"First Name,Last Name,E-mail 1 - Value\r\n"
-                b"Jan,Novak,jan@example.com\r\n"
-            ),
+            (b"First Name,Last Name,E-mail 1 - Value\r\nJan,Novak,jan@example.com\r\n"),
             content_type="text/csv",
         )
         request = add_session_and_messages(

@@ -8,10 +8,34 @@ class SolomonThemeExtension(PluginTemplateExtension):
     """
 
     def head(self):
-        return THEME_CSS
+        return BRAND_META + THEME_CSS
 
     def navbar(self):
         return ""
+
+
+# ---------------------------------------------------------------------------
+
+BRAND_META = """
+<meta name="description" content="Solomon - Property Management Software.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Solomon">
+<meta property="og:title" content="Solomon | Property Management Software">
+<meta property="og:description" content="Property Management Software">
+<meta property="og:url" content="https://solo-mon.site/">
+<meta property="og:image" content="https://solo-mon.site/static/solomon_theme/img/social-preview.png">
+<meta property="og:image:secure_url" content="https://solo-mon.site/static/solomon_theme/img/social-preview.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Solomon - Property Management Software">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Solomon | Property Management Software">
+<meta name="twitter:description" content="Property Management Software">
+<meta name="twitter:image" content="https://solo-mon.site/static/solomon_theme/img/social-preview.png">
+<link rel="icon" href="/static/solomon_theme/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/static/solomon_theme/img/social-preview.png">
+"""
 
 
 # ---------------------------------------------------------------------------
