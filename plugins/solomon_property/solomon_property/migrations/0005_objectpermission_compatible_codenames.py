@@ -8,11 +8,36 @@ def copy_permission_assignments(apps, schema_editor):
     User = apps.get_model("users", "User")
 
     permission_pairs = [
-        ("solomon_property", "building", "import_cuzk_data", "import_cuzk_data_building"),
-        ("solomon_property", "building", "calculate_flat_area", "calculate_flat_area_building"),
-        ("solomon_property", "person", "import_contacts_data", "import_contacts_data_person"),
-        ("solomon_property", "person", "export_contacts_data", "export_contacts_data_person"),
-        ("solomon_property", "propertyowner", "import_owner_data", "import_owner_data_propertyowner"),
+        (
+            "solomon_property",
+            "building",
+            "import_cuzk_data",
+            "import_cuzk_data_building",
+        ),
+        (
+            "solomon_property",
+            "building",
+            "calculate_flat_area",
+            "calculate_flat_area_building",
+        ),
+        (
+            "solomon_property",
+            "person",
+            "import_contacts_data",
+            "import_contacts_data_person",
+        ),
+        (
+            "solomon_property",
+            "person",
+            "export_contacts_data",
+            "export_contacts_data_person",
+        ),
+        (
+            "solomon_property",
+            "propertyowner",
+            "import_owner_data",
+            "import_owner_data_propertyowner",
+        ),
     ]
 
     for app_label, model, old_codename, new_codename in permission_pairs:
@@ -21,8 +46,12 @@ def copy_permission_assignments(apps, schema_editor):
         except ContentType.DoesNotExist:
             continue
 
-        old_permission = Permission.objects.filter(content_type=content_type, codename=old_codename).first()
-        new_permission = Permission.objects.filter(content_type=content_type, codename=new_codename).first()
+        old_permission = Permission.objects.filter(
+            content_type=content_type, codename=old_codename
+        ).first()
+        new_permission = Permission.objects.filter(
+            content_type=content_type, codename=new_codename
+        ).first()
         if not old_permission or not new_permission:
             continue
 
@@ -34,7 +63,6 @@ def copy_permission_assignments(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("solomon_property", "0004_model_permissions"),
     ]
@@ -45,8 +73,14 @@ class Migration(migrations.Migration):
             options={
                 "ordering": ["name"],
                 "permissions": (
-                    ("import_cuzk_data_building", "Can import building and flat data from CUZK"),
-                    ("calculate_flat_area_building", "Can calculate and apply flat areas from CUZK shares"),
+                    (
+                        "import_cuzk_data_building",
+                        "Can import building and flat data from CUZK",
+                    ),
+                    (
+                        "calculate_flat_area_building",
+                        "Can calculate and apply flat areas from CUZK shares",
+                    ),
                 ),
                 "verbose_name": "Building",
                 "verbose_name_plural": "Buildings",
@@ -69,7 +103,10 @@ class Migration(migrations.Migration):
             options={
                 "ordering": ["display_name"],
                 "permissions": (
-                    ("import_owner_data_propertyowner", "Can import owners from text data"),
+                    (
+                        "import_owner_data_propertyowner",
+                        "Can import owners from text data",
+                    ),
                 ),
                 "verbose_name": "Property Owner",
                 "verbose_name_plural": "Property Owners",

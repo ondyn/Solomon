@@ -26,7 +26,7 @@ from solomon_property.contacts.contacts_parser import (
     match_contacts_to_persons,
     parse_google_csv,
 )
-from solomon_property.models import Building, Person
+from solomon_property.models import Building
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +37,7 @@ class ContactsImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
       1. Upload CSV -> parse & match -> show preview
       2. User selects rows to import -> execute
     """
+
     template_name = "solomon_property/contacts_import.html"
     permission_required = "solomon_property.import_contacts_data_person"
     raise_exception = True
@@ -49,25 +50,38 @@ class ContactsImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
             rows = match_contacts_to_persons(rows)
             # Only show rows that actually matched something and have data to import
             preview_rows = [
-                r for r in rows
+                r
+                for r in rows
                 if r.match_status in ("matched", "ambiguous") and r.has_useful_data
             ]
-            matched = sum(1 for r in rows if r.match_status == "matched" and r.has_useful_data)
-            ambiguous = sum(1 for r in rows if r.match_status == "ambiguous" and r.has_useful_data)
+            matched = sum(
+                1 for r in rows if r.match_status == "matched" and r.has_useful_data
+            )
+            ambiguous = sum(
+                1 for r in rows if r.match_status == "ambiguous" and r.has_useful_data
+            )
             total_with_data = sum(1 for r in rows if r.has_useful_data)
-            return render(request, self.template_name, {
+            return render(
+                request,
+                self.template_name,
+                {
+                    "title": _("Import Contacts from Google CSV"),
+                    "rows": preview_rows,
+                    "preview": True,
+                    "matched_count": matched,
+                    "ambiguous_count": ambiguous,
+                    "total_with_data": total_with_data,
+                    "total_rows": len(rows),
+                },
+            )
+        return render(
+            request,
+            self.template_name,
+            {
                 "title": _("Import Contacts from Google CSV"),
-                "rows": preview_rows,
-                "preview": True,
-                "matched_count": matched,
-                "ambiguous_count": ambiguous,
-                "total_with_data": total_with_data,
-                "total_rows": len(rows),
-            })
-        return render(request, self.template_name, {
-            "title": _("Import Contacts from Google CSV"),
-            "preview": False,
-        })
+                "preview": False,
+            },
+        )
 
     def post(self, request):
         action = request.POST.get("action", "upload")
@@ -83,34 +97,50 @@ class ContactsImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
         return redirect(reverse("plugins:solomon_property:contacts-import"))
 
     def _handle_upload(self, request):
+        csv_text = request.POST.get("csv_content", "").strip()
         csv_file = request.FILES.get("csv_file")
-        if not csv_file:
-            messages.error(request, _("Please select a CSV file."))
-            return render(request, self.template_name, {
-                "title": _("Import Contacts from Google CSV"),
-                "preview": False,
-            })
-
-        try:
-            csv_text = csv_file.read().decode("utf-8-sig")
-        except UnicodeDecodeError:
-            try:
-                csv_file.seek(0)
-                csv_text = csv_file.read().decode("latin-1")
-            except Exception:
-                messages.error(request, _("Unable to read the CSV file. Check encoding."))
-                return render(request, self.template_name, {
+        if not csv_text and not csv_file:
+            messages.error(request, _("Please select a CSV file or paste CSV content."))
+            return render(
+                request,
+                self.template_name,
+                {
                     "title": _("Import Contacts from Google CSV"),
                     "preview": False,
-                })
+                },
+            )
+
+        if csv_file and not csv_text:
+            try:
+                csv_text = csv_file.read().decode("utf-8-sig")
+            except UnicodeDecodeError:
+                try:
+                    csv_file.seek(0)
+                    csv_text = csv_file.read().decode("latin-1")
+                except Exception:
+                    messages.error(
+                        request, _("Unable to read the CSV file. Check encoding.")
+                    )
+                    return render(
+                        request,
+                        self.template_name,
+                        {
+                            "title": _("Import Contacts from Google CSV"),
+                            "preview": False,
+                        },
+                    )
 
         rows = parse_google_csv(csv_text)
         if not rows:
             messages.warning(request, _("No contacts found in the CSV file."))
-            return render(request, self.template_name, {
-                "title": _("Import Contacts from Google CSV"),
-                "preview": False,
-            })
+            return render(
+                request,
+                self.template_name,
+                {
+                    "title": _("Import Contacts from Google CSV"),
+                    "preview": False,
+                },
+            )
 
         # Store in session (only serializable data)
         request.session["contacts_import_rows"] = self._serialize_rows(rows)
@@ -157,18 +187,26 @@ class ContactsImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
         errors = [r for r in results if r.error]
         total_emails = sum(r.emails_added for r in results)
         total_phones = sum(r.phones_added for r in results)
-        updated = sum(1 for r in results if r.person and (r.emails_added or r.phones_added))
+        updated = sum(
+            1 for r in results if r.person and (r.emails_added or r.phones_added)
+        )
 
         if errors:
             for r in errors:
-                messages.warning(request, _("%(name)s: %(err)s") % {
-                    "name": r.row.display_name, "err": r.error
-                })
+                messages.warning(
+                    request,
+                    _("%(name)s: %(err)s")
+                    % {"name": r.row.display_name, "err": r.error},
+                )
 
-        messages.success(request, _(
-            "Import complete: %(u)d person(s) updated, "
-            "%(e)d email(s) added, %(p)d phone(s) added."
-        ) % {"u": updated, "e": total_emails, "p": total_phones})
+        messages.success(
+            request,
+            _(
+                "Import complete: %(u)d person(s) updated, "
+                "%(e)d email(s) added, %(p)d phone(s) added."
+            )
+            % {"u": updated, "e": total_emails, "p": total_phones},
+        )
 
         return redirect(reverse("plugins:solomon_property:person_list"))
 
@@ -220,39 +258,40 @@ class ContactsExportView(LoginRequiredMixin, PermissionRequiredMixin, View):
     GET  - show export filter form (buildings, roles)
     POST - apply filters and stream the CSV file download
     """
+
     template_name = "solomon_property/contacts_export.html"
     permission_required = "solomon_property.export_contacts_data_person"
     raise_exception = True
 
     def get(self, request):
-        buildings = Building.objects.order_by("name")
-        return render(request, self.template_name, {
-            "title": _("Export Contacts to Google CSV"),
-            "buildings": buildings,
-            "is_initial": True,
-            "include_owners": True,
-            "include_tenants": False,
-            "include_others": False,
-            "selected_buildings": [],
-        })
+        return render(
+            request,
+            self.template_name,
+            self._get_context(),
+        )
 
     def post(self, request):
-        building_ids = request.POST.getlist("buildings")  # list of str PKs, may be empty
+        building_ids = request.POST.getlist(
+            "buildings"
+        )  # list of str PKs, may be empty
         include_owners = "include_owners" in request.POST
         include_tenants = "include_tenants" in request.POST
         include_others = "include_others" in request.POST
 
         if not any([include_owners, include_tenants, include_others]):
-            messages.error(request, _("Please select at least one contact group to export."))
-            buildings = Building.objects.order_by("name")
-            return render(request, self.template_name, {
-                "title": _("Export Contacts to Google CSV"),
-                "buildings": buildings,
-                "selected_buildings": building_ids,
-                "include_owners": include_owners,
-                "include_tenants": include_tenants,
-                "include_others": include_others,
-            })
+            messages.error(
+                request, _("Please select at least one contact group to export.")
+            )
+            return render(
+                request,
+                self.template_name,
+                self._get_context(
+                    selected_buildings=building_ids,
+                    include_owners=include_owners,
+                    include_tenants=include_tenants,
+                    include_others=include_others,
+                ),
+            )
 
         # Convert to ints (ignore invalid values)
         try:
@@ -269,6 +308,32 @@ class ContactsExportView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         csv_content = export_persons_to_google_csv(persons)
 
+        if request.POST.get("action") == "copy":
+            return render(
+                request,
+                self.template_name,
+                self._get_context(
+                    selected_buildings=building_ids,
+                    include_owners=include_owners,
+                    include_tenants=include_tenants,
+                    include_others=include_others,
+                    csv_content=csv_content,
+                ),
+            )
+
         response = HttpResponse(csv_content, content_type="text/csv; charset=utf-8")
         response["Content-Disposition"] = 'attachment; filename="solomon_contacts.csv"'
         return response
+
+    @staticmethod
+    def _get_context(**overrides):
+        context = {
+            "title": _("Export Contacts to Google CSV"),
+            "buildings": Building.objects.order_by("name"),
+            "include_owners": True,
+            "include_tenants": False,
+            "include_others": False,
+            "selected_buildings": [],
+        }
+        context.update(overrides)
+        return context

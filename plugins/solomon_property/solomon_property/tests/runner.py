@@ -59,8 +59,3 @@ class SolomonTestRunner(DiscoverRunner):
         finally:
             BaseDatabaseSchemaEditor.__exit__ = original_exit
         return result
-
-
-
-
-

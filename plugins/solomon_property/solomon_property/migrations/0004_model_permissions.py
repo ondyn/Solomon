@@ -2,7 +2,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("solomon_property", "0003_buildingobject_and_building_parent"),
     ]
@@ -14,7 +13,10 @@ class Migration(migrations.Migration):
                 "ordering": ["name"],
                 "permissions": (
                     ("import_cuzk_data", "Can import building and flat data from CUZK"),
-                    ("calculate_flat_area", "Can calculate and apply flat areas from CUZK shares"),
+                    (
+                        "calculate_flat_area",
+                        "Can calculate and apply flat areas from CUZK shares",
+                    ),
                 ),
                 "verbose_name": "Building",
                 "verbose_name_plural": "Buildings",

@@ -6,14 +6,26 @@ from django.utils.translation import gettext_lazy as _
 
 from netbox.filtersets import NetBoxModelFilterSet
 
-from .models import Building, BuildingObject, Flat, FlatOwner, PropertyOwner, Person, PropertyTenant
+from .models import (
+    Building,
+    BuildingObject,
+    Flat,
+    FlatOwner,
+    PropertyOwner,
+    Person,
+    PropertyTenant,
+)
 
 
 class BuildingObjectFilterSet(NetBoxModelFilterSet):
     q = django_filters.CharFilter(method="search", label=_("Search"))
     name = django_filters.CharFilter(lookup_expr="icontains", label=_("Name"))
-    municipality_name = django_filters.CharFilter(lookup_expr="icontains", label=_("Municipality"))
-    city_part_name = django_filters.CharFilter(lookup_expr="icontains", label=_("City part"))
+    municipality_name = django_filters.CharFilter(
+        lookup_expr="icontains", label=_("Municipality")
+    )
+    city_part_name = django_filters.CharFilter(
+        lookup_expr="icontains", label=_("City part")
+    )
     cuzk_building_id = django_filters.NumberFilter()
 
     def search(self, queryset, name, value):
@@ -51,12 +63,20 @@ class BuildingFilterSet(NetBoxModelFilterSet):
 
     class Meta:
         model = Building
-        fields = ["name", "city", "house_number", "building_object_id", "cuzk_building_id"]
+        fields = [
+            "name",
+            "city",
+            "house_number",
+            "building_object_id",
+            "cuzk_building_id",
+        ]
 
 
 class FlatFilterSet(NetBoxModelFilterSet):
     q = django_filters.CharFilter(method="search", label=_("Search"))
-    flat_number = django_filters.CharFilter(lookup_expr="icontains", label=_("Flat number"))
+    flat_number = django_filters.CharFilter(
+        lookup_expr="icontains", label=_("Flat number")
+    )
     building_id = django_filters.ModelChoiceFilter(
         queryset=Building.objects.all(), label=_("Building")
     )
@@ -112,8 +132,11 @@ class PropertyOwnerFilterSet(NetBoxModelFilterSet):
     def search(self, queryset, name, value):
         return queryset.filter(
             Q(display_name__icontains=value)
-            | Q(email__icontains=value)
-        )
+            | Q(persons__first_name__icontains=value)
+            | Q(persons__last_name__icontains=value)
+            | Q(persons__emails__icontains=value)
+            | Q(persons__phones__icontains=value)
+        ).distinct()
 
     class Meta:
         model = PropertyOwner

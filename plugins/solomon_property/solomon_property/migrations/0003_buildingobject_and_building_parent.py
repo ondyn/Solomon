@@ -8,13 +8,11 @@ import utilities.json
 from django.db import migrations, models
 
 
-
 def _to_house_number(value):
     if value is None:
         return None
     text = str(value).strip()
     return int(text) if text.isdigit() else None
-
 
 
 def populate_building_objects(apps, _schema_editor):
@@ -35,7 +33,10 @@ def populate_building_objects(apps, _schema_editor):
         house_numbers = []
         for item in buildings:
             parsed_house_number = _to_house_number(item.house_number)
-            if parsed_house_number is not None and parsed_house_number not in house_numbers:
+            if (
+                parsed_house_number is not None
+                and parsed_house_number not in house_numbers
+            ):
                 house_numbers.append(parsed_house_number)
 
         obj = BuildingObject.objects.create(
@@ -47,7 +48,9 @@ def populate_building_objects(apps, _schema_editor):
             house_numbers=house_numbers,
         )
 
-        Building.objects.filter(id__in=[b.id for b in buildings]).update(building_object=obj)
+        Building.objects.filter(id__in=[b.id for b in buildings]).update(
+            building_object=obj
+        )
 
     for building in without_cuzk:
         parsed_house_number = _to_house_number(building.house_number)
@@ -55,11 +58,12 @@ def populate_building_objects(apps, _schema_editor):
             name=f"{building.city} {building.street}".strip() or building.name,
             municipality_name=building.city or "",
             city_part_name=building.street or "",
-            house_numbers=[parsed_house_number] if parsed_house_number is not None else [],
+            house_numbers=[parsed_house_number]
+            if parsed_house_number is not None
+            else [],
         )
         building.building_object = obj
         building.save(update_fields=["building_object"])
-
 
 
 def noop_reverse(_apps, _schema_editor):
@@ -67,7 +71,6 @@ def noop_reverse(_apps, _schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("solomon_property", "0002_convert_person_email_phone_to_arrays"),
     ]
@@ -76,18 +79,38 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="BuildingObject",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False
+                    ),
+                ),
                 ("created", models.DateTimeField(auto_now_add=True, null=True)),
                 ("last_updated", models.DateTimeField(auto_now=True, null=True)),
-                ("custom_field_data", models.JSONField(blank=True, default=dict, encoder=utilities.json.CustomFieldJSONEncoder)),
+                (
+                    "custom_field_data",
+                    models.JSONField(
+                        blank=True,
+                        default=dict,
+                        encoder=utilities.json.CustomFieldJSONEncoder,
+                    ),
+                ),
                 ("name", models.CharField(max_length=200)),
-                ("cuzk_building_id", models.BigIntegerField(blank=True, db_index=True, null=True, unique=True)),
+                (
+                    "cuzk_building_id",
+                    models.BigIntegerField(
+                        blank=True, db_index=True, null=True, unique=True
+                    ),
+                ),
                 ("building_type_name", models.CharField(blank=True, max_length=200)),
                 ("usage_name", models.CharField(blank=True, max_length=200)),
                 ("municipality_name", models.CharField(blank=True, max_length=100)),
                 ("city_part_name", models.CharField(blank=True, max_length=100)),
                 ("lv_number", models.IntegerField(blank=True, null=True)),
-                ("cadastral_territory_name", models.CharField(blank=True, max_length=100)),
+                (
+                    "cadastral_territory_name",
+                    models.CharField(blank=True, max_length=100),
+                ),
                 (
                     "house_numbers",
                     django.contrib.postgres.fields.ArrayField(
@@ -98,7 +121,12 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("note", models.TextField(blank=True)),
-                ("tags", taggit.managers.TaggableManager(through="extras.TaggedItem", to="extras.Tag")),
+                (
+                    "tags",
+                    taggit.managers.TaggableManager(
+                        through="extras.TaggedItem", to="extras.Tag"
+                    ),
+                ),
             ],
             options={
                 "verbose_name": "Building object",
@@ -110,12 +138,22 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="building",
             name="building_object",
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name="buildings", to="solomon_property.buildingobject"),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="buildings",
+                to="solomon_property.buildingobject",
+            ),
         ),
         migrations.RunPython(populate_building_objects, noop_reverse),
         migrations.AlterField(
             model_name="building",
             name="building_object",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name="buildings", to="solomon_property.buildingobject"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="buildings",
+                to="solomon_property.buildingobject",
+            ),
         ),
     ]

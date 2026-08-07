@@ -47,6 +47,10 @@ class FlatOwnerFormTest(TestCase):
         self.assertEqual(original.effective_to, datetime.date(2024, 12, 31))
 
         owner_names = list(
-            flat.flat_owners.order_by("effective_from").values_list("owner__display_name", flat=True)
+            flat.flat_owners.order_by("effective_from").values_list(
+                "owner__display_name", flat=True
+            )
         )
-        self.assertEqual(owner_names, ["Holobradá Olga", "SJ Hnyk Ondřej a Hnyková Simona"])
+        self.assertEqual(
+            owner_names, ["Holobradá Olga", "SJ Hnyk Ondřej a Hnyková Simona"]
+        )

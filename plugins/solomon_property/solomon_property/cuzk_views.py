@@ -57,29 +57,41 @@ class CUZKImportSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
     raise_exception = True
 
     def get(self, request):
-        return render(request, self.template_name, {
-            "title": _("CUZK Import - Search"),
-        })
+        return render(
+            request,
+            self.template_name,
+            {
+                "title": _("CUZK Import - Search"),
+            },
+        )
 
     def post(self, request):
         building_id_str = request.POST.get("cuzk_building_id", "").strip()
 
         if not building_id_str:
             messages.error(request, _("Please enter a CUZK building ID."))
-            return render(request, self.template_name, {"title": _("CUZK Import - Search")})
+            return render(
+                request, self.template_name, {"title": _("CUZK Import - Search")}
+            )
 
         try:
             building_id = int(building_id_str)
         except ValueError:
             messages.error(request, _("Invalid CUZK building ID - must be a number."))
-            return render(request, self.template_name, {"title": _("CUZK Import - Search")})
+            return render(
+                request, self.template_name, {"title": _("CUZK Import - Search")}
+            )
 
         client = CUZKClient()
         try:
             cuzk_building, cuzk_units = client.get_building_with_units(building_id)
         except CUZKApiError as exc:
-            messages.error(request, _("CUZK API error: %(detail)s") % {"detail": exc.detail})
-            return render(request, self.template_name, {"title": _("CUZK Import - Search")})
+            messages.error(
+                request, _("CUZK API error: %(detail)s") % {"detail": exc.detail}
+            )
+            return render(
+                request, self.template_name, {"title": _("CUZK Import - Search")}
+            )
 
         request.session["cuzk_import"] = {
             "building": serialize_building(cuzk_building),
@@ -93,6 +105,7 @@ class CUZKImportSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
 # ---------------------------------------------------------------------------
 class CUZKAddressSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
     """POST: search CUZK buildings by city_part_code + house_number. Returns JSON."""
+
     permission_required = "solomon_property.import_cuzk_data_building"
     raise_exception = True
 
@@ -106,7 +119,9 @@ class CUZKAddressSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         client = CUZKClient()
         try:
-            results = client.search_building(city_part_code, house_number, building_type)
+            results = client.search_building(
+                city_part_code, house_number, building_type
+            )
         except CUZKApiError as exc:
             return JsonResponse({"error": exc.detail}, status=502)
 
@@ -126,6 +141,7 @@ class CUZKAddressSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 class CUZKCityPartAutocompleteView(LoginRequiredMixin, PermissionRequiredMixin, View):
     """GET ?q=<text>  - return matching city parts as JSON."""
+
     permission_required = "solomon_property.import_cuzk_data_building"
     raise_exception = True
 
@@ -161,7 +177,8 @@ class CUZKCityPartAutocompleteView(LoginRequiredMixin, PermissionRequiredMixin, 
             q = query.lower()
             # Match city part name, municipality name, or district name
             results = [
-                p for p in _city_parts_cache
+                p
+                for p in _city_parts_cache
                 if p.name.lower().startswith(q)
                 or p.municipality_name.lower().startswith(q)
                 or p.district_name.lower().startswith(q)
@@ -169,15 +186,18 @@ class CUZKCityPartAutocompleteView(LoginRequiredMixin, PermissionRequiredMixin, 
         except CUZKApiError:
             return JsonResponse([], safe=False)
 
-        return JsonResponse([
-            {
-                "code": p.code,
-                "name": p.name,
-                "municipality": p.municipality_name,
-                "district": p.district_name,
-            }
-            for p in results
-        ], safe=False)
+        return JsonResponse(
+            [
+                {
+                    "code": p.code,
+                    "name": p.name,
+                    "municipality": p.municipality_name,
+                    "district": p.district_name,
+                }
+                for p in results
+            ],
+            safe=False,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -200,7 +220,9 @@ class CUZKImportPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def get(self, request):
         cuzk_building, cuzk_units = self._get_import_data(request)
         if not cuzk_building:
-            messages.warning(request, _("No import data found. Please search for a building first."))
+            messages.warning(
+                request, _("No import data found. Please search for a building first.")
+            )
             return redirect(reverse("plugins:solomon_property:cuzk-import-search"))
 
         building_diffs, unit_diffs = build_import_preview(cuzk_building, cuzk_units)
@@ -210,14 +232,18 @@ class CUZKImportPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
         for ud in unit_diffs:
             units_by_hn.setdefault(ud.house_number, []).append(ud)
 
-        return render(request, self.template_name, {
-            "title": _("CUZK Import - Preview"),
-            "cuzk_building": cuzk_building,
-            "building_diffs": building_diffs,
-            "unit_diffs": unit_diffs,
-            "units_by_hn": units_by_hn,
-            "action_choices": ACTION_CHOICES,
-        })
+        return render(
+            request,
+            self.template_name,
+            {
+                "title": _("CUZK Import - Preview"),
+                "cuzk_building": cuzk_building,
+                "building_diffs": building_diffs,
+                "unit_diffs": unit_diffs,
+                "units_by_hn": units_by_hn,
+                "action_choices": ACTION_CHOICES,
+            },
+        )
 
     def post(self, request):
         cuzk_building, cuzk_units = self._get_import_data(request)
@@ -228,16 +254,22 @@ class CUZKImportPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
         building_diffs, unit_diffs = build_import_preview(cuzk_building, cuzk_units)
 
         building_actions = {
-            bdiff.house_number: request.POST.get(f"building_action_{bdiff.house_number}", ACTION_SKIP)
+            bdiff.house_number: request.POST.get(
+                f"building_action_{bdiff.house_number}", ACTION_SKIP
+            )
             for bdiff in building_diffs
         }
         unit_actions = {
-            udiff.cuzk_unit.id: request.POST.get(f"unit_action_{udiff.cuzk_unit.id}", ACTION_SKIP)
+            udiff.cuzk_unit.id: request.POST.get(
+                f"unit_action_{udiff.cuzk_unit.id}", ACTION_SKIP
+            )
             for udiff in unit_diffs
         }
 
         try:
-            stats = execute_import(building_diffs, building_actions, unit_diffs, unit_actions)
+            stats = execute_import(
+                building_diffs, building_actions, unit_diffs, unit_actions
+            )
         except Exception:
             logger.exception("CUZK building import failed")
             messages.error(request, _("Import failed. Please check the logs."))
@@ -247,9 +279,13 @@ class CUZKImportPreviewView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         parts = []
         if stats["buildings_created"]:
-            parts.append(_("%(n)d building(s) created") % {"n": stats["buildings_created"]})
+            parts.append(
+                _("%(n)d building(s) created") % {"n": stats["buildings_created"]}
+            )
         if stats["buildings_updated"]:
-            parts.append(_("%(n)d building(s) updated") % {"n": stats["buildings_updated"]})
+            parts.append(
+                _("%(n)d building(s) updated") % {"n": stats["buildings_updated"]}
+            )
         if stats["flats_created"]:
             parts.append(_("%(n)d flat(s) created") % {"n": stats["flats_created"]})
         if stats["flats_updated"]:
@@ -312,7 +348,9 @@ class OwnersImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 coowned_flat_checks[flat_number] = {
                     "owners": owner_names,
                     "sum_str": f"{total.numerator}/{total.denominator}",
-                    "cuzk_str": f"{cuzk_frac.numerator}/{cuzk_frac.denominator}" if cuzk_frac else "-",
+                    "cuzk_str": f"{cuzk_frac.numerator}/{cuzk_frac.denominator}"
+                    if cuzk_frac
+                    else "-",
                     "ok": ok,
                     "mixed": False,
                 }
@@ -320,7 +358,9 @@ class OwnersImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 coowned_flat_checks[flat_number] = {
                     "owners": owner_names,
                     "mixed": True,
-                    "cuzk_str": f"{cuzk_frac.numerator}/{cuzk_frac.denominator}" if cuzk_frac else "-",
+                    "cuzk_str": f"{cuzk_frac.numerator}/{cuzk_frac.denominator}"
+                    if cuzk_frac
+                    else "-",
                 }
 
         # === Per-record annotation ===
@@ -345,7 +385,9 @@ class OwnersImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     missing_flats.append(flat_number)
                     continue
                 if unit.cuzk_share_numerator and unit.cuzk_share_denominator:
-                    flats_fraction += Fraction(unit.cuzk_share_numerator, unit.cuzk_share_denominator)
+                    flats_fraction += Fraction(
+                        unit.cuzk_share_numerator, unit.cuzk_share_denominator
+                    )
                 else:
                     missing_cuzk_share.append(flat_number)
 
@@ -354,7 +396,9 @@ class OwnersImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 if imported_fraction is not None
                 else "-"
             )
-            rec.preview_flats_total_share = f"{flats_fraction.numerator}/{flats_fraction.denominator}"
+            rec.preview_flats_total_share = (
+                f"{flats_fraction.numerator}/{flats_fraction.denominator}"
+            )
             rec.preview_missing_flats = missing_flats
             rec.preview_missing_cuzk_share = missing_cuzk_share
             rec.preview_share_matches = (
@@ -377,17 +421,25 @@ class OwnersImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
         if parsed:
             records = parse_owners_txt(parsed["text"])
             records = self._annotate_preview(records)
-            return render(request, self.template_name, {
+            return render(
+                request,
+                self.template_name,
+                {
+                    "title": _("Import Owners from Text"),
+                    "records": records,
+                    "raw_text": parsed["text"],
+                    "preview": True,
+                    "effective_from": parsed.get("effective_from", ""),
+                },
+            )
+        return render(
+            request,
+            self.template_name,
+            {
                 "title": _("Import Owners from Text"),
-                "records": records,
-                "raw_text": parsed["text"],
-                "preview": True,
-                "effective_from": parsed.get("effective_from", ""),
-            })
-        return render(request, self.template_name, {
-            "title": _("Import Owners from Text"),
-            "preview": False,
-        })
+                "preview": False,
+            },
+        )
 
     def post(self, request):
         action = request.POST.get("action", "preview")
@@ -397,10 +449,14 @@ class OwnersImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
             effective_from_str = request.POST.get("effective_from", "").strip()
             if not raw_text:
                 messages.error(request, _("Please paste the owners text."))
-                return render(request, self.template_name, {
-                    "title": _("Import Owners from Text"),
-                    "preview": False,
-                })
+                return render(
+                    request,
+                    self.template_name,
+                    {
+                        "title": _("Import Owners from Text"),
+                        "preview": False,
+                    },
+                )
             request.session["owners_import_parsed"] = {
                 "text": raw_text,
                 "effective_from": effective_from_str,
@@ -410,12 +466,18 @@ class OwnersImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
         elif action == "import":
             parsed = request.session.get("owners_import_parsed")
             if not parsed:
-                messages.error(request, _("Session expired. Please paste the text again."))
+                messages.error(
+                    request, _("Session expired. Please paste the text again.")
+                )
                 return redirect(reverse("plugins:solomon_property:owners-import"))
 
             effective_from_str = parsed.get("effective_from", "")
             try:
-                effective_from = datetime.date.fromisoformat(effective_from_str) if effective_from_str else None
+                effective_from = (
+                    datetime.date.fromisoformat(effective_from_str)
+                    if effective_from_str
+                    else None
+                )
             except ValueError:
                 effective_from = None
 
@@ -432,12 +494,22 @@ class OwnersImportView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             if errors:
                 for r in errors:
-                    messages.warning(request, _("%(name)s: %(err)s") % {
-                        "name": r.record.display_name, "err": r.error
-                    })
-            messages.success(request, _(
-                "Import complete: %(o)d owner(s), %(p)d person(s), %(fo)d flat ownership(s)."
-            ) % {"o": owners_created, "p": persons_created, "fo": flat_owners_created})
+                    messages.warning(
+                        request,
+                        _("%(name)s: %(err)s")
+                        % {"name": r.record.display_name, "err": r.error},
+                    )
+            messages.success(
+                request,
+                _(
+                    "Import complete: %(o)d owner(s), %(p)d person(s), %(fo)d flat ownership(s)."
+                )
+                % {
+                    "o": owners_created,
+                    "p": persons_created,
+                    "fo": flat_owners_created,
+                },
+            )
 
             return redirect(reverse("plugins:solomon_property:propertyowner_list"))
 
@@ -466,11 +538,15 @@ class FlatAreaCalculationView(LoginRequiredMixin, PermissionRequiredMixin, View)
 
     def _build_preview(self):
         """Return (max_denominator, rows) where rows is a list of dicts."""
-        flats = Flat.objects.filter(
-            cuzk_share_numerator__isnull=False,
-            cuzk_share_denominator__isnull=False,
-            cuzk_share_denominator__gt=0,
-        ).select_related("building").order_by("building__name", "flat_number")
+        flats = (
+            Flat.objects.filter(
+                cuzk_share_numerator__isnull=False,
+                cuzk_share_denominator__isnull=False,
+                cuzk_share_denominator__gt=0,
+            )
+            .select_related("building")
+            .order_by("building__name", "flat_number")
+        )
 
         if not flats.exists():
             return None, []
@@ -479,24 +555,36 @@ class FlatAreaCalculationView(LoginRequiredMixin, PermissionRequiredMixin, View)
 
         rows = []
         for flat in flats:
-            calculated = max_denominator / flat.cuzk_share_denominator * flat.cuzk_share_numerator / 10
-            rows.append({
-                "flat": flat,
-                "share": flat.cuzk_share,
-                "calculated_area": calculated,
-                "current_area": flat.area_m2,
-                "will_change": flat.area_m2 is None or float(flat.area_m2) != calculated,
-            })
+            calculated = (
+                max_denominator
+                / flat.cuzk_share_denominator
+                * flat.cuzk_share_numerator
+                / 10
+            )
+            rows.append(
+                {
+                    "flat": flat,
+                    "share": flat.cuzk_share,
+                    "calculated_area": calculated,
+                    "current_area": flat.area_m2,
+                    "will_change": flat.area_m2 is None
+                    or float(flat.area_m2) != calculated,
+                }
+            )
 
         return max_denominator, rows
 
     def get(self, request):
         max_denominator, rows = self._build_preview()
-        return render(request, self.template_name, {
-            "title": _("Calculate Flat Areas"),
-            "max_denominator": max_denominator,
-            "rows": rows,
-        })
+        return render(
+            request,
+            self.template_name,
+            {
+                "title": _("Calculate Flat Areas"),
+                "max_denominator": max_denominator,
+                "rows": rows,
+            },
+        )
 
     def post(self, request):
         if request.POST.get("action") != "apply":

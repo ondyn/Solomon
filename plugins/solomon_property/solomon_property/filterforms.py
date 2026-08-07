@@ -8,82 +8,94 @@ from utilities.forms import BOOLEAN_WITH_BLANK_CHOICES
 from utilities.forms.fields import DynamicModelChoiceField, TagFilterField
 from utilities.forms.rendering import FieldSet
 
-from .models import Building, BuildingObject, Flat, FlatOwner, Person, PropertyOwner, PropertyTenant
+from .models import (
+    Building,
+    BuildingObject,
+    Flat,
+    FlatOwner,
+    Person,
+    PropertyOwner,
+    PropertyTenant,
+)
 
 
 class BuildingObjectFilterForm(NetBoxModelFilterSetForm):
     model = BuildingObject
     fieldsets = (
-        FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('name', 'municipality_name', 'city_part_name', name=_('Building object')),
+        FieldSet("q", "filter_id", "tag"),
+        FieldSet(
+            "name", "municipality_name", "city_part_name", name=_("Building object")
+        ),
     )
-    name = forms.CharField(required=False, label=_('Name'))
-    municipality_name = forms.CharField(required=False, label=_('Municipality'))
-    city_part_name = forms.CharField(required=False, label=_('City part'))
+    name = forms.CharField(required=False, label=_("Name"))
+    municipality_name = forms.CharField(required=False, label=_("Municipality"))
+    city_part_name = forms.CharField(required=False, label=_("City part"))
     tag = TagFilterField(model)
 
 
 class BuildingFilterForm(NetBoxModelFilterSetForm):
     model = Building
     fieldsets = (
-        FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('building_object_id', 'name', 'city', 'house_number', name=_('Building')),
+        FieldSet("q", "filter_id", "tag"),
+        FieldSet(
+            "building_object_id", "name", "city", "house_number", name=_("Building")
+        ),
     )
     building_object_id = DynamicModelChoiceField(
         queryset=BuildingObject.objects.all(),
         required=False,
-        label=_('Building object'),
+        label=_("Building object"),
     )
-    name = forms.CharField(required=False, label=_('Name'))
-    city = forms.CharField(required=False, label=_('City'))
-    house_number = forms.CharField(required=False, label=_('House number'))
+    name = forms.CharField(required=False, label=_("Name"))
+    city = forms.CharField(required=False, label=_("City"))
+    house_number = forms.CharField(required=False, label=_("House number"))
     tag = TagFilterField(model)
 
 
 class FlatFilterForm(NetBoxModelFilterSetForm):
     model = Flat
     fieldsets = (
-        FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('building_id', 'flat_number', 'floor', 'disposition', name=_('Flat')),
+        FieldSet("q", "filter_id", "tag"),
+        FieldSet("building_id", "flat_number", "floor", "disposition", name=_("Flat")),
     )
     building_id = DynamicModelChoiceField(
         queryset=Building.objects.all(),
         required=False,
-        label=_('Building'),
+        label=_("Building"),
     )
-    flat_number = forms.CharField(required=False, label=_('Flat number'))
-    floor = forms.IntegerField(required=False, label=_('Floor'))
-    disposition = forms.CharField(required=False, label=_('Disposition'))
+    flat_number = forms.CharField(required=False, label=_("Flat number"))
+    floor = forms.IntegerField(required=False, label=_("Floor"))
+    disposition = forms.CharField(required=False, label=_("Disposition"))
     tag = TagFilterField(model)
 
 
 class PersonFilterForm(NetBoxModelFilterSetForm):
     model = Person
     fieldsets = (
-        FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('last_name', 'first_name', 'email', name=_('Person')),
+        FieldSet("q", "filter_id", "tag"),
+        FieldSet("last_name", "first_name", "email", name=_("Person")),
     )
-    last_name = forms.CharField(required=False, label=_('Last name'))
-    first_name = forms.CharField(required=False, label=_('First name'))
-    email = forms.CharField(required=False, label=_('Email'))
+    last_name = forms.CharField(required=False, label=_("Last name"))
+    first_name = forms.CharField(required=False, label=_("First name"))
+    email = forms.CharField(required=False, label=_("Email"))
     tag = TagFilterField(model)
 
 
 class PropertyOwnerFilterForm(NetBoxModelFilterSetForm):
     model = PropertyOwner
     fieldsets = (
-        FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('display_name', 'person_type', name=_('Owner')),
+        FieldSet("q", "filter_id", "tag"),
+        FieldSet("display_name", "person_type", name=_("Owner")),
     )
-    display_name = forms.CharField(required=False, label=_('Name'))
+    display_name = forms.CharField(required=False, label=_("Name"))
     person_type = forms.MultipleChoiceField(
         choices=[
-            ('natural', _('Natural person')),
-            ('legal', _('Legal entity')),
-            ('sjm', _('SJM')),
+            ("natural", _("Natural person")),
+            ("legal", _("Legal entity")),
+            ("sjm", _("SJM")),
         ],
         required=False,
-        label=_('Type'),
+        label=_("Type"),
     )
     tag = TagFilterField(model)
 
@@ -91,22 +103,22 @@ class PropertyOwnerFilterForm(NetBoxModelFilterSetForm):
 class FlatOwnerFilterForm(NetBoxModelFilterSetForm):
     model = FlatOwner
     fieldsets = (
-        FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('flat_id', 'owner_id', 'is_current', name=_('Ownership')),
+        FieldSet("q", "filter_id", "tag"),
+        FieldSet("flat_id", "owner_id", "is_current", name=_("Ownership")),
     )
     flat_id = DynamicModelChoiceField(
         queryset=Flat.objects.all(),
         required=False,
-        label=_('Flat'),
+        label=_("Flat"),
     )
     owner_id = DynamicModelChoiceField(
         queryset=PropertyOwner.objects.all(),
         required=False,
-        label=_('Owner'),
+        label=_("Owner"),
     )
     is_current = forms.NullBooleanField(
         required=False,
-        label=_('Current owner'),
+        label=_("Current owner"),
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     tag = TagFilterField(model)
@@ -115,22 +127,22 @@ class FlatOwnerFilterForm(NetBoxModelFilterSetForm):
 class PropertyTenantFilterForm(NetBoxModelFilterSetForm):
     model = PropertyTenant
     fieldsets = (
-        FieldSet('q', 'filter_id', 'tag'),
-        FieldSet('flat_id', 'person_id', 'is_current', name=_('Tenancy')),
+        FieldSet("q", "filter_id", "tag"),
+        FieldSet("flat_id", "person_id", "is_current", name=_("Tenancy")),
     )
     flat_id = DynamicModelChoiceField(
         queryset=Flat.objects.all(),
         required=False,
-        label=_('Flat'),
+        label=_("Flat"),
     )
     person_id = DynamicModelChoiceField(
         queryset=Person.objects.all(),
         required=False,
-        label=_('Person'),
+        label=_("Person"),
     )
     is_current = forms.NullBooleanField(
         required=False,
-        label=_('Current tenant'),
+        label=_("Current tenant"),
         widget=forms.Select(choices=BOOLEAN_WITH_BLANK_CHOICES),
     )
     tag = TagFilterField(model)

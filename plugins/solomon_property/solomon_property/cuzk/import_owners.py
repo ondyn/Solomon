@@ -34,7 +34,9 @@ class OwnerImportResult:
             self.persons_created = []
 
 
-def _get_or_create_person(pp: ParsedPerson, fallback_address: str = "") -> tuple[Person, bool]:
+def _get_or_create_person(
+    pp: ParsedPerson, fallback_address: str = ""
+) -> tuple[Person, bool]:
     """
     Find existing Person by name or create new one.
 
@@ -83,7 +85,9 @@ def _find_flat(flat_number_str: str) -> Flat | None:
     ).first()
 
 
-def _resolve_flat_share(rec: ParsedOwnerRecord, flat: Flat, flat_count: int) -> tuple[int, int]:
+def _resolve_flat_share(
+    rec: ParsedOwnerRecord, flat: Flat, flat_count: int
+) -> tuple[int, int]:
     """
     Resolve per-flat ownership share for FlatOwner row creation.
 
@@ -143,7 +147,9 @@ def import_owners(
             for pp in rec.persons:
                 if not pp.last_name:
                     continue
-                person, created = _get_or_create_person(pp, fallback_address=rec.address)
+                person, created = _get_or_create_person(
+                    pp, fallback_address=rec.address
+                )
                 owner.persons.add(person)
                 if created:
                     result.persons_created.append(person)
@@ -152,7 +158,11 @@ def import_owners(
             for flat_num_str in rec.flat_numbers:
                 flat = _find_flat(flat_num_str)
                 if not flat:
-                    logger.warning("Flat not found for %s (owner: %s)", flat_num_str, rec.display_name)
+                    logger.warning(
+                        "Flat not found for %s (owner: %s)",
+                        flat_num_str,
+                        rec.display_name,
+                    )
                     continue
 
                 share_numerator, share_denominator = _resolve_flat_share(

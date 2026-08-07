@@ -139,7 +139,9 @@ property_menu = PluginMenu(
                             link="plugins:solomon_property:owners-import",
                             title=_("Import"),
                             icon_class="mdi mdi-file-import",
-                            permissions=["solomon_property.import_owner_data_propertyowner"],
+                            permissions=[
+                                "solomon_property.import_owner_data_propertyowner"
+                            ],
                         ),
                     ),
                 ),
@@ -152,7 +154,9 @@ property_menu = PluginMenu(
                             link="plugins:solomon_property:flat-area-calculation",
                             title=_("Calculate"),
                             icon_class="mdi mdi-calculator-variant",
-                            permissions=["solomon_property.calculate_flat_area_building"],
+                            permissions=[
+                                "solomon_property.calculate_flat_area_building"
+                            ],
                         ),
                     ),
                 ),
@@ -170,7 +174,9 @@ property_menu = PluginMenu(
                             link="plugins:solomon_property:contacts-import",
                             title=_("Import"),
                             icon_class="mdi mdi-file-upload",
-                            permissions=["solomon_property.import_contacts_data_person"],
+                            permissions=[
+                                "solomon_property.import_contacts_data_person"
+                            ],
                         ),
                     ),
                 ),
@@ -183,7 +189,9 @@ property_menu = PluginMenu(
                             link="plugins:solomon_property:contacts-export",
                             title=_("Export"),
                             icon_class="mdi mdi-file-download",
-                            permissions=["solomon_property.export_contacts_data_person"],
+                            permissions=[
+                                "solomon_property.export_contacts_data_person"
+                            ],
                         ),
                     ),
                 ),

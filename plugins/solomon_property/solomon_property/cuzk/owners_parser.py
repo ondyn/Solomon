@@ -42,12 +42,13 @@ TITLE_AFTER_RE = re.compile(
 @dataclass
 class ParsedPerson:
     """A single person parsed from the owners file."""
-    raw_name: str            # Full name as written
+
+    raw_name: str  # Full name as written
     title_before: str = ""
     first_name: str = ""
     last_name: str = ""
     title_after: str = ""
-    address: str = ""        # Street + city from the same line
+    address: str = ""  # Street + city from the same line
 
 
 @dataclass
@@ -62,8 +63,9 @@ class ParsedOwnerRecord:
     share_numerator / share_denominator: ownership share of common parts
     address: address line from the owner line
     """
+
     display_name: str
-    person_type: str = "natural"   # natural | sjm | legal
+    person_type: str = "natural"  # natural | sjm | legal
     persons: list[ParsedPerson] = field(default_factory=list)
     flat_numbers: list[str] = field(default_factory=list)
     share_numerator: int | None = None
@@ -84,7 +86,15 @@ def _split_name_address(line: str) -> tuple[str, str]:
         return line.strip(), ""
 
     # Legal suffix fragments that are part of the name, not the address
-    legal_fragments = {"spol. s r.o.", "s.r.o.", "a.s.", "v.o.s.", "k.s.", "o.p.s.", "z.s."}
+    legal_fragments = {
+        "spol. s r.o.",
+        "s.r.o.",
+        "a.s.",
+        "v.o.s.",
+        "k.s.",
+        "o.p.s.",
+        "z.s.",
+    }
 
     name_parts = [parts[0]]
     i = 1
@@ -127,7 +137,7 @@ def _parse_person_name(raw_name: str) -> tuple[str, str, str, str]:
     m = TITLE_BEFORE_RE.match(name)
     if m:
         title_before = m.group(1)
-        name = name[m.end():].strip()
+        name = name[m.end() :].strip()
 
     # Check for middle titles (e.g. "Ing." appearing after last name)
     # Pattern: Word Word Ing. → extract title
@@ -266,7 +276,7 @@ def parse_owners_txt(text: str) -> list[ParsedOwnerRecord]:
         line = raw_line.strip()
         if not line:
             # Blank lines may appear between records - flush if block is complete
-            if current and any(l.startswith("Jednotka:") for l in current):
+            if current and any(line.startswith("Jednotka:") for line in current):
                 if not absorbing_last_names:
                     blocks.append(current)
                     current = []
@@ -304,7 +314,7 @@ def parse_owners_txt(text: str) -> list[ParsedOwnerRecord]:
     if current:
         if absorbing_last_names:
             blocks.append(current)
-        elif any(l.startswith("Jednotka:") for l in current):
+        elif any(line.startswith("Jednotka:") for line in current):
             blocks.append(current)
 
     for owner_lines in blocks:
@@ -325,7 +335,7 @@ def parse_owners_txt(text: str) -> list[ParsedOwnerRecord]:
         # Lines before Jednotka are owner name/address lines
         name_lines = owner_lines[:jednotka_idx]
         # Lines after Jednotka may be extra person lines (SJM Schmidt pattern)
-        extra_lines = owner_lines[jednotka_idx + 1:]
+        extra_lines = owner_lines[jednotka_idx + 1 :]
 
         if not name_lines:
             continue
@@ -342,7 +352,15 @@ def parse_owners_txt(text: str) -> list[ParsedOwnerRecord]:
             sjm_names = _parse_sjm_names(raw_name)
             for sn in sjm_names:
                 tb, fn, ln, ta = _parse_person_name(sn)
-                persons.append(ParsedPerson(raw_name=sn, title_before=tb, first_name=fn, last_name=ln, title_after=ta))
+                persons.append(
+                    ParsedPerson(
+                        raw_name=sn,
+                        title_before=tb,
+                        first_name=fn,
+                        last_name=ln,
+                        title_after=ta,
+                    )
+                )
             # Extra lines may have addresses for each spouse
             for extra in extra_lines:
                 extra = extra.strip()
@@ -360,7 +378,16 @@ def parse_owners_txt(text: str) -> list[ParsedOwnerRecord]:
             mcp_names = _parse_mcp_names(raw_name)
             for mn in mcp_names:
                 tb, fn, ln, ta = _parse_person_name(mn)
-                persons.append(ParsedPerson(raw_name=mn, title_before=tb, first_name=fn, last_name=ln, title_after=ta, address=address))
+                persons.append(
+                    ParsedPerson(
+                        raw_name=mn,
+                        title_before=tb,
+                        first_name=fn,
+                        last_name=ln,
+                        title_after=ta,
+                        address=address,
+                    )
+                )
 
         elif _is_legal_entity(raw_name):
             person_type = "legal"
@@ -368,7 +395,16 @@ def parse_owners_txt(text: str) -> list[ParsedOwnerRecord]:
         else:
             # Natural person
             tb, fn, ln, ta = _parse_person_name(raw_name)
-            persons.append(ParsedPerson(raw_name=raw_name, title_before=tb, first_name=fn, last_name=ln, title_after=ta, address=address))
+            persons.append(
+                ParsedPerson(
+                    raw_name=raw_name,
+                    title_before=tb,
+                    first_name=fn,
+                    last_name=ln,
+                    title_after=ta,
+                    address=address,
+                )
+            )
 
             # Additional name lines in block (before Jednotka)
             for extra in name_lines[1:]:
@@ -376,7 +412,16 @@ def parse_owners_txt(text: str) -> list[ParsedOwnerRecord]:
                 if extra and not extra.startswith("Jednotka:"):
                     en, ea = _split_name_address(extra)
                     etb, efn, eln, eta = _parse_person_name(en)
-                    persons.append(ParsedPerson(raw_name=en, title_before=etb, first_name=efn, last_name=eln, title_after=eta, address=ea))
+                    persons.append(
+                        ParsedPerson(
+                            raw_name=en,
+                            title_before=etb,
+                            first_name=efn,
+                            last_name=eln,
+                            title_after=eta,
+                            address=ea,
+                        )
+                    )
 
             # Extra lines after Jednotka
             for extra in extra_lines:
@@ -384,23 +429,42 @@ def parse_owners_txt(text: str) -> list[ParsedOwnerRecord]:
                 if extra and not extra.startswith("Jednotka:"):
                     en, ea = _split_name_address(extra)
                     etb, efn, eln, eta = _parse_person_name(en)
-                    persons.append(ParsedPerson(raw_name=en, title_before=etb, first_name=efn, last_name=eln, title_after=eta, address=ea))
+                    persons.append(
+                        ParsedPerson(
+                            raw_name=en,
+                            title_before=etb,
+                            first_name=efn,
+                            last_name=eln,
+                            title_after=eta,
+                            address=ea,
+                        )
+                    )
 
-        records.append(ParsedOwnerRecord(
-            display_name=raw_name,
-            person_type=person_type,
-            persons=persons,
-            flat_numbers=flat_numbers,
-            share_numerator=share_num,
-            share_denominator=share_den,
-            address=address,
-        ))
+        records.append(
+            ParsedOwnerRecord(
+                display_name=raw_name,
+                person_type=person_type,
+                persons=persons,
+                flat_numbers=flat_numbers,
+                share_numerator=share_num,
+                share_denominator=share_den,
+                address=address,
+            )
+        )
 
     return records
 
 
 def _is_legal_entity(name: str) -> bool:
     """Heuristic: detect legal entities (s.r.o., a.s., etc.)."""
-    legal_suffixes = ["s.r.o.", "a.s.", "spol. s r.o.", "v.o.s.", "k.s.", "o.p.s.", "z.s."]
+    legal_suffixes = [
+        "s.r.o.",
+        "a.s.",
+        "spol. s r.o.",
+        "v.o.s.",
+        "k.s.",
+        "o.p.s.",
+        "z.s.",
+    ]
     name_lower = name.lower()
     return any(s in name_lower for s in legal_suffixes)

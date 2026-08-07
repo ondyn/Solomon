@@ -131,11 +131,34 @@
             </div>
           </div>
 
+          {% if csv_content %}
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label for="csv_content" class="form-label fw-semibold mb-0">{% trans "CSV Content" %}</label>
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="copy-csv">
+                <i class="mdi mdi-content-copy"></i>
+                {% trans "Copy" %}
+              </button>
+            </div>
+            <textarea
+              class="form-control font-monospace"
+              id="csv_content"
+              rows="12"
+              readonly
+              spellcheck="false"
+            >{{ csv_content }}</textarea>
+          </div>
+          {% endif %}
+
           {# ── Actions ──────────────────────────────────────────────────── #}
-          <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">
+          <div class="d-flex flex-wrap gap-2">
+            <button type="submit" name="action" value="download" class="btn btn-primary">
               <i class="mdi mdi-download"></i>
               {% trans "Download CSV" %}
+            </button>
+            <button type="submit" name="action" value="copy" class="btn btn-outline-primary">
+              <i class="mdi mdi-text-box-outline"></i>
+              {% trans "Show CSV to Copy" %}
             </button>
             <a href="{% url 'plugins:solomon_property:person_list' %}" class="btn btn-outline-secondary">
               {% trans "Cancel" %}
@@ -171,6 +194,16 @@
     deselectAll.addEventListener('click', function (e) {
       e.preventDefault();
       allBuildings.forEach(function (cb) { cb.checked = false; });
+    });
+  }
+
+  var copyButton = document.getElementById('copy-csv');
+  var csvContent = document.getElementById('csv_content');
+  if (copyButton && csvContent) {
+    copyButton.addEventListener('click', function () {
+      navigator.clipboard.writeText(csvContent.value).then(function () {
+        copyButton.innerHTML = '<i class="mdi mdi-check"></i> {% trans "Copied" %}';
+      });
     });
   }
 })();

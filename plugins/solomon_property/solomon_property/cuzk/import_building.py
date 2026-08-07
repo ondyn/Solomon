@@ -85,12 +85,30 @@ def compute_building_diff(
     lv_number = cuzk_building.lv.number if cuzk_building.lv else None
 
     if building:
-        diffs.append(FieldDiff("house_number", _("House number"), building.house_number, house_number_str))
-        diffs.append(FieldDiff("city", _("City"), building.city, cuzk_building.municipality_name))
-        diffs.append(FieldDiff("cuzk_lv_number", _("Title deed (LV)"), building.cuzk_lv_number, lv_number))
+        diffs.append(
+            FieldDiff(
+                "house_number",
+                _("House number"),
+                building.house_number,
+                house_number_str,
+            )
+        )
+        diffs.append(
+            FieldDiff("city", _("City"), building.city, cuzk_building.municipality_name)
+        )
+        diffs.append(
+            FieldDiff(
+                "cuzk_lv_number",
+                _("Title deed (LV)"),
+                building.cuzk_lv_number,
+                lv_number,
+            )
+        )
         action = ACTION_UPDATE if any(d.is_changed for d in diffs) else ACTION_SKIP
     else:
-        diffs.append(FieldDiff("house_number", _("House number"), "-", house_number_str))
+        diffs.append(
+            FieldDiff("house_number", _("House number"), "-", house_number_str)
+        )
         diffs.append(FieldDiff("city", _("City"), "-", cuzk_building.municipality_name))
         diffs.append(FieldDiff("cuzk_lv_number", _("Title deed (LV)"), "-", lv_number))
         action = ACTION_CREATE
@@ -111,14 +129,34 @@ def compute_unit_diff(cuzk_unit: CUZKUnit, flat: Flat | None) -> UnitDiff:
     share_den = cuzk_unit.share.denominator if cuzk_unit.share else None
 
     if flat:
-        diffs.append(FieldDiff("flat_number", _("Flat number"), flat.flat_number, unit_num))
-        diffs.append(FieldDiff("cuzk_share_numerator", _("Share numerator"), flat.cuzk_share_numerator, share_num))
-        diffs.append(FieldDiff("cuzk_share_denominator", _("Share denominator"), flat.cuzk_share_denominator, share_den))
+        diffs.append(
+            FieldDiff("flat_number", _("Flat number"), flat.flat_number, unit_num)
+        )
+        diffs.append(
+            FieldDiff(
+                "cuzk_share_numerator",
+                _("Share numerator"),
+                flat.cuzk_share_numerator,
+                share_num,
+            )
+        )
+        diffs.append(
+            FieldDiff(
+                "cuzk_share_denominator",
+                _("Share denominator"),
+                flat.cuzk_share_denominator,
+                share_den,
+            )
+        )
         action = ACTION_UPDATE if any(d.is_changed for d in diffs) else ACTION_SKIP
     else:
         diffs.append(FieldDiff("flat_number", _("Flat number"), "-", unit_num))
-        diffs.append(FieldDiff("cuzk_share_numerator", _("Share numerator"), "-", share_num))
-        diffs.append(FieldDiff("cuzk_share_denominator", _("Share denominator"), "-", share_den))
+        diffs.append(
+            FieldDiff("cuzk_share_numerator", _("Share numerator"), "-", share_num)
+        )
+        diffs.append(
+            FieldDiff("cuzk_share_denominator", _("Share denominator"), "-", share_den)
+        )
         action = ACTION_CREATE
 
     return UnitDiff(
@@ -145,14 +183,18 @@ def build_import_preview(
         if hn in target_buildings and target_buildings[hn] is not None:
             existing_by_hn[hn] = target_buildings[hn]
         else:
-            existing = Building.objects.filter(cuzk_building_id=cuzk_building.id, house_number=str(hn)).first()
+            existing = Building.objects.filter(
+                cuzk_building_id=cuzk_building.id, house_number=str(hn)
+            ).first()
             if not existing:
                 existing = Building.objects.filter(
                     building_object__cuzk_building_id=cuzk_building.id,
                     house_number=str(hn),
                 ).first()
             if not existing:
-                existing = Building.objects.filter(house_number=str(hn), city=cuzk_building.municipality_name).first()
+                existing = Building.objects.filter(
+                    house_number=str(hn), city=cuzk_building.municipality_name
+                ).first()
             existing_by_hn[hn] = existing
 
     grouped_units = group_units_by_house_number(cuzk_units, house_numbers)
@@ -167,9 +209,13 @@ def build_import_preview(
             existing_flat = None
             if existing_by_hn.get(hn):
                 bld = existing_by_hn[hn]
-                existing_flat = Flat.objects.filter(building=bld, cuzk_unit_id=cu.id).first()
+                existing_flat = Flat.objects.filter(
+                    building=bld, cuzk_unit_id=cu.id
+                ).first()
                 if not existing_flat:
-                    existing_flat = Flat.objects.filter(building=bld, flat_number=cu.flat_number_in_building).first()
+                    existing_flat = Flat.objects.filter(
+                        building=bld, flat_number=cu.flat_number_in_building
+                    ).first()
             unit_diffs.append(compute_unit_diff(cu, existing_flat))
 
     return building_diffs, unit_diffs
@@ -207,7 +253,13 @@ def execute_import(
     unit_diffs: list[UnitDiff],
     unit_actions: dict[int, str],
 ) -> dict[str, int]:
-    stats = {"buildings_created": 0, "buildings_updated": 0, "flats_created": 0, "flats_updated": 0, "skipped": 0}
+    stats = {
+        "buildings_created": 0,
+        "buildings_updated": 0,
+        "flats_created": 0,
+        "flats_updated": 0,
+        "skipped": 0,
+    }
     resolved_buildings: dict[int, Building | None] = {}
 
     for bdiff in building_diffs:
@@ -290,15 +342,21 @@ def serialize_building(b: CUZKBuilding) -> dict:
         "city_part_name": b.city_part_name,
         "usage_code": b.usage_code,
         "usage_name": b.usage_name,
-        "lv": {"id": b.lv.id, "number": b.lv.number,
-               "cadastral_territory_code": b.lv.cadastral_territory_code,
-               "cadastral_territory_name": b.lv.cadastral_territory_name} if b.lv else None,
+        "lv": {
+            "id": b.lv.id,
+            "number": b.lv.number,
+            "cadastral_territory_code": b.lv.cadastral_territory_code,
+            "cadastral_territory_name": b.lv.cadastral_territory_name,
+        }
+        if b.lv
+        else None,
         "unit_refs": [{"id": u.id, "unit_number": u.unit_number} for u in b.unit_refs],
     }
 
 
 def deserialize_building(data: dict) -> CUZKBuilding:
     from .service import CUZKBuilding as B, CUZKTitleDeed, CUZKUnitRef
+
     lv = CUZKTitleDeed(**data["lv"]) if data.get("lv") else None
     return B(
         id=data["id"],
@@ -324,16 +382,24 @@ def serialize_unit(u: CUZKUnit) -> dict:
         "unit_type_name": u.unit_type_name,
         "usage_code": u.usage_code,
         "usage_name": u.usage_name,
-        "share": {"numerator": u.share.numerator, "denominator": u.share.denominator} if u.share else None,
-        "lv": {"id": u.lv.id, "number": u.lv.number,
-               "cadastral_territory_code": u.lv.cadastral_territory_code,
-               "cadastral_territory_name": u.lv.cadastral_territory_name} if u.lv else None,
+        "share": {"numerator": u.share.numerator, "denominator": u.share.denominator}
+        if u.share
+        else None,
+        "lv": {
+            "id": u.lv.id,
+            "number": u.lv.number,
+            "cadastral_territory_code": u.lv.cadastral_territory_code,
+            "cadastral_territory_name": u.lv.cadastral_territory_name,
+        }
+        if u.lv
+        else None,
         "building_id": u.building_id,
     }
 
 
 def deserialize_unit(data: dict) -> CUZKUnit:
     from .service import CUZKShare, CUZKTitleDeed, CUZKUnit as U
+
     share = CUZKShare(**data["share"]) if data.get("share") else None
     lv = CUZKTitleDeed(**data["lv"]) if data.get("lv") else None
     return U(

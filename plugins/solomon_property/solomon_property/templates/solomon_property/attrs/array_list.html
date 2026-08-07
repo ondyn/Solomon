@@ -1,7 +1,9 @@
 {% if value %}
-  {% for item in value %}
-    <span>{{ item }}</span>{% if not forloop.last %}, {% endif %}
-  {% endfor %}
+  <div class="d-grid gap-1">
+    {% for item in value %}
+      <div class="text-break"><a href="{{ scheme }}{{ item }}">{{ item }}</a></div>
+    {% endfor %}
+  </div>
 {% else %}
   <span class="text-muted">&mdash;</span>
 {% endif %}

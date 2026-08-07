@@ -274,9 +274,11 @@ class CUZKClient:
             # Fall back to os.environ as a last resort.
             try:
                 import netbox.configuration as _nb_conf
+
                 self.api_key = _nb_conf.CUZK_API_KEY
             except Exception:
                 import os
+
                 self.api_key = os.environ.get("CUZK_API_KEY", "")
         self.base_url = base_url or CUZK_API_BASE_URL
         self.session = requests.Session()
@@ -400,7 +402,9 @@ class CUZKClient:
         q = query.lower()
         return [p for p in all_parts if p.name.lower().startswith(q)]
 
-    def get_city_parts_for_municipality(self, municipality_code: int) -> list[CUZKCityPart]:
+    def get_city_parts_for_municipality(
+        self, municipality_code: int
+    ) -> list[CUZKCityPart]:
         """
         Get city parts belonging to a specific municipality.
 
@@ -448,7 +452,9 @@ class CUZKClient:
     # ------------------------------------------------------------------
     #  Convenience: load building with all its units
     # ------------------------------------------------------------------
-    def get_building_with_units(self, building_id: int) -> tuple[CUZKBuilding, list[CUZKUnit]]:
+    def get_building_with_units(
+        self, building_id: int
+    ) -> tuple[CUZKBuilding, list[CUZKUnit]]:
         """
         Fetch a building and all its units in detail.
 

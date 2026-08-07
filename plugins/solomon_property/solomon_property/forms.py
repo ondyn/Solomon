@@ -8,9 +8,20 @@ from django.forms.models import construct_instance
 from django.utils.translation import gettext_lazy as _
 
 from netbox.forms import NetBoxModelForm
-from utilities.forms.fields import DynamicModelChoiceField, DynamicModelMultipleChoiceField
+from utilities.forms.fields import (
+    DynamicModelChoiceField,
+    DynamicModelMultipleChoiceField,
+)
 
-from .models import Building, BuildingObject, Flat, FlatOwner, PropertyOwner, Person, PropertyTenant
+from .models import (
+    Building,
+    BuildingObject,
+    Flat,
+    FlatOwner,
+    PropertyOwner,
+    Person,
+    PropertyTenant,
+)
 
 
 class BuildingObjectForm(NetBoxModelForm):
@@ -44,11 +55,22 @@ class BuildingForm(NetBoxModelForm):
         model = Building
         fields = [
             "building_object",
-            "name", "street", "house_number", "city", "postal_code",
-            "number_of_floors", "elevator", "year_built", "total_units",
-            "land_plot_number", "common_rooms", "floor_plan_url",
-            "common_area_rental", "note",
-            "cuzk_building_id", "cuzk_lv_number",
+            "name",
+            "street",
+            "house_number",
+            "city",
+            "postal_code",
+            "number_of_floors",
+            "elevator",
+            "year_built",
+            "total_units",
+            "land_plot_number",
+            "common_rooms",
+            "floor_plan_url",
+            "common_area_rental",
+            "note",
+            "cuzk_building_id",
+            "cuzk_lv_number",
             "tags",
         ]
         widgets = {
@@ -64,17 +86,31 @@ class BuildingForm(NetBoxModelForm):
 
 
 class FlatForm(NetBoxModelForm):
-    building = DynamicModelChoiceField(queryset=Building.objects.all(), label=_("Building"))
+    building = DynamicModelChoiceField(
+        queryset=Building.objects.all(), label=_("Building")
+    )
 
     class Meta:
         model = Flat
         fields = [
-            "building", "flat_number", "floor", "area_m2", "disposition",
-            "number_of_rooms", "water_outlets", "waste_outlets",
-            "radiator_count", "radiator_power_kw",
-            "gas_installed", "has_balcony", "cellar_unit",
-            "ownership_cert_number", "note",
-            "cuzk_unit_id", "cuzk_share_numerator", "cuzk_share_denominator",
+            "building",
+            "flat_number",
+            "floor",
+            "area_m2",
+            "disposition",
+            "number_of_rooms",
+            "water_outlets",
+            "waste_outlets",
+            "radiator_count",
+            "radiator_power_kw",
+            "gas_installed",
+            "has_balcony",
+            "cellar_unit",
+            "ownership_cert_number",
+            "note",
+            "cuzk_unit_id",
+            "cuzk_share_numerator",
+            "cuzk_share_denominator",
             "tags",
         ]
         widgets = {
@@ -99,11 +135,17 @@ class PersonForm(NetBoxModelForm):
     class Meta:
         model = Person
         fields = [
-            "title_before", "first_name", "last_name", "title_after",
-            "emails", "phones",
+            "title_before",
+            "first_name",
+            "last_name",
+            "title_after",
+            "emails",
+            "phones",
             "date_of_birth",
-            "permanent_address", "contact_address",
-            "note", "tags",
+            "permanent_address",
+            "contact_address",
+            "note",
+            "tags",
         ]
         widgets = {
             "permanent_address": forms.Textarea(attrs={"rows": 2}),
@@ -123,11 +165,15 @@ class PropertyOwnerForm(NetBoxModelForm):
     class Meta:
         model = PropertyOwner
         fields = [
-            "display_name", "person_type", "persons",
-            "email", "phone",
-            "permanent_address", "contact_address",
-            "deputy_name", "deputy_contact",
-            "note", "cuzk_owner_id",
+            "display_name",
+            "person_type",
+            "persons",
+            "permanent_address",
+            "contact_address",
+            "deputy_name",
+            "deputy_contact",
+            "note",
+            "cuzk_owner_id",
             "tags",
         ]
         widgets = {
@@ -139,14 +185,19 @@ class PropertyOwnerForm(NetBoxModelForm):
 
 class FlatOwnerForm(NetBoxModelForm):
     flat = DynamicModelChoiceField(queryset=Flat.objects.all(), label=_("Flat"))
-    owner = DynamicModelChoiceField(queryset=PropertyOwner.objects.all(), label=_("Owner"))
+    owner = DynamicModelChoiceField(
+        queryset=PropertyOwner.objects.all(), label=_("Owner")
+    )
 
     class Meta:
         model = FlatOwner
         fields = [
-            "flat", "owner",
-            "share_numerator", "share_denominator",
-            "effective_from", "effective_to",
+            "flat",
+            "owner",
+            "share_numerator",
+            "share_denominator",
+            "effective_from",
+            "effective_to",
             "tags",
         ]
         widgets = {
@@ -157,7 +208,13 @@ class FlatOwnerForm(NetBoxModelForm):
     def save(self, commit=True):
         if self.instance.pk and commit:
             original = FlatOwner.objects.get(pk=self.instance.pk)
-            history_fields = ("flat", "owner", "share_numerator", "share_denominator", "effective_from")
+            history_fields = (
+                "flat",
+                "owner",
+                "share_numerator",
+                "share_denominator",
+                "effective_from",
+            )
             history_changed = any(
                 getattr(original, field) != self.cleaned_data[field]
                 for field in history_fields
@@ -175,7 +232,9 @@ class FlatOwnerForm(NetBoxModelForm):
                 m2m_values = getattr(self.instance, "_m2m_values", {}).copy()
                 custom_field_data = self.instance.custom_field_data.copy()
                 self.instance = self._meta.model()
-                self.instance = construct_instance(self, self.instance, self._meta.fields, self._meta.exclude)
+                self.instance = construct_instance(
+                    self, self.instance, self._meta.fields, self._meta.exclude
+                )
                 self.instance._m2m_values = m2m_values
                 self.instance.custom_field_data = custom_field_data
 
@@ -189,9 +248,12 @@ class PropertyTenantForm(NetBoxModelForm):
     class Meta:
         model = PropertyTenant
         fields = [
-            "flat", "person",
-            "effective_from", "effective_to",
-            "note", "tags",
+            "flat",
+            "person",
+            "effective_from",
+            "effective_to",
+            "note",
+            "tags",
         ]
         widgets = {
             "effective_from": forms.DateInput(attrs={"type": "date"}),

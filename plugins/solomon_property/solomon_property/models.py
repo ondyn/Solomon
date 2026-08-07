@@ -31,6 +31,7 @@ from netbox.models import NetBoxModel
 #  Building Object
 # ---------------------------------------------------------------------------
 
+
 class BuildingObject(NetBoxModel):
     """Parent CUZK building object (stavebni objekt) that can group multiple buildings."""
 
@@ -47,11 +48,19 @@ class BuildingObject(NetBoxModel):
         verbose_name=_("CUZK building object ID"),
         help_text=_("Kód stavebního objektu (RUIAN)"),
     )
-    building_type_name = models.CharField(max_length=200, blank=True, verbose_name=_("Building type"))
+    building_type_name = models.CharField(
+        max_length=200, blank=True, verbose_name=_("Building type")
+    )
     usage_name = models.CharField(max_length=200, blank=True, verbose_name=_("Usage"))
-    municipality_name = models.CharField(max_length=100, blank=True, verbose_name=_("Municipality"))
-    city_part_name = models.CharField(max_length=100, blank=True, verbose_name=_("City part"))
-    lv_number = models.IntegerField(null=True, blank=True, verbose_name=_("Title deed (LV)"))
+    municipality_name = models.CharField(
+        max_length=100, blank=True, verbose_name=_("Municipality")
+    )
+    city_part_name = models.CharField(
+        max_length=100, blank=True, verbose_name=_("City part")
+    )
+    lv_number = models.IntegerField(
+        null=True, blank=True, verbose_name=_("Title deed (LV)")
+    )
     cadastral_territory_name = models.CharField(
         max_length=100,
         blank=True,
@@ -75,12 +84,15 @@ class BuildingObject(NetBoxModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("plugins:solomon_property:buildingobject", kwargs={"pk": self.pk})
+        return reverse(
+            "plugins:solomon_property:buildingobject", kwargs={"pk": self.pk}
+        )
 
 
 # ---------------------------------------------------------------------------
 #  Building
 # ---------------------------------------------------------------------------
+
 
 class Building(NetBoxModel):
     """An apartment building managed under the SVJ."""
@@ -104,7 +116,9 @@ class Building(NetBoxModel):
         help_text=_("Číslo popisné"),
     )
     city = models.CharField(max_length=100, verbose_name=_("City"), default="Praha")
-    postal_code = models.CharField(max_length=10, verbose_name=_("Postal code"), default="14900")
+    postal_code = models.CharField(
+        max_length=10, verbose_name=_("Postal code"), default="14900"
+    )
     number_of_floors = models.PositiveSmallIntegerField(
         null=True, blank=True, verbose_name=_("Number of floors")
     )
@@ -116,8 +130,10 @@ class Building(NetBoxModel):
         null=True, blank=True, verbose_name=_("Total units")
     )
     land_plot_number = models.CharField(
-        max_length=50, blank=True, verbose_name=_("Land plot number"),
-        help_text=_("Číslo parcely")
+        max_length=50,
+        blank=True,
+        verbose_name=_("Land plot number"),
+        help_text=_("Číslo parcely"),
     )
     common_rooms = models.TextField(blank=True, verbose_name=_("Common rooms"))
     floor_plan_url = models.URLField(blank=True, verbose_name=_("Floor plan URL"))
@@ -128,12 +144,16 @@ class Building(NetBoxModel):
 
     # CUZK integration fields
     cuzk_building_id = models.BigIntegerField(
-        null=True, blank=True, verbose_name=_("CUZK building ID"),
+        null=True,
+        blank=True,
+        verbose_name=_("CUZK building ID"),
         help_text=_("ID stavby z ČÚZK katastru"),
         db_index=True,
     )
     cuzk_lv_number = models.IntegerField(
-        null=True, blank=True, verbose_name=_("CUZK LV number"),
+        null=True,
+        blank=True,
+        verbose_name=_("CUZK LV number"),
         help_text=_("Číslo listu vlastnictví"),
     )
 
@@ -142,13 +162,18 @@ class Building(NetBoxModel):
         verbose_name = _("Building")
         verbose_name_plural = _("Buildings")
         permissions = (
-            ("import_cuzk_data_building", "Can import building and flat data from CUZK"),
-            ("calculate_flat_area_building", "Can calculate and apply flat areas from CUZK shares"),
+            (
+                "import_cuzk_data_building",
+                "Can import building and flat data from CUZK",
+            ),
+            (
+                "calculate_flat_area_building",
+                "Can calculate and apply flat areas from CUZK shares",
+            ),
         )
 
     def __str__(self):
-        # return f"{self.name} ({self.street} {self.house_number})"
-        return f"{self.name}"
+        return f"{self.name} ({self.street} {self.house_number})"
 
     def get_absolute_url(self):
         return reverse("plugins:solomon_property:building", kwargs={"pk": self.pk})
@@ -188,15 +213,21 @@ class Flat(NetBoxModel):
         help_text=_("Číslo jednotky, e.g. '1937/1'"),
     )
     floor = models.SmallIntegerField(
-        null=True, blank=True, verbose_name=_("Floor"),
+        null=True,
+        blank=True,
+        verbose_name=_("Floor"),
         help_text=_("0 = ground floor, negative = basement"),
     )
     area_m2 = models.DecimalField(
-        max_digits=7, decimal_places=2, null=True, blank=True,
+        max_digits=7,
+        decimal_places=2,
+        null=True,
+        blank=True,
         verbose_name=_("Area (m²)"),
     )
     disposition = models.CharField(
-        max_length=10, blank=True,
+        max_length=10,
+        blank=True,
         choices=DISPOSITION_CHOICES,
         verbose_name=_("Disposition"),
     )
@@ -213,7 +244,10 @@ class Flat(NetBoxModel):
         null=True, blank=True, verbose_name=_("Radiator count")
     )
     radiator_power_kw = models.DecimalField(
-        max_digits=6, decimal_places=2, null=True, blank=True,
+        max_digits=6,
+        decimal_places=2,
+        null=True,
+        blank=True,
         verbose_name=_("Radiator power (kW)"),
     )
     gas_installed = models.BooleanField(default=False, verbose_name=_("Gas installed"))
@@ -222,22 +256,30 @@ class Flat(NetBoxModel):
         max_length=50, blank=True, verbose_name=_("Cellar unit")
     )
     ownership_cert_number = models.CharField(
-        max_length=50, blank=True, verbose_name=_("Ownership certificate number"),
+        max_length=50,
+        blank=True,
+        verbose_name=_("Ownership certificate number"),
         help_text=_("Číslo LV jednotky"),
     )
     note = models.TextField(blank=True, verbose_name=_("Note"))
 
     # CUZK integration fields
     cuzk_unit_id = models.BigIntegerField(
-        null=True, blank=True, verbose_name=_("CUZK unit ID"),
+        null=True,
+        blank=True,
+        verbose_name=_("CUZK unit ID"),
         db_index=True,
     )
     cuzk_share_numerator = models.IntegerField(
-        null=True, blank=True, verbose_name=_("CUZK share numerator"),
+        null=True,
+        blank=True,
+        verbose_name=_("CUZK share numerator"),
         help_text=_("Podíl na společných částech - čitatel"),
     )
     cuzk_share_denominator = models.IntegerField(
-        null=True, blank=True, verbose_name=_("CUZK share denominator"),
+        null=True,
+        blank=True,
+        verbose_name=_("CUZK share denominator"),
         help_text=_("Podíl na společných částech - jmenovatel"),
     )
 
@@ -262,23 +304,39 @@ class Flat(NetBoxModel):
         if has_numerator != has_denominator:
             raise ValidationError(
                 {
-                    "cuzk_share_numerator": _("Both CUZK share values must be set together."),
-                    "cuzk_share_denominator": _("Both CUZK share values must be set together."),
+                    "cuzk_share_numerator": _(
+                        "Both CUZK share values must be set together."
+                    ),
+                    "cuzk_share_denominator": _(
+                        "Both CUZK share values must be set together."
+                    ),
                 }
             )
 
         if has_numerator and has_denominator:
             if self.cuzk_share_numerator <= 0:
                 raise ValidationError(
-                    {"cuzk_share_numerator": _("CUZK share numerator must be greater than zero.")}
+                    {
+                        "cuzk_share_numerator": _(
+                            "CUZK share numerator must be greater than zero."
+                        )
+                    }
                 )
             if self.cuzk_share_denominator <= 0:
                 raise ValidationError(
-                    {"cuzk_share_denominator": _("CUZK share denominator must be greater than zero.")}
+                    {
+                        "cuzk_share_denominator": _(
+                            "CUZK share denominator must be greater than zero."
+                        )
+                    }
                 )
             if self.cuzk_share_numerator > self.cuzk_share_denominator:
                 raise ValidationError(
-                    {"cuzk_share_numerator": _("CUZK share numerator cannot be greater than denominator.")}
+                    {
+                        "cuzk_share_numerator": _(
+                            "CUZK share numerator cannot be greater than denominator."
+                        )
+                    }
                 )
 
     @property
@@ -308,6 +366,7 @@ class Flat(NetBoxModel):
 #  Person
 # ---------------------------------------------------------------------------
 
+
 class Person(NetBoxModel):
     """
     A natural person - universal contact data store.
@@ -321,11 +380,15 @@ class Person(NetBoxModel):
     first_name = models.CharField(max_length=100, verbose_name=_("First name"))
     last_name = models.CharField(max_length=100, verbose_name=_("Last name"))
     title_before = models.CharField(
-        max_length=50, blank=True, verbose_name=_("Title before name"),
+        max_length=50,
+        blank=True,
+        verbose_name=_("Title before name"),
         help_text=_("e.g. Ing., Mgr., JUDr."),
     )
     title_after = models.CharField(
-        max_length=50, blank=True, verbose_name=_("Title after name"),
+        max_length=50,
+        blank=True,
+        verbose_name=_("Title after name"),
         help_text=_("e.g. Ph.D., MBA"),
     )
     emails = ArrayField(
@@ -340,10 +403,15 @@ class Person(NetBoxModel):
         blank=True,
         verbose_name=_("Phones"),
     )
-    date_of_birth = models.DateField(null=True, blank=True, verbose_name=_("Date of birth"))
-    permanent_address = models.TextField(blank=True, verbose_name=_("Permanent address"))
+    date_of_birth = models.DateField(
+        null=True, blank=True, verbose_name=_("Date of birth")
+    )
+    permanent_address = models.TextField(
+        blank=True, verbose_name=_("Permanent address")
+    )
     contact_address = models.TextField(
-        blank=True, verbose_name=_("Contact address"),
+        blank=True,
+        verbose_name=_("Contact address"),
         help_text=_("If different from permanent address"),
     )
     note = models.TextField(blank=True, verbose_name=_("Note"))
@@ -438,13 +506,17 @@ class PropertyOwner(NetBoxModel):
         verbose_name=_("Persons"),
         help_text=_("Individual persons behind this ownership (for contacts)"),
     )
-    email = models.EmailField(blank=True, verbose_name=_("Email"))
-    phone = models.CharField(max_length=30, blank=True, verbose_name=_("Phone"))
-    permanent_address = models.TextField(blank=True, verbose_name=_("Permanent address"))
+    permanent_address = models.TextField(
+        blank=True, verbose_name=_("Permanent address")
+    )
     contact_address = models.TextField(blank=True, verbose_name=_("Contact address"))
     deputy_name = models.CharField(
-        max_length=200, blank=True, verbose_name=_("Deputy name"),
-        help_text=_("Statutory representative (for legal entities) or authorized person"),
+        max_length=200,
+        blank=True,
+        verbose_name=_("Deputy name"),
+        help_text=_(
+            "Statutory representative (for legal entities) or authorized person"
+        ),
     )
     deputy_contact = models.CharField(
         max_length=200, blank=True, verbose_name=_("Deputy contact")
@@ -453,7 +525,9 @@ class PropertyOwner(NetBoxModel):
 
     # CUZK integration
     cuzk_owner_id = models.BigIntegerField(
-        null=True, blank=True, verbose_name=_("CUZK owner ID"),
+        null=True,
+        blank=True,
+        verbose_name=_("CUZK owner ID"),
         db_index=True,
     )
 
@@ -497,6 +571,7 @@ class PropertyOwner(NetBoxModel):
 #  FlatOwner  (M:N junction with share + effective dates)
 # ---------------------------------------------------------------------------
 
+
 class FlatOwner(NetBoxModel):
     """
     Ownership record: which PropertyOwner owns which Flat, with what share and when.
@@ -534,7 +609,8 @@ class FlatOwner(NetBoxModel):
         help_text=_("Date ownership began (cadastral transfer date)"),
     )
     effective_to = models.DateField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
         verbose_name=_("Effective to"),
         help_text=_("Date ownership ended (null = current owner)"),
     )
@@ -562,19 +638,27 @@ class FlatOwner(NetBoxModel):
 
         if self.share_numerator > self.share_denominator:
             raise ValidationError(
-                {"share_numerator": _("Share numerator cannot be greater than denominator.")}
+                {
+                    "share_numerator": _(
+                        "Share numerator cannot be greater than denominator."
+                    )
+                }
             )
 
         period_end = self.effective_to
-        overlapping = FlatOwner.objects.filter(flat=self.flat, owner=self.owner).exclude(pk=self.pk)
+        overlapping = FlatOwner.objects.filter(
+            flat=self.flat, owner=self.owner
+        ).exclude(pk=self.pk)
 
         if period_end is None:
             overlapping = overlapping.filter(
-                models.Q(effective_to__isnull=True) | models.Q(effective_to__gte=self.effective_from)
+                models.Q(effective_to__isnull=True)
+                | models.Q(effective_to__gte=self.effective_from)
             )
         else:
             overlapping = overlapping.filter(
-                models.Q(effective_to__isnull=True) | models.Q(effective_to__gte=self.effective_from),
+                models.Q(effective_to__isnull=True)
+                | models.Q(effective_to__gte=self.effective_from),
                 effective_from__lte=period_end,
             )
 
@@ -595,6 +679,7 @@ class FlatOwner(NetBoxModel):
 # ---------------------------------------------------------------------------
 #  Tenant
 # ---------------------------------------------------------------------------
+
 
 class PropertyTenant(NetBoxModel):
     """
@@ -621,7 +706,8 @@ class PropertyTenant(NetBoxModel):
         help_text=_("Move-in date"),
     )
     effective_to = models.DateField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
         verbose_name=_("Effective to"),
         help_text=_("Move-out date (null = current tenant)"),
     )
@@ -636,7 +722,9 @@ class PropertyTenant(NetBoxModel):
         return f"{self.person} @ {self.flat}"
 
     def get_absolute_url(self):
-        return reverse("plugins:solomon_property:propertytenant", kwargs={"pk": self.pk})
+        return reverse(
+            "plugins:solomon_property:propertytenant", kwargs={"pk": self.pk}
+        )
 
     def clean(self):
         super().clean()
@@ -647,15 +735,19 @@ class PropertyTenant(NetBoxModel):
             )
 
         period_end = self.effective_to
-        overlapping = PropertyTenant.objects.filter(flat=self.flat, person=self.person).exclude(pk=self.pk)
+        overlapping = PropertyTenant.objects.filter(
+            flat=self.flat, person=self.person
+        ).exclude(pk=self.pk)
 
         if period_end is None:
             overlapping = overlapping.filter(
-                models.Q(effective_to__isnull=True) | models.Q(effective_to__gte=self.effective_from)
+                models.Q(effective_to__isnull=True)
+                | models.Q(effective_to__gte=self.effective_from)
             )
         else:
             overlapping = overlapping.filter(
-                models.Q(effective_to__isnull=True) | models.Q(effective_to__gte=self.effective_from),
+                models.Q(effective_to__isnull=True)
+                | models.Q(effective_to__gte=self.effective_from),
                 effective_from__lte=period_end,
             )
 

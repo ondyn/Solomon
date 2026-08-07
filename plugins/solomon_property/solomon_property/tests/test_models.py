@@ -21,6 +21,7 @@ from solomon_property.models import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def make_building_object(**kwargs):
     defaults = dict(
         name="SO Test",
@@ -66,6 +67,7 @@ def make_owner(**kwargs):
 # BuildingObject tests
 # ---------------------------------------------------------------------------
 
+
 class BuildingObjectModelTest(TestCase):
     def test_str_returns_name(self):
         obj = make_building_object(name="SO 21835349")
@@ -81,6 +83,7 @@ class BuildingObjectModelTest(TestCase):
 # ---------------------------------------------------------------------------
 # Building tests
 # ---------------------------------------------------------------------------
+
 
 class BuildingModelTest(TestCase):
     def test_str_returns_name_and_address(self):
@@ -108,6 +111,7 @@ class BuildingModelTest(TestCase):
 # Flat tests
 # ---------------------------------------------------------------------------
 
+
 class FlatModelTest(TestCase):
     def setUp(self):
         self.building = make_building()
@@ -128,12 +132,16 @@ class FlatModelTest(TestCase):
         self.assertIsNone(flat.cuzk_share_denominator)
 
     def test_clean_requires_both_cuzk_share_values(self):
-        flat = make_flat(self.building, cuzk_share_numerator=3, cuzk_share_denominator=None)
+        flat = make_flat(
+            self.building, cuzk_share_numerator=3, cuzk_share_denominator=None
+        )
         with self.assertRaises(ValidationError):
             flat.full_clean()
 
     def test_clean_rejects_cuzk_share_numerator_greater_than_denominator(self):
-        flat = make_flat(self.building, cuzk_share_numerator=5, cuzk_share_denominator=4)
+        flat = make_flat(
+            self.building, cuzk_share_numerator=5, cuzk_share_denominator=4
+        )
         with self.assertRaises(ValidationError):
             flat.full_clean()
 
@@ -174,6 +182,7 @@ class FlatModelTest(TestCase):
 # Person tests
 # ---------------------------------------------------------------------------
 
+
 class PersonModelTest(TestCase):
     def test_str_returns_full_name(self):
         p = make_person(first_name="Jana", last_name="Nováková")
@@ -197,6 +206,7 @@ class PersonModelTest(TestCase):
 # ---------------------------------------------------------------------------
 # PropertyOwner tests
 # ---------------------------------------------------------------------------
+
 
 class PropertyOwnerModelTest(TestCase):
     def test_str_returns_display_name(self):
@@ -274,6 +284,7 @@ class PropertyOwnerModelTest(TestCase):
 # FlatOwner tests
 # ---------------------------------------------------------------------------
 
+
 class FlatOwnerModelTest(TestCase):
     def setUp(self):
         self.building = make_building()
@@ -321,8 +332,8 @@ class FlatOwnerModelTest(TestCase):
 
     def test_multiple_owners_per_flat(self):
         owner2 = make_owner(display_name="Druhý vlastník")
-        fo1 = self._make_flat_owner(share_numerator=1, share_denominator=2)
-        fo2 = FlatOwner.objects.create(
+        self._make_flat_owner(share_numerator=1, share_denominator=2)
+        FlatOwner.objects.create(
             flat=self.flat,
             owner=owner2,
             share_numerator=1,
@@ -377,6 +388,7 @@ class FlatOwnerModelTest(TestCase):
 # PropertyTenant tests
 # ---------------------------------------------------------------------------
 
+
 class PropertyTenantModelTest(TestCase):
     def setUp(self):
         self.building = make_building()
@@ -424,8 +436,8 @@ class PropertyTenantModelTest(TestCase):
 
     def test_person_can_have_multiple_tenancies(self):
         flat2 = make_flat(self.building, flat_number="2A")
-        t1 = self._make_tenant(effective_from=datetime.date(2021, 1, 1))
-        t2 = PropertyTenant.objects.create(
+        self._make_tenant(effective_from=datetime.date(2021, 1, 1))
+        PropertyTenant.objects.create(
             flat=flat2,
             person=self.person,
             effective_from=datetime.date(2021, 6, 1),

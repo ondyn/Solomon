@@ -22,9 +22,11 @@ from solomon_property.models import Person
 #  Data classes
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ContactRow:
     """One row from the Google CSV after parsing."""
+
     row_number: int
     first_name: str
     last_name: str
@@ -66,14 +68,33 @@ class ContactRow:
 # ---------------------------------------------------------------------------
 
 _TITLES_BEFORE = {
-    "ing.", "mgr.", "mudr.", "judr.", "rndr.", "phdr.", "paeddr.",
-    "mvdr.", "bc.", "doc.", "prof.", "thdr.", "thlic.",
-    "ing.arch.", "akad.mal.", "akad.soch.",
+    "ing.",
+    "mgr.",
+    "mudr.",
+    "judr.",
+    "rndr.",
+    "phdr.",
+    "paeddr.",
+    "mvdr.",
+    "bc.",
+    "doc.",
+    "prof.",
+    "thdr.",
+    "thlic.",
+    "ing.arch.",
+    "akad.mal.",
+    "akad.soch.",
 }
 
 _TITLES_AFTER = {
-    "ph.d.", "csc.", "drsc.", "mba", "dis.", "bca.",
-    "th.d.", "phd.",
+    "ph.d.",
+    "csc.",
+    "drsc.",
+    "mba",
+    "dis.",
+    "bca.",
+    "th.d.",
+    "phd.",
 }
 
 
@@ -116,8 +137,6 @@ def _normalize_phone(raw: str) -> str:
     raw = raw.strip()
     if not raw:
         return ""
-    # Handle multiple numbers separated by :::
-    raw = raw.split(":::")[0].strip()
     # Keep the leading + if present
     if raw.startswith("+"):
         return "+" + _PHONE_RE.sub("", raw[1:])
@@ -127,6 +146,7 @@ def _normalize_phone(raw: str) -> str:
 # ---------------------------------------------------------------------------
 #  CSV parsing
 # ---------------------------------------------------------------------------
+
 
 def parse_google_csv(csv_text: str) -> list[ContactRow]:
     """
@@ -155,16 +175,21 @@ def parse_google_csv(csv_text: str) -> list[ContactRow]:
         phones = []
         for i in range(1, 4):
             val = raw.get(f"Phone {i} - Value", "").strip()
-            norm = _normalize_phone(val)
-            if norm:
-                phones.append(norm)
+            for phone in val.split(":::"):
+                norm = _normalize_phone(phone)
+                if norm:
+                    phones.append(norm)
 
         # Address - use formatted if available, else build from parts
         address = raw.get("Address 1 - Formatted", "").strip()
         if not address:
             parts = []
-            for key in ("Address 1 - Street", "Address 1 - City",
-                        "Address 1 - Postal Code", "Address 1 - Country"):
+            for key in (
+                "Address 1 - Street",
+                "Address 1 - City",
+                "Address 1 - Postal Code",
+                "Address 1 - Country",
+            ):
                 v = raw.get(key, "").strip()
                 if v:
                     parts.append(v)
@@ -194,20 +219,22 @@ def parse_google_csv(csv_text: str) -> list[ContactRow]:
                     last = parts[0]
                     first = ""
 
-        rows.append(ContactRow(
-            row_number=idx,
-            list_index=len(rows),
-            first_name=first,
-            last_name=last,
-            title_before=title_before,
-            title_after=title_after,
-            emails=emails,
-            phones=phones,
-            address=address,
-            birthday=birthday,
-            organization=organization,
-            notes=notes,
-        ))
+        rows.append(
+            ContactRow(
+                row_number=idx,
+                list_index=len(rows),
+                first_name=first,
+                last_name=last,
+                title_before=title_before,
+                title_after=title_after,
+                emails=emails,
+                phones=phones,
+                address=address,
+                birthday=birthday,
+                organization=organization,
+                notes=notes,
+            )
+        )
 
     return rows
 
@@ -216,11 +243,11 @@ def parse_google_csv(csv_text: str) -> list[ContactRow]:
 #  Fuzzy name matching helpers
 # ---------------------------------------------------------------------------
 
+
 def _strip_diacritics(s: str) -> str:
     """Remove diacritical marks: 'Jiří' -> 'Jiri', 'Čermáková' -> 'Cermakova'."""
     return "".join(
-        c for c in unicodedata.normalize("NFD", s)
-        if unicodedata.category(c) != "Mn"
+        c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn"
     ).lower()
 
 
@@ -272,7 +299,6 @@ _DIMINUTIVES: dict[str, set[str]] = {
     "alenka": {"alena"},
     "milena": {"milena"},
     "milka": {"miloslava", "milena"},
-    "jarka": {"jaroslava", "jarka"},
     "jarka": {"jaroslava", "jarka"},
     "sarka": {"sarka"},
     "zuzka": {"zuzana"},
@@ -373,6 +399,7 @@ def _extract_first_word(name: str) -> str:
 #  Person matching
 # ---------------------------------------------------------------------------
 
+
 def match_contacts_to_persons(rows: list[ContactRow]) -> list[ContactRow]:
     """
     For each ContactRow, try to find a matching Person in the database.
@@ -428,7 +455,8 @@ def match_contacts_to_persons(rows: list[ContactRow]) -> list[ContactRow]:
 
         # Pass 1: exact first name match
         exact = [
-            p for p in last_candidates
+            p
+            for p in last_candidates
             if _strip_diacritics(p.first_name) == _strip_diacritics(row.first_name)
         ]
         if len(exact) == 1:
@@ -475,9 +503,11 @@ def match_contacts_to_persons(rows: list[ContactRow]) -> list[ContactRow]:
 #  Import execution
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ContactImportResult:
     """Result of importing one contact row."""
+
     row: ContactRow
     person: Optional[Person] = None
     emails_added: int = 0
@@ -513,15 +543,13 @@ def execute_contacts_import(
             try:
                 person = Person.objects.get(pk=person_overrides[idx])
             except Person.DoesNotExist:
-                results.append(ContactImportResult(
-                    row=row, error="Selected person not found"
-                ))
+                results.append(
+                    ContactImportResult(row=row, error="Selected person not found")
+                )
                 continue
 
         if person is None:
-            results.append(ContactImportResult(
-                row=row, error="No matching person"
-            ))
+            results.append(ContactImportResult(row=row, error="No matching person"))
             continue
 
         result = ContactImportResult(row=row, person=person)
@@ -564,6 +592,7 @@ def execute_contacts_import(
 #  Export to Google Contacts CSV
 # ---------------------------------------------------------------------------
 
+
 def _build_person_role_notes(person) -> str:
     """
     Build a role description string for a person, listing all their
@@ -581,18 +610,14 @@ def _build_person_role_notes(person) -> str:
             flat = flat_owner.flat
             building = flat.building
             status = "" if flat_owner.is_current else " (former)"
-            parts.append(
-                f"Owner: {building.name}, flat {flat.flat_number}{status}"
-            )
+            parts.append(f"Owner: {building.name}, flat {flat.flat_number}{status}")
 
     # Tenancies: person -> PropertyTenant -> Flat -> Building
     for tenancy in person.tenancies.select_related("flat__building").all():
         flat = tenancy.flat
         building = flat.building
         status = "" if tenancy.is_current else " (former)"
-        parts.append(
-            f"Tenant: {building.name}, flat {flat.flat_number}{status}"
-        )
+        parts.append(f"Tenant: {building.name}, flat {flat.flat_number}{status}")
 
     return "; ".join(parts)
 
@@ -605,22 +630,43 @@ def export_persons_to_google_csv(persons) -> str:
     """
     output = io.StringIO()
     fieldnames = [
-        "First Name", "Middle Name", "Last Name",
-        "Phonetic First Name", "Phonetic Middle Name", "Phonetic Last Name",
-        "Name Prefix", "Name Suffix",
-        "Nickname", "File As",
-        "Organization Name", "Organization Title", "Organization Department",
-        "Birthday", "Notes", "Photo", "Labels",
-        "E-mail 1 - Label", "E-mail 1 - Value",
-        "E-mail 2 - Label", "E-mail 2 - Value",
-        "E-mail 3 - Label", "E-mail 3 - Value",
-        "Phone 1 - Label", "Phone 1 - Value",
-        "Phone 2 - Label", "Phone 2 - Value",
-        "Phone 3 - Label", "Phone 3 - Value",
-        "Address 1 - Label", "Address 1 - Formatted",
-        "Address 1 - Street", "Address 1 - City",
-        "Address 1 - PO Box", "Address 1 - Region",
-        "Address 1 - Postal Code", "Address 1 - Country",
+        "First Name",
+        "Middle Name",
+        "Last Name",
+        "Phonetic First Name",
+        "Phonetic Middle Name",
+        "Phonetic Last Name",
+        "Name Prefix",
+        "Name Suffix",
+        "Nickname",
+        "File As",
+        "Organization Name",
+        "Organization Title",
+        "Organization Department",
+        "Birthday",
+        "Notes",
+        "Photo",
+        "Labels",
+        "E-mail 1 - Label",
+        "E-mail 1 - Value",
+        "E-mail 2 - Label",
+        "E-mail 2 - Value",
+        "E-mail 3 - Label",
+        "E-mail 3 - Value",
+        "Phone 1 - Label",
+        "Phone 1 - Value",
+        "Phone 2 - Label",
+        "Phone 2 - Value",
+        "Phone 3 - Label",
+        "Phone 3 - Value",
+        "Address 1 - Label",
+        "Address 1 - Formatted",
+        "Address 1 - Street",
+        "Address 1 - City",
+        "Address 1 - PO Box",
+        "Address 1 - Region",
+        "Address 1 - Postal Code",
+        "Address 1 - Country",
         "Address 1 - Extended Address",
     ]
 
@@ -672,7 +718,10 @@ def export_persons_to_google_csv(persons) -> str:
 #  Export queryset builder
 # ---------------------------------------------------------------------------
 
-def build_export_queryset(building_ids, include_owners, include_tenants, include_others):
+
+def build_export_queryset(
+    building_ids, include_owners, include_tenants, include_others
+):
     """
     Build a deduplicated Person queryset for the CSV export based on filter params.
 
@@ -719,8 +768,7 @@ def build_export_queryset(building_ids, include_owners, include_tenants, include
         conditions |= Q(has_any_ownership=False, has_any_tenancy=False)
 
     persons = (
-        Person.objects
-        .annotate(
+        Person.objects.annotate(
             has_ownership=has_ownership,
             has_tenancy=has_tenancy,
             has_any_ownership=has_any_ownership,
