@@ -96,7 +96,9 @@ class FlatInstallationsPanel(panels.ObjectAttributesPanel):
     )
     gas_installed = attrs.BooleanAttr("gas_installed", label=_("Gas installed"))
     has_balcony = attrs.BooleanAttr("has_balcony", label=_("Has balcony"))
-    cellar_unit = attrs.TextAttr("cellar_unit", label=_("Cellar unit"))
+    cellar_space = attrs.RelatedObjectAttr(
+        "cellar_space", label=_("Cellar unit"), linkify=True
+    )
 
 
 class FlatCuzkPanel(panels.ObjectAttributesPanel):

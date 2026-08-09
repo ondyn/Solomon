@@ -1,0 +1,30 @@
+####
+## Solomon Facilities Plugin
+##
+## Spatial plans, building systems, and access management for Solomon.
+####
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solomon-facilities"
+version = "0.1.0"
+description = "Solomon building schematics, technical assets, and key management"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+dependencies = ["solomon-property>=0.1.1"]
+authors = [
+    {name = "Solomon Dev"},
+]
+
+[project.urls]
+Homepage = "https://github.com/ondyn/Solomon"
+
+[tool.setuptools.packages.find]
+include = ["solomon_facilities*"]
+
+[tool.setuptools.package-data]
+solomon_facilities = ["templates/**/*", "static/**/*", "locale/**/*", "fixtures/**/*"]

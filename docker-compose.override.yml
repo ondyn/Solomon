@@ -43,6 +43,8 @@ services:
       # ── Plugin development: mount local plugins into container ──
       # rw is required for editable installs (.egg-info / .pth files)
       - ./plugins:/opt/netbox/plugins_dev:z
+      # Source drawings and legal documents used by the facilities seed importer
+      - ./support:/opt/netbox/support:z,ro
       # ── Django local_settings override (for MIGRATION_MODULES etc.) ──
       # - ./docker/local_settings.py:/opt/netbox/netbox/netbox/local_settings.py:z,ro
       # ── Solomon entrypoint (skips trace_paths for disabled DCIM) ──

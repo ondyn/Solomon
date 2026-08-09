@@ -1,0 +1,253 @@
+:root {
+  --schematic-ink: #27343a;
+  --schematic-muted: #65757b;
+  --schematic-border: #c8d1d4;
+  --schematic-paper: #f9fbfa;
+  --schematic-space: #dce9e4;
+  --schematic-space-stroke: #39806a;
+  --schematic-door: #d08b27;
+  --schematic-technical: #b83f3f;
+  --schematic-highlight: #efb419;
+}
+
+.schematic-app {
+  min-width: 0;
+  color: var(--schematic-ink);
+}
+
+.schematic-commandbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 8px 0 12px;
+  border-bottom: 1px solid var(--schematic-border);
+}
+
+.schematic-command-group,
+.schematic-command-actions,
+.schematic-layers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.schematic-command-actions {
+  margin-left: auto;
+}
+
+.schematic-command-actions form {
+  margin: 0;
+}
+
+.schematic-layers {
+  gap: 14px;
+  color: var(--schematic-muted);
+  font-size: 0.875rem;
+}
+
+.schematic-layers label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.schematic-divider {
+  width: 1px;
+  height: 28px;
+  margin: 0 3px;
+  background: var(--schematic-border);
+}
+
+.schematic-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  min-height: 620px;
+  border-bottom: 1px solid var(--schematic-border);
+}
+
+.schematic-stage {
+  position: relative;
+  min-width: 0;
+  overflow: auto;
+  padding: 18px;
+  background-color: #eef2f1;
+  background-image:
+    linear-gradient(#d8dfdd 1px, transparent 1px),
+    linear-gradient(90deg, #d8dfdd 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.schematic-stage .canvas-container {
+  margin: 0 auto;
+  box-shadow: 0 2px 10px rgb(25 40 45 / 14%);
+  background: white;
+}
+
+.schematic-inspector {
+  min-width: 0;
+  padding: 20px;
+  overflow: auto;
+  border-left: 1px solid var(--schematic-border);
+  background: var(--schematic-paper);
+}
+
+.schematic-inspector h2 {
+  margin: 0 0 18px;
+  font-family: "Avenir Next", "Trebuchet MS", sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: 0;
+}
+
+.schematic-inspector dl {
+  display: grid;
+  grid-template-columns: minmax(85px, 0.7fr) minmax(0, 1.3fr);
+  gap: 9px 12px;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.schematic-inspector dt {
+  color: var(--schematic-muted);
+  font-weight: 500;
+}
+
+.schematic-inspector dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.schematic-inspector ul {
+  padding-left: 18px;
+  font-size: 0.875rem;
+}
+
+.schematic-loading {
+  position: absolute;
+  inset: 18px;
+  display: grid;
+  place-items: center;
+  color: var(--schematic-muted);
+  background: rgb(249 251 250 / 92%);
+}
+
+.schematic-loading.is-hidden {
+  display: none;
+}
+
+.schematic-editor-workspace {
+  grid-template-columns: minmax(0, 1fr) 300px;
+}
+
+.tool-palette .active {
+  color: white;
+  border-color: var(--schematic-space-stroke);
+  background: var(--schematic-space-stroke);
+}
+
+.schematic-number-grid,
+.schematic-color-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.schematic-number-grid label,
+.schematic-color-grid label {
+  color: var(--schematic-muted);
+  font-size: 0.78rem;
+}
+
+.schematic-number-grid input {
+  margin-top: 4px;
+}
+
+.schematic-color-grid {
+  margin-top: 14px;
+}
+
+.schematic-color-grid label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.schematic-color-grid input[type="color"] {
+  width: 42px;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid var(--schematic-border);
+  border-radius: 4px;
+  background: white;
+}
+
+.schematic-save-state {
+  min-width: 70px;
+  color: var(--schematic-muted);
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.schematic-target-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.schematic-target-actions:not(.is-empty) a {
+  display: none;
+}
+
+@media (max-width: 992px) {
+  .schematic-commandbar {
+    flex-wrap: wrap;
+  }
+
+  .schematic-command-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .schematic-layers {
+    margin-left: auto;
+  }
+
+  .schematic-workspace,
+  .schematic-editor-workspace {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .schematic-stage {
+    min-height: 420px;
+  }
+
+  .schematic-inspector {
+    border-top: 1px solid var(--schematic-border);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .schematic-layers {
+    width: 100%;
+    margin-left: 0;
+    overflow-x: auto;
+  }
+
+  .schematic-command-actions {
+    flex-wrap: wrap;
+  }
+
+  .schematic-stage {
+    min-height: 340px;
+    padding: 8px;
+  }
+
+  .schematic-loading {
+    inset: 8px;
+  }
+}

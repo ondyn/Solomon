@@ -1,0 +1,81 @@
+{% extends 'generic/object.html' %}
+{% load static i18n %}
+
+{% block head %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'solomon_facilities/schematic.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
+{% endblock head %}
+
+{% block content %}
+  <div
+    id="schematic-app"
+    class="schematic-app"
+    data-url="{% if revision %}{% url 'plugins:solomon_facilities:floorplan_data' pk=object.pk %}{% if revision.status == 'draft' %}?draft=1{% endif %}{% endif %}"
+    data-highlight="{{ request.GET.highlight|default:'' }}"
+  >
+    <div class="schematic-commandbar" role="toolbar" aria-label="Plan controls">
+      <div class="schematic-command-group">
+        <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-out" title="{% trans 'Zoom out' %}" aria-label="{% trans 'Zoom out' %}">
+          <i class="mdi mdi-magnify-minus-outline"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-fit" title="{% trans 'Fit floor' %}" aria-label="{% trans 'Fit floor' %}">
+          <i class="mdi mdi-fit-to-screen-outline"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-in" title="{% trans 'Zoom in' %}" aria-label="{% trans 'Zoom in' %}">
+          <i class="mdi mdi-magnify-plus-outline"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" id="export-svg" title="{% trans 'Export SVG' %}" aria-label="{% trans 'Export SVG' %}">
+          <i class="mdi mdi-download-outline"></i>
+        </button>
+      </div>
+      <div class="schematic-layers" aria-label="{% trans 'Visible layers' %}">
+        <label><input type="checkbox" data-layer="space" checked> {% trans "Spaces" %}</label>
+        <label><input type="checkbox" data-layer="door" checked> {% trans "Doors" %}</label>
+        <label><input type="checkbox" data-layer="technical" checked> {% trans "Technical" %}</label>
+        <label><input type="checkbox" data-layer="structure" checked> {% trans "Structure" %}</label>
+      </div>
+      <div class="schematic-command-actions">
+        {% if revision.status == 'draft' and perms.solomon_facilities.change_planrevision %}
+          <a class="btn btn-outline-secondary" href="{% url 'plugins:solomon_facilities:planrevision_edit' pk=revision.pk %}">
+            <i class="mdi mdi-upload-outline" aria-hidden="true"></i>
+            {% trans "Upload layout" %}
+          </a>
+        {% endif %}
+        {% if revision and revision.source_file %}
+          <a class="btn btn-outline-secondary" href="{{ revision.source_file.url }}" title="{% trans 'Open source document' %}">
+            <i class="mdi mdi-file-document-outline" aria-hidden="true"></i>
+            {% trans "Source" %}
+          </a>
+        {% endif %}
+        {% if perms.solomon_facilities.change_floorplan and perms.solomon_facilities.change_planrevision %}
+          <a class="btn btn-warning" href="{% url 'plugins:solomon_facilities:floorplan_draw' pk=object.pk %}">
+            <i class="mdi mdi-vector-square-edit" aria-hidden="true"></i>
+            {% trans "Edit" %}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="schematic-workspace">
+      <div class="schematic-stage" id="schematic-stage">
+        <canvas id="schematic-canvas" aria-label="{{ object.name }}"></canvas>
+        <div class="schematic-loading" id="schematic-loading">
+          {% if revision %}{% trans "Loading plan..." %}{% else %}{% trans "No plan revision yet. Select Edit to start drawing." %}{% endif %}
+        </div>
+      </div>
+      <aside class="schematic-inspector" id="schematic-inspector" aria-live="polite">
+        <h2>{{ object.level.reference }}</h2>
+        <dl>
+          <dt>{% trans "Building" %}</dt>
+          <dd>{{ object.level.building_object }}</dd>
+          <dt>{% trans "Revision" %}</dt>
+          <dd>{% if revision %}{{ revision.revision }} ({{ revision.get_status_display }}){% else %}{% trans "None" %}{% endif %}</dd>
+          <dt>{% trans "Canvas" %}</dt>
+          <dd>{{ object.width }} x {{ object.height }} {{ object.get_measurement_unit_display }}</dd>
+        </dl>
+      </aside>
+    </div>
+  </div>
+  {% if revision %}<script src="{% static 'solomon_facilities/viewer.js' %}"></script>{% endif %}
+{% endblock content %}

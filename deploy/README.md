@@ -146,7 +146,8 @@ protection against loss or theft.
 Restore a downloaded backup:
 
 ```sh
-sh deploy/restore-from-mac.sh backup/cloud/20260731_120000
+CONFIRM_REMOTE_RESTORE=solomon \
+   sh deploy/restore-from-mac.sh backup/cloud/20260731_120000
 ```
 
 Restore verifies checksums, starts the VM, uploads the backup, stops NetBox,

@@ -1,0 +1,134 @@
+{% extends 'generic/object.html' %}
+{% load static i18n %}
+
+{% block head %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'solomon_facilities/schematic.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
+{% endblock head %}
+
+{% block content %}
+  <div
+    id="schematic-editor"
+    class="schematic-app schematic-editor"
+    data-url="{% url 'plugins:solomon_facilities:floorplan_data' pk=plan.pk %}?draft=1"
+    data-save-url="{% url 'plugins:solomon_facilities:floorplan_data' pk=plan.pk %}"
+    data-revision-id="{{ revision.pk }}"
+  >
+    <div class="schematic-commandbar" role="toolbar" aria-label="{% trans 'Drawing tools' %}">
+      <div class="schematic-command-group tool-palette">
+        <button type="button" class="btn btn-outline-secondary btn-icon active" data-tool="select" title="{% trans 'Select' %}" aria-label="{% trans 'Select' %}">
+          <i class="mdi mdi-cursor-default-outline"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" data-tool="pan" title="{% trans 'Pan' %}" aria-label="{% trans 'Pan' %}">
+          <i class="mdi mdi-hand-back-right-outline"></i>
+        </button>
+        <span class="schematic-divider"></span>
+        <button type="button" class="btn btn-outline-secondary btn-icon" data-add="wall" title="{% trans 'Add wall' %}" aria-label="{% trans 'Add wall' %}">
+          <i class="mdi mdi-wall"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" data-add="door" title="{% trans 'Add door' %}" aria-label="{% trans 'Add door' %}">
+          <i class="mdi mdi-door"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" data-add="window" title="{% trans 'Add window' %}" aria-label="{% trans 'Add window' %}">
+          <i class="mdi mdi-window-closed-variant"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" data-add="space" title="{% trans 'Add space' %}" aria-label="{% trans 'Add space' %}">
+          <i class="mdi mdi-vector-rectangle"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" data-add="technical" title="{% trans 'Add technical item' %}" aria-label="{% trans 'Add technical item' %}">
+          <i class="mdi mdi-valve"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" data-add="text" title="{% trans 'Add label' %}" aria-label="{% trans 'Add label' %}">
+          <i class="mdi mdi-format-text"></i>
+        </button>
+        <span class="schematic-divider"></span>
+        <button type="button" class="btn btn-outline-danger btn-icon" id="delete-element" title="{% trans 'Delete selected' %}" aria-label="{% trans 'Delete selected' %}">
+          <i class="mdi mdi-delete-outline"></i>
+        </button>
+      </div>
+      <div class="schematic-command-group">
+        <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-out" title="{% trans 'Zoom out' %}" aria-label="{% trans 'Zoom out' %}"><i class="mdi mdi-magnify-minus-outline"></i></button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-fit" title="{% trans 'Fit floor' %}" aria-label="{% trans 'Fit floor' %}"><i class="mdi mdi-fit-to-screen-outline"></i></button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-in" title="{% trans 'Zoom in' %}" aria-label="{% trans 'Zoom in' %}"><i class="mdi mdi-magnify-plus-outline"></i></button>
+      </div>
+      <div class="schematic-command-actions">
+        <span class="schematic-save-state" id="save-state" aria-live="polite"></span>
+        <a class="btn btn-outline-secondary" href="{% url 'plugins:solomon_facilities:planrevision_edit' pk=revision.pk %}" title="{% trans 'Edit source and scale' %}">
+          <i class="mdi mdi-file-cog-outline" aria-hidden="true"></i>
+          {% trans "Source" %}
+        </a>
+        <button type="button" class="btn btn-primary" id="save-plan">
+          <i class="mdi mdi-content-save-outline" aria-hidden="true"></i>
+          {% trans "Save" %}
+        </button>
+        <form method="post" action="{% url 'plugins:solomon_facilities:floorplan_publish' pk=plan.pk %}" id="publish-form">
+          {% csrf_token %}
+          <input type="hidden" name="revision_id" value="{{ revision.pk }}">
+          <button type="submit" class="btn btn-success">
+            <i class="mdi mdi-check-decagram-outline" aria-hidden="true"></i>
+            {% trans "Publish" %}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="schematic-workspace schematic-editor-workspace">
+      <div class="schematic-stage" id="schematic-stage">
+        <canvas id="schematic-canvas" aria-label="Edit {{ plan.name }}"></canvas>
+        <div class="schematic-loading" id="schematic-loading">{% trans "Loading plan..." %}</div>
+      </div>
+      <aside class="schematic-inspector editor-inspector" id="schematic-inspector">
+        <h2>{% trans "Element" %}</h2>
+        <div class="mb-3">
+          <label class="form-label" for="element-type">{% trans "Type" %}</label>
+          <select class="form-select no-ts" id="element-type">
+            <option value="wall">{% trans "Wall" %}</option>
+            <option value="door">{% trans "Door" %}</option>
+            <option value="window">{% trans "Window" %}</option>
+            <option value="space">{% trans "Space" %}</option>
+            <option value="technical">{% trans "Technical item" %}</option>
+            <option value="line">{% trans "Line" %}</option>
+            <option value="text">{% trans "Text" %}</option>
+            <option value="dimension">{% trans "Dimension" %}</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="element-label">{% trans "Label" %}</label>
+          <input class="form-control" id="element-label" maxlength="200">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="element-target">{% trans "Linked object" %} <span class="text-secondary">({% trans "optional" %})</span></label>
+          <select class="form-select no-ts" id="element-target" disabled>
+            <option selected>{% trans "No linkable objects loaded" %}</option>
+          </select>
+          <div class="form-hint" id="element-target-help">{% trans "Facility records must exist on this floor before they can be linked." %}</div>
+          <div class="schematic-target-actions mt-2" id="element-target-actions">
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'plugins:solomon_facilities:space_add' %}?level={{ plan.level_id }}" target="_blank" rel="noopener">{% trans "New space" %}</a>
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'plugins:solomon_facilities:door_add' %}?level={{ plan.level_id }}" target="_blank" rel="noopener">{% trans "New door" %}</a>
+            <a class="btn btn-sm btn-outline-secondary" href="{% url 'plugins:solomon_facilities:technicalasset_add' %}?level={{ plan.level_id }}" target="_blank" rel="noopener">{% trans "New asset" %}</a>
+            <button class="btn btn-sm btn-outline-secondary" type="button" id="refresh-targets">
+              <i class="mdi mdi-refresh" aria-hidden="true"></i>
+              {% trans "Refresh" %}
+            </button>
+          </div>
+        </div>
+        <div class="schematic-number-grid">
+          <label>X <input class="form-control" type="number" step="0.1" id="element-x"></label>
+          <label>Y <input class="form-control" type="number" step="0.1" id="element-y"></label>
+          <label>{% trans "Width" %} <input class="form-control" type="number" min="0" step="0.1" id="element-width"></label>
+          <label>{% trans "Height" %} <input class="form-control" type="number" min="0" step="0.1" id="element-height"></label>
+        </div>
+        <div class="schematic-color-grid">
+          <label>{% trans "Stroke" %} <input type="color" id="element-stroke" value="#27343a"></label>
+          <label>{% trans "Fill" %} <input type="color" id="element-fill" value="#dce9e4"></label>
+        </div>
+        <label class="form-check form-switch mt-3">
+          <input class="form-check-input" type="checkbox" id="element-locked">
+          <span class="form-check-label">{% trans "Locked" %}</span>
+        </label>
+      </aside>
+    </div>
+  </div>
+  <script src="{% static 'solomon_facilities/editor.js' %}?v=4"></script>
+{% endblock content %}

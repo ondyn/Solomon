@@ -12,6 +12,7 @@ secret() { gcloud secrets versions access latest --secret "$1"; }
   printf '\nSOLOMON_IMAGE=%s\n' "$IMAGE"
   printf 'DB_PASSWORD=%s\n' "$(secret solomon-db-password)"
   printf 'SECRET_KEY=%s\n' "$(secret solomon-secret-key)"
+  printf 'API_TOKEN_PEPPER_1=%s\n' "$(secret solomon-api-token-pepper-1)"
   printf 'REDIS_PASSWORD=%s\n' "$(secret solomon-redis-password)"
   printf 'REDIS_CACHE_PASSWORD=%s\n' "$(secret solomon-redis-cache-password)"
 } >> .env.production

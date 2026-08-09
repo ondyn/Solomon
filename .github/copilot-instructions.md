@@ -21,6 +21,22 @@ Solomon is a **facility management system** for managing apartment buildings und
 
 - **Never use em dashes (`—`) anywhere in code** - use a plain hyphen (`-`) instead, in comments, docstrings, strings, and templates
 
+## Localization
+
+- **Every feature change, addition, or new plugin must include localization** - English (default) and Czech at minimum.
+- All user-facing strings must be wrapped with Django's translation functions: `_()` for Python, `{% trans %}` / `{% blocktrans %}` in templates.
+- Czech translations live in `locale/cs/LC_MESSAGES/django.po` inside each plugin. After adding strings, run `makemessages` then update the `.po` file, and compile with `compilemessages`.
+- Commands (inside container):
+  - Extract strings: `docker compose exec netbox python manage.py makemessages -l cs --ignore=netbox`
+  - Compile: `docker compose exec netbox python manage.py compilemessages`
+- Never leave new UI strings untranslated.
+
+## Testing
+
+- **Reuse the test database where possible** - restoring from a dump is slow; only do it when the schema changed, fixtures changed, or the test explicitly requires a clean slate.
+- When iterating on logic or templates, run tests against the existing database and only restore when truly necessary.
+- To restore: `./restore_db.sh backup/local/<snapshot>` (or the appropriate backup path).
+
 ## Debugging and Logs
 
 - **App runs in Docker** - To debug or view logs, you must use Docker Compose:

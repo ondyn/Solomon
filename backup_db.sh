@@ -2,13 +2,28 @@
 
 set -eu
 
-BACKUP_DIR="./backup"
-TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
-BACKUP_FILE="${BACKUP_DIR}/db_backup_${TIMESTAMP}.dump"
+BACKUP_ROOT="./backup/local"
+TIMESTAMP="$(date -u +%Y%m%d_%H%M%S)"
+BACKUP_DIR="${BACKUP_ROOT}/${TIMESTAMP}"
 
 mkdir -p "$BACKUP_DIR"
 
-echo "Creating PostgreSQL backup: $BACKUP_FILE"
-docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -F c' > "$BACKUP_FILE"
+echo "Backing up PostgreSQL..."
+docker compose exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -F c' \
+	> "$BACKUP_DIR/database.dump"
 
-echo "Backup complete: $BACKUP_FILE"
+echo "Backing up persistent files..."
+docker compose run --rm volume-tools \
+	tar -czf "/backups/local/$TIMESTAMP/files.tar.gz" -C /data media reports scripts
+
+printf '%s\n' "$TIMESTAMP" > "$BACKUP_DIR/manifest.txt"
+(
+	cd "$BACKUP_DIR"
+	shasum -a 256 database.dump files.tar.gz > SHA256SUMS
+)
+
+echo "Validating backup..."
+docker compose exec -T postgres pg_restore --list < "$BACKUP_DIR/database.dump" >/dev/null
+tar -tzf "$BACKUP_DIR/files.tar.gz" >/dev/null
+
+echo "Backup complete: $BACKUP_DIR"

@@ -15,7 +15,7 @@ rm -rf "$DIST_DIR"
 mkdir -p "$DIST_DIR"
 
 docker run --rm -v "$ROOT_DIR:/workspace" -w /workspace python:3.12-slim \
-  sh -c 'pip install --quiet build && for plugin in solomon_theme solomon_property solomon_meetings; do python -m build --wheel --outdir /workspace/dist/plugins "/workspace/plugins/$plugin"; done'
+  sh -c 'pip install --quiet build && for plugin in solomon_theme solomon_property solomon_meetings solomon_facilities; do python -m build --wheel --outdir /workspace/dist/plugins "/workspace/plugins/$plugin"; done'
 
 ACCESS_TOKEN="$(gcloud auth print-access-token)"
 

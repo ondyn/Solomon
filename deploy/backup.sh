@@ -30,4 +30,7 @@ sh deploy/compose.sh --env-file "$ENV_FILE" -f "$COMPOSE_FILE" run --rm volume-t
   tar -czf "/backups/$TIMESTAMP/files.tar.gz" -C /data media reports scripts
 
 printf '%s\n' "$TIMESTAMP" > "$BACKUP_DIR/manifest.txt"
+sh deploy/compose.sh --env-file "$ENV_FILE" -f "$COMPOSE_FILE" exec -T postgres \
+  pg_restore --list < "$BACKUP_DIR/database.dump" >/dev/null
+tar -tzf "$BACKUP_DIR/files.tar.gz" >/dev/null
 echo "Backup ready at $BACKUP_DIR"

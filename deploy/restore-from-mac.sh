@@ -3,11 +3,17 @@ set -eu
 
 . deploy/load-env.sh
 
-BACKUP_DIR="${1:?Usage: deploy/restore-from-mac.sh backup/cloud/YYYYMMDD_HHMMSS}"
+BACKUP_DIR="${1:?Usage: CONFIRM_REMOTE_RESTORE=solomon deploy/restore-from-mac.sh backup/local/YYYYMMDD_HHMMSS}"
 PROJECT_ID="${PROJECT_ID:?Set PROJECT_ID in .env or export it}"
 ZONE="${ZONE:-europe-west3-a}"
 VM_NAME="${VM_NAME:-solomon}"
 TIMESTAMP="$(basename "$BACKUP_DIR")"
+
+if [ "${CONFIRM_REMOTE_RESTORE:-}" != solomon ]; then
+  echo "Refusing to replace the remote database and persistent files." >&2
+  echo "Set CONFIRM_REMOTE_RESTORE=solomon after verifying the backup and target project." >&2
+  exit 1
+fi
 
 gcloud config set project "$PROJECT_ID" >/dev/null
 

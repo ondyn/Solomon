@@ -15,13 +15,17 @@ docker compose exec netbox python manage.py makemigrations <plugin>
 docker compose exec netbox python manage.py migrate <plugin>
 ```
 
-# Local database backup and restore
+# Local backup and restore
 
-PostgreSQL runs in Docker Compose service `postgres`.
+PostgreSQL and the persistent media, reports, and scripts volumes are backed up
+together. This includes the source PDFs and SVG backgrounds uploaded by
+`solomon_facilities`.
 
-Backups are stored in `./backup` and use this format:
+Backups are stored in `./backup/local` and use this format:
 
-- `db_backup_YYYYMMDD_HHMMSS.dump`
+- `YYYYMMDD_HHMMSS/database.dump`
+- `YYYYMMDD_HHMMSS/files.tar.gz`
+- `YYYYMMDD_HHMMSS/SHA256SUMS`
 
 Create a backup:
 
@@ -29,7 +33,7 @@ Create a backup:
 ./backup_db.sh
 ```
 
-Restore latest backup found in `./backup`:
+Restore the latest full backup:
 
 ```sh
 ./restore_db.sh
@@ -47,6 +51,8 @@ Restore a specific dump file by relative or absolute path:
 ./restore_db.sh backup/db_backup_20260807_125250.dump
 ```
 
+Legacy dump files restore only PostgreSQL and leave persistent files unchanged.
+
 The database containers must be running before backup or restore commands are
 executed. Run these commands from the project root. Restore replaces the entire
 configured local database; create a fresh backup first if its current contents
@@ -54,19 +60,20 @@ may still be needed.
 
 Restore behavior:
 
-1) Validates that PostgreSQL can read the dump
+1) Validates the dump, file archive paths, and SHA-256 checksums
 2) Stops local NetBox and its worker
 3) Terminates active connections and drops the target DB
 4) Creates a new empty DB
-5) Restores the dump, then starts NetBox and its worker again
+5) Replaces persistent files from the same backup
+6) Starts NetBox and its worker again
 
 If restore fails, the application services remain stopped so they cannot write
 to a partially restored database.
 
-# Remote Google Cloud database restore
+# Remote Google Cloud full restore
 
-The remote restore replaces only the production PostgreSQL database. It does not
-replace persistent media, reports, or scripts. Export the target project and run:
+Use `deploy/restore-from-mac.sh` to replace the production database and
+persistent media, reports, and scripts from a full local backup directory:
 
 ```sh
 export PROJECT_ID=my-solomon-project
@@ -74,14 +81,12 @@ export ZONE=europe-west3-a
 export VM_NAME=solomon
 
 CONFIRM_REMOTE_RESTORE=solomon \
-  ./restore_db_remote.sh backup/db_backup_20260807_125250.dump
+	sh deploy/restore-from-mac.sh backup/local/20260809_195739
 ```
 
-Before replacing the remote database, the script starts the VM if needed and
-downloads a full database-and-files backup into `backup/cloud/`. It validates
-the uploaded dump on the VM, stops NetBox and its worker, restores PostgreSQL,
-and starts the application services again. If restore fails, the application
-services remain stopped so they cannot write to a partially restored database.
+Create a separate full production backup with `deploy/backup-from-mac.sh` before
+restoring local data. Deploy the application version containing all restored
+plugin models and migrations before starting the restore.
 
 # Remote Google Cloud migrations
 

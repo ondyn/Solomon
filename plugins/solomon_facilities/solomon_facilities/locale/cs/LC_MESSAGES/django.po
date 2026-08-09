@@ -1,0 +1,848 @@
+# Czech translations for Solomon Facilities.
+# Copyright (C) 2026 Solomon Dev
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: solomon-facilities 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-09 21:15+0200\n"
+"PO-Revision-Date: 2026-08-09 21:15+0200\n"
+"Last-Translator: GitHub Copilot\n"
+"Language-Team: Czech\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+msgid "Solomon Facilities"
+msgstr "Správa objektu"
+
+msgid "Meters"
+msgstr "Metry"
+
+msgid "Centimeters"
+msgstr "Centimetry"
+
+msgid "Draft"
+msgstr "Koncept"
+
+msgid "Published"
+msgstr "Zveřejněno"
+
+msgid "Archived"
+msgstr "Archivováno"
+
+msgid "Flat"
+msgstr "Byt"
+
+msgid "Room"
+msgstr "Pokoj"
+
+msgid "Common room"
+msgstr "Společenská místnost"
+
+msgid "Cellar cubicle"
+msgstr "Sklep"
+
+msgid "Corridor"
+msgstr "Chodba"
+
+msgid "Staircase"
+msgstr "Schodiště"
+
+msgid "Elevator"
+msgstr "Výtah"
+
+msgid "Service shaft"
+msgstr "Instalační šachta"
+
+msgid "Technical room"
+msgstr "Technická místnost"
+
+msgid "Balcony or loggia"
+msgstr "Balkon nebo lodžie"
+
+msgid "Exterior"
+msgstr "Exteriér"
+
+msgid "Other"
+msgstr "Ostatní"
+
+msgid "Active"
+msgstr "Aktivní"
+
+msgid "Inactive"
+msgstr "Neaktivní"
+
+msgid "Planned"
+msgstr "Plánováno"
+
+msgid "Primary flat area"
+msgstr "Hlavní plocha bytu"
+
+msgid "Room in flat"
+msgstr "Pokoj bytu"
+
+msgid "Cellar assigned to flat"
+msgstr "Sklep přiřazený bytu"
+
+msgid "Balcony or loggia assigned to flat"
+msgstr "Balkon nebo lodžie přiřazená bytu"
+
+msgid "Common area under exclusive use"
+msgstr "Společná část ve výhradním užívání"
+
+msgid "Rental"
+msgstr "Pronájem"
+
+msgid "Occupancy"
+msgstr "Užívání"
+
+msgid "Loan"
+msgstr "Výpůjčka"
+
+msgid "License"
+msgstr "Licence"
+
+msgid "Wall"
+msgstr "Zeď"
+
+msgid "Door"
+msgstr "Dveře"
+
+msgid "Window"
+msgstr "Okno"
+
+msgid "Space"
+msgstr "Prostor"
+
+msgid "Technical item"
+msgstr "Technický prvek"
+
+msgid "Line"
+msgstr "Čára"
+
+msgid "Text"
+msgstr "Text"
+
+msgid "Dimension"
+msgstr "Kóta"
+
+msgid "Interior"
+msgstr "Interiérové"
+
+msgid "Entrance"
+msgstr "Vstupní"
+
+msgid "Fire door"
+msgstr "Protipožární dveře"
+
+msgid "Service door"
+msgstr "Servisní dveře"
+
+msgid "Gate"
+msgstr "Brána"
+
+msgid "Available"
+msgstr "K dispozici"
+
+msgid "Issued"
+msgstr "Vydáno"
+
+msgid "Lost"
+msgstr "Ztraceno"
+
+msgid "Damaged"
+msgstr "Poškozeno"
+
+msgid "Retired"
+msgstr "Vyřazeno"
+
+msgid "Gas"
+msgstr "Plyn"
+
+msgid "Cold water"
+msgstr "Studená voda"
+
+msgid "Hot water"
+msgstr "Teplá voda"
+
+msgid "Wastewater"
+msgstr "Kanalizace"
+
+msgid "Electrical"
+msgstr "Elektřina"
+
+msgid "Low-current and data"
+msgstr "Slaboproud a data"
+
+msgid "Heating"
+msgstr "Topení"
+
+msgid "Ventilation"
+msgstr "Ventilace"
+
+msgid "Fire safety"
+msgstr "Požární bezpečnost"
+
+msgid "Out of service"
+msgstr "Mimo provoz"
+
+msgid "Removed"
+msgstr "Odstraněno"
+
+msgid "Feeds"
+msgstr "Zásobuje"
+
+msgid "Controls"
+msgstr "Ovládá"
+
+msgid "Isolates"
+msgstr "Izoluje"
+
+msgid "Monitors"
+msgstr "Monitoruje"
+
+msgid "Building object"
+msgstr "Bytový komplex"
+
+msgid "Level number"
+msgstr "Číslo podlaží"
+
+msgid "Basements are negative; ground floor is zero."
+msgstr "Suterény jsou záporné; přízemí je nula."
+
+msgid "Displayed reference"
+msgstr "Zobrazená zkratka"
+
+msgid "For example 1PP, 1NP, or 4NP."
+msgstr "Například 1PP, 1NP nebo 4NP."
+
+msgid "Name"
+msgstr "Název"
+
+msgid "Elevation (m)"
+msgstr "Nadmořská výška (m)"
+
+msgid "Floor-to-floor height (m)"
+msgstr "Světlá výška podlaží (m)"
+
+msgid "Notes"
+msgstr "Poznámky"
+
+msgid "Building level"
+msgstr "Podlaží"
+
+msgid "Building levels"
+msgstr "Podlaží"
+
+msgid "Level"
+msgstr "Podlaží"
+
+msgid "Canvas width"
+msgstr "Šířka plátna"
+
+msgid "Canvas height"
+msgstr "Výška plátna"
+
+msgid "Measurement unit"
+msgstr "Jednotka míry"
+
+msgid "Active revision"
+msgstr "Aktivní revize"
+
+msgid "Floor plan"
+msgstr "Půdorys"
+
+msgid "Floor plans"
+msgstr "Půdorysy"
+
+msgid "The active revision must belong to this plan."
+msgstr "Aktivní revize musí náležet k tomuto půdorysu."
+
+msgid "Plan"
+msgstr "Půdorys"
+
+msgid "Revision"
+msgstr "Revize"
+
+msgid "Status"
+msgstr "Stav"
+
+msgid "Source document"
+msgstr "Zdrojový dokument"
+
+msgid "Background image or SVG"
+msgstr "Obrázek na pozadí nebo SVG"
+
+msgid "Background rotation"
+msgstr "Otočení pozadí"
+
+msgid "Source page"
+msgstr "Zdrojová stránka"
+
+msgid "Scale denominator"
+msgstr "Jmenovatel měřítka"
+
+msgid "For a 1:75 drawing, enter 75."
+msgstr "Pro výkres 1:75 zadejte 75."
+
+msgid "Source note"
+msgstr "Poznámka ke zdroji"
+
+msgid "Plan revision"
+msgstr "Revize půdorysu"
+
+msgid "Plan revisions"
+msgstr "Revize půdorysů"
+
+msgid "Entrance or building"
+msgstr "Vchod nebo budova"
+
+msgid "Parent space"
+msgstr "Nadřazený prostor"
+
+msgid "Reference"
+msgstr "Označení"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Area (m²)"
+msgstr "Plocha (m²)"
+
+msgid "Spaces"
+msgstr "Prostory"
+
+msgid "The building must belong to the level's building object."
+msgstr "Budova musí náležet ke komplexu příslušného podlaží."
+
+msgid "A space cannot contain itself."
+msgstr "Prostor nemůže být svým vlastním nadřazeným prostorem."
+
+msgid "Parent space must be on the same level."
+msgstr "Nadřazený prostor musí být na stejném podlaží."
+
+msgid "Assignment type"
+msgstr "Typ přiřazení"
+
+msgid "From"
+msgstr "Od"
+
+msgid "To"
+msgstr "Do"
+
+msgid "Space-to-flat assignment"
+msgstr "Přiřazení prostoru bytu"
+
+msgid "Space-to-flat assignments"
+msgstr "Přiřazení prostorů bytům"
+
+msgid "End date cannot precede start date."
+msgstr "Datum ukončení nesmí předcházet datu zahájení."
+
+msgid "The flat and space must be in the same building object."
+msgstr "Byt a prostor musí náležet ke stejnému bytovému komplexu."
+
+msgid "The flat and space must be in the same entrance."
+msgstr "Byt a prostor musí být ve stejném vchodě."
+
+msgid "The flat and assigned space must be on the same level."
+msgstr "Byt a přiřazený prostor musí být na stejném podlaží."
+
+msgid "Person"
+msgstr "Osoba"
+
+msgid "Owner or organization"
+msgstr "Vlastník nebo organizace"
+
+msgid "Usage type"
+msgstr "Typ užívání"
+
+msgid "Space usage"
+msgstr "Užívání prostoru"
+
+msgid "Space usages"
+msgstr "Užívání prostorů"
+
+msgid "Select exactly one person or owner/organization."
+msgstr "Vyberte přesně jednu osobu nebo vlastníka/organizaci."
+
+msgid "Door type"
+msgstr "Typ dveří"
+
+msgid "Space A"
+msgstr "Prostor A"
+
+msgid "Space B"
+msgstr "Prostor B"
+
+msgid "Leave one side empty for an exterior door."
+msgstr "Pro vnější dveře nechte jednu stranu prázdnou."
+
+msgid "Fire rating"
+msgstr "Požární odolnost"
+
+msgid "Emergency exit"
+msgstr "Nouzový východ"
+
+msgid "Doors"
+msgstr "Dveře"
+
+msgid "At least one connected space is required."
+msgstr "Je vyžadován alespoň jeden připojený prostor."
+
+msgid "Connected spaces must be on the door's level."
+msgstr "Připojené prostory musí být na podlaží dveří."
+
+msgid "A door must connect two different spaces."
+msgstr "Dveře musí spojovat dva různé prostory."
+
+msgid "Cylinder code"
+msgstr "Kód vložky"
+
+msgid "Active from"
+msgstr "Aktivní od"
+
+msgid "Active to"
+msgstr "Aktivní do"
+
+msgid "Lock cylinder"
+msgstr "Zámková vložka"
+
+msgid "Lock cylinders"
+msgstr "Zámkové vložky"
+
+msgid "Locks opened"
+msgstr "Otevírané zámky"
+
+msgid "Key profile"
+msgstr "Klíčový profil"
+
+msgid "Key profiles"
+msgstr "Klíčové profily"
+
+msgid "Profile code"
+msgstr "Kód profilu"
+
+msgid "Key profile lock"
+msgstr "Zámek klíčového profilu"
+
+msgid "Key profile locks"
+msgstr "Zámky klíčového profilu"
+
+msgid "The key profile and lock must belong to the same building object."
+msgstr "Klíčový profil a zámek musí náležet ke stejnému bytovému komplexu."
+
+msgid "Inventory code"
+msgstr "Inventární číslo"
+
+msgid "Serial number"
+msgstr "Sériové číslo"
+
+msgid "Physical key"
+msgstr "Fyzický klíč"
+
+msgid "Physical keys"
+msgstr "Fyzické klíče"
+
+msgid "Holder"
+msgstr "Držitel"
+
+msgid "External holder"
+msgstr "Externí držitel"
+
+msgid "For a contractor or organization not stored as a person."
+msgstr "Pro dodavatele nebo organizaci, která není evidována jako osoba."
+
+msgid "Issued at"
+msgstr "Vydáno"
+
+msgid "Due at"
+msgstr "Vrátit do"
+
+msgid "Returned at"
+msgstr "Vráceno"
+
+msgid "Purpose"
+msgstr "Účel"
+
+msgid "Key issue"
+msgstr "Výdej klíče"
+
+msgid "Key issues"
+msgstr "Výdeje klíčů"
+
+msgid "Select a person or enter an external holder."
+msgstr "Vyberte osobu nebo zadejte externího držitele."
+
+msgid "A lost, damaged, or retired key cannot be issued."
+msgstr "Ztracený, poškozený nebo vyřazený klíč nelze vydat."
+
+msgid "Due date cannot precede issue date."
+msgstr "Datum vrácení nesmí předcházet datu vydání."
+
+msgid "Return date cannot precede issue date."
+msgstr "Datum vrácení nesmí předcházet datu vydání."
+
+msgid "System type"
+msgstr "Typ soustavy"
+
+msgid "Description"
+msgstr "Popis"
+
+msgid "Technical system"
+msgstr "Technická soustava"
+
+msgid "Technical systems"
+msgstr "Technické soustavy"
+
+msgid "System"
+msgstr "Soustava"
+
+msgid "Parent component"
+msgstr "Nadřazená součást"
+
+msgid "Asset code"
+msgstr "Kód součásti"
+
+msgid "Component type"
+msgstr "Typ součásti"
+
+msgid "For example valve, riser, switchboard, meter, or distribution board."
+msgstr "Například ventil, stoupačka, rozvaděč, měřič nebo rozvodná skříň."
+
+msgid "Affected flats"
+msgstr "Dotčené byty"
+
+msgid "Affected spaces"
+msgstr "Dotčené prostory"
+
+msgid "Emergency instructions"
+msgstr "Pokyny pro nouzové situace"
+
+msgid "Technical asset"
+msgstr "Technická součást"
+
+msgid "Technical assets"
+msgstr "Technické součásti"
+
+msgid "The level and system must belong to the same building object."
+msgstr "Podlaží a soustava musí náležet ke stejnému bytovému komplexu."
+
+msgid "The space and system must belong to the same building object."
+msgstr "Prostor a soustava musí náležet ke stejnému bytovému komplexu."
+
+msgid "The space must be on the selected level."
+msgstr "Prostor musí být na vybraném podlaží."
+
+msgid "An asset cannot contain itself."
+msgstr "Součást nemůže být svou vlastní nadřazenou součástí."
+
+msgid "Parent asset must belong to the same system."
+msgstr "Nadřazená součást musí náležet ke stejné soustavě."
+
+msgid "From component"
+msgstr "Zdrojová součást"
+
+msgid "To component"
+msgstr "Cílová součást"
+
+msgid "Relationship"
+msgstr "Vztah"
+
+msgid "Technical connection"
+msgstr "Technické propojení"
+
+msgid "Technical connections"
+msgstr "Technická propojení"
+
+msgid "A component cannot connect to itself."
+msgstr "Součást nemůže být propojená sama se sebou."
+
+msgid "Connected components must belong to the same system."
+msgstr "Propojené součásti musí náležet ke stejné soustavě."
+
+msgid "Element type"
+msgstr "Typ prvku"
+
+msgid "Label"
+msgstr "Popis"
+
+msgid "Geometry"
+msgstr "Geometrie"
+
+msgid "Style"
+msgstr "Styl"
+
+msgid "Layer order"
+msgstr "Pořadí vrstvy"
+
+msgid "Locked"
+msgstr "Zamčeno"
+
+msgid "Plan element"
+msgstr "Prvek půdorysu"
+
+msgid "Plan elements"
+msgstr "Prvky půdorysu"
+
+msgid "A plan element can link to only one facility object."
+msgstr "Prvek půdorysu může být propojen pouze s jedním objektem správy."
+
+msgid "The linked space must be on this plan's level."
+msgstr "Propojený prostor musí být na podlaží tohoto půdorysu."
+
+msgid "The linked door must be on this plan's level."
+msgstr "Propojené dveře musí být na podlaží tohoto půdorysu."
+
+msgid "The linked asset must be on this plan's level."
+msgstr "Propojená součást musí být na podlaží tohoto půdorysu."
+
+msgid "Geometry must be a JSON object."
+msgstr "Geometrie musí být JSON objekt."
+
+msgid "Unsupported geometry type."
+msgstr "Nepodporovaný typ geometrie."
+
+msgid "Every point must be a JSON object."
+msgstr "Každý bod musí být JSON objekt."
+
+msgid "Geometry coordinates must be finite numbers."
+msgstr "Souřadnice geometrie musí být konečná čísla."
+
+msgid "Original source document"
+msgstr "Originální zdrojový dokument"
+
+msgid "Drawable canvas background"
+msgstr "Pozadí kreslicího plátna"
+
+msgid "Optional archival PDF or source drawing. This file is not displayed on the canvas."
+msgstr "Volitelný archivní PDF nebo zdrojový výkres. Tento soubor se na plátně nezobrazuje."
+
+msgid "Optional SVG, PNG, or JPEG displayed beneath editable drawing elements."
+msgstr "Volitelný SVG, PNG nebo JPEG zobrazený pod editovatelnými prvky výkresu."
+
+msgid "Every lock must belong to the selected building object."
+msgstr "Každý zámek musí náležet k vybranému bytovému komplexu."
+
+msgid "Copies"
+msgstr "Kopie"
+
+msgid "Add"
+msgstr "Přidat"
+
+msgid "Facilities"
+msgstr "Správa objektu"
+
+msgid "Schematics"
+msgstr "Schemata"
+
+msgid "Access"
+msgstr "Přístupy"
+
+msgid "Building Systems"
+msgstr "Technické soustavy"
+
+msgid "Building Levels"
+msgstr "Podlaží"
+
+msgid "Floor Plans"
+msgstr "Půdorysy"
+
+msgid "Flat Assignments"
+msgstr "Přiřazení prostorů"
+
+msgid "Rentals and Occupancy"
+msgstr "Pronájmy a užívání"
+
+msgid "Lock Cylinders"
+msgstr "Zámkové vložky"
+
+msgid "Key Profiles"
+msgstr "Klíčové profily"
+
+msgid "Physical Keys"
+msgstr "Fyzické klíče"
+
+msgid "Key Issues"
+msgstr "Výdeje klíčů"
+
+msgid "Technical Systems"
+msgstr "Technické soustavy"
+
+msgid "Technical Assets"
+msgstr "Technické součásti"
+
+msgid "System Connections"
+msgstr "Technická propojení"
+
+msgid "Flat assignments"
+msgstr "Přiřazení prostorů"
+
+msgid "Rentals and occupancy"
+msgstr "Pronájmy a užívání"
+
+msgid "Physical copies"
+msgstr "Fyzické kopie"
+
+msgid "Custody history"
+msgstr "Historie vydání"
+
+msgid "Components"
+msgstr "Součásti"
+
+msgid "Downstream relationships"
+msgstr "Odchozí propojení"
+
+msgid "Upstream relationships"
+msgstr "Příchozí propojení"
+
+msgid "This plan has no revision."
+msgstr "Tento půdorys nemá žádnou revizi."
+
+msgid "Invalid JSON payload."
+msgstr "Neplatná JSON data."
+
+msgid "Elements must be a JSON array."
+msgstr "Prvky musí být JSON pole."
+
+msgid "A revision may contain at most 5000 elements."
+msgstr "Revize může obsahovat nejvýše 5 000 prvků."
+
+msgid "Visible layers"
+msgstr "Viditelné vrstvy"
+
+msgid "Technical"
+msgstr "Technické"
+
+msgid "Structure"
+msgstr "Konstrukce"
+
+msgid "Upload layout"
+msgstr "Nahrát podklad"
+
+msgid "Open source document"
+msgstr "Otevřít zdrojový dokument"
+
+msgid "Source"
+msgstr "Zdroj"
+
+msgid "Edit"
+msgstr "Upravit"
+
+msgid "Loading plan..."
+msgstr "Načítání půdorysu..."
+
+msgid "No plan revision yet. Select Edit to start drawing."
+msgstr "Zatím žádná revize. Klikněte na Upravit a začněte kreslit."
+
+msgid "Building"
+msgstr "Bytový komplex"
+
+msgid "None"
+msgstr "Žádná"
+
+msgid "Canvas"
+msgstr "Plátno"
+
+msgid "Zoom out"
+msgstr "Oddálit"
+
+msgid "Fit floor"
+msgstr "Přizpůsobit podlaží"
+
+msgid "Zoom in"
+msgstr "Přiblížit"
+
+msgid "Export SVG"
+msgstr "Exportovat SVG"
+
+msgid "Floor"
+msgstr "Podlaží"
+
+msgid "View schematic"
+msgstr "Zobrazit schéma"
+
+msgid "No schematic is available."
+msgstr "Žádné schéma není k dispozici."
+
+msgid "Drawing tools"
+msgstr "Nástroje kreslení"
+
+msgid "Select"
+msgstr "Vybrat"
+
+msgid "Pan"
+msgstr "Posunout"
+
+msgid "Add wall"
+msgstr "Přidat zeď"
+
+msgid "Add door"
+msgstr "Přidat dveře"
+
+msgid "Add window"
+msgstr "Přidat okno"
+
+msgid "Add space"
+msgstr "Přidat prostor"
+
+msgid "Add technical item"
+msgstr "Přidat technický prvek"
+
+msgid "Add label"
+msgstr "Přidat popis"
+
+msgid "Delete selected"
+msgstr "Smazat vybrané"
+
+msgid "Edit source and scale"
+msgstr "Upravit zdroj a měřítko"
+
+msgid "Save"
+msgstr "Uložit"
+
+msgid "Publish"
+msgstr "Zveřejnit"
+
+msgid "Element"
+msgstr "Prvek"
+
+msgid "Linked object"
+msgstr "Propojený objekt"
+
+msgid "optional"
+msgstr "volitelné"
+
+msgid "No linkable objects loaded"
+msgstr "Žádné propojitelné objekty nejsou načteny"
+
+msgid "Facility records must exist on this floor before they can be linked."
+msgstr "Záznamy správy objektu musí existovat na tomto podlaží, než je lze propojit."
+
+msgid "New space"
+msgstr "Nový prostor"
+
+msgid "New door"
+msgstr "Nové dveře"
+
+msgid "New asset"
+msgstr "Nová součást"
+
+msgid "Refresh"
+msgstr "Obnovit"
+
+msgid "Width"
+msgstr "Šířka"
+
+msgid "Height"
+msgstr "Výška"
+
+msgid "Stroke"
+msgstr "Obrys"
+
+msgid "Fill"
+msgstr "Výplň"

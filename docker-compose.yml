@@ -92,6 +92,15 @@ services:
     volumes:
       - netbox-redis-cache-data:/data
 
+  volume-tools:
+    image: docker.io/alpine:3.22
+    profiles: ["tools"]
+    volumes:
+      - netbox-media-files:/data/media
+      - netbox-reports-files:/data/reports
+      - netbox-scripts-files:/data/scripts
+      - ./backup:/backups
+
 volumes:
   netbox-media-files:
   netbox-postgres-data:

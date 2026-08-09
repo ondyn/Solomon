@@ -1,8 +1,9 @@
 """Solomon Property - URL patterns."""
 
-from django.urls import path
+from django.urls import include, path
 
 from netbox.views.generic import ObjectChangeLogView
+from utilities.urls import get_model_urls
 
 from . import models, views
 from .contacts_views import ContactsExportView, ContactsImportView
@@ -78,6 +79,10 @@ urlpatterns = [
         name="building_changelog",
         kwargs={"model": models.Building},
     ),
+    path(
+        "buildings/<int:pk>/",
+        include(get_model_urls("solomon_property", "building")),
+    ),
     # ── Flats ─────────────────────────────────────────────────────────────
     path("flats/", views.FlatListView.as_view(), name="flat_list"),
     path("flats/add/", views.FlatEditView.as_view(), name="flat_add"),
@@ -90,6 +95,10 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="flat_changelog",
         kwargs={"model": models.Flat},
+    ),
+    path(
+        "flats/<int:pk>/",
+        include(get_model_urls("solomon_property", "flat")),
     ),
     # ── Persons ───────────────────────────────────────────────────────────
     path("persons/", views.PersonListView.as_view(), name="person_list"),
@@ -138,6 +147,10 @@ urlpatterns = [
         ObjectChangeLogView.as_view(),
         name="propertyowner_changelog",
         kwargs={"model": models.PropertyOwner},
+    ),
+    path(
+        "owners/<int:pk>/",
+        include(get_model_urls("solomon_property", "propertyowner")),
     ),
     # ── FlatOwners ────────────────────────────────────────────────────────
     path("flat-owners/", views.FlatOwnerListView.as_view(), name="flatowner_list"),

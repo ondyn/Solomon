@@ -14,6 +14,7 @@ PLUGINS = [
     # "solomon_core",
     # "solomon_test_plugin",
     "solomon_theme",
+    "solomon_facilities",
     "solomon_property",
     "solomon_meetings",
     # "netbox_bgp",
@@ -42,6 +43,7 @@ PLUGINS_CONFIG = {
     # },
     "solomon_theme": {},
     "solomon_property": {},
+    "solomon_facilities": {},
     "solomon_meetings": {},
     # "netbox_bgp": {
     #     "top_level_menu": True,
