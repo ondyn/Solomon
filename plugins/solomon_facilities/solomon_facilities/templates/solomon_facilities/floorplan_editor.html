@@ -3,7 +3,7 @@
 
 {% block head %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'solomon_facilities/schematic.css' %}">
+  <link rel="stylesheet" href="{% static 'solomon_facilities/schematic.css' %}?v=5">
   <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
 {% endblock head %}
 
@@ -43,6 +43,9 @@
           <i class="mdi mdi-format-text"></i>
         </button>
         <span class="schematic-divider"></span>
+        <button type="button" class="btn btn-outline-secondary btn-icon" id="duplicate-element" title="{% trans 'Duplicate selected' %} (Shift+D)" aria-label="{% trans 'Duplicate selected' %}" aria-keyshortcuts="Shift+D" disabled>
+          <i class="mdi mdi-content-copy"></i>
+        </button>
         <button type="button" class="btn btn-outline-danger btn-icon" id="delete-element" title="{% trans 'Delete selected' %}" aria-label="{% trans 'Delete selected' %}">
           <i class="mdi mdi-delete-outline"></i>
         </button>
@@ -54,20 +57,20 @@
       </div>
       <div class="schematic-command-actions">
         <span class="schematic-save-state" id="save-state" aria-live="polite"></span>
+        <a class="btn btn-outline-secondary" id="cancel-edit" href="{{ plan.get_absolute_url }}">
+          <i class="mdi mdi-close" aria-hidden="true"></i>
+          {% trans "Cancel" %}
+        </a>
         <a class="btn btn-outline-secondary" href="{% url 'plugins:solomon_facilities:planrevision_edit' pk=revision.pk %}" title="{% trans 'Edit source and scale' %}">
           <i class="mdi mdi-file-cog-outline" aria-hidden="true"></i>
           {% trans "Source" %}
         </a>
-        <button type="button" class="btn btn-primary" id="save-plan">
-          <i class="mdi mdi-content-save-outline" aria-hidden="true"></i>
-          {% trans "Save" %}
-        </button>
-        <form method="post" action="{% url 'plugins:solomon_facilities:floorplan_publish' pk=plan.pk %}" id="publish-form">
+        <form method="post" action="{% url 'plugins:solomon_facilities:floorplan_publish' pk=plan.pk %}" id="save-form">
           {% csrf_token %}
           <input type="hidden" name="revision_id" value="{{ revision.pk }}">
-          <button type="submit" class="btn btn-success">
-            <i class="mdi mdi-check-decagram-outline" aria-hidden="true"></i>
-            {% trans "Publish" %}
+          <button type="submit" class="btn btn-primary">
+            <i class="mdi mdi-content-save-outline" aria-hidden="true"></i>
+            {% trans "Save" %}
           </button>
         </form>
       </div>
@@ -130,5 +133,5 @@
       </aside>
     </div>
   </div>
-  <script src="{% static 'solomon_facilities/editor.js' %}?v=4"></script>
+  <script src="{% static 'solomon_facilities/editor.js' %}?v=10"></script>
 {% endblock content %}

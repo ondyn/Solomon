@@ -33,6 +33,7 @@ from solomon_facilities.models import (
     TechnicalConnection,
     TechnicalSystem,
 )
+from solomon_facilities.forms import SpaceUsageForm
 from users.models import ObjectPermission
 
 
@@ -118,6 +119,24 @@ class FloorPlanViewTest(TestCase):
         self.assertContains(response, "schematic-canvas")
         self.assertContains(response, "Second floor")
 
+    def test_space_usage_form_uses_netbox_date_pickers(self):
+        grant_object_permission(self.user, SpaceUsage, "add")
+        form = SpaceUsageForm()
+
+        self.assertTrue(form.fields["effective_from"].required)
+        self.assertFalse(form.fields["effective_to"].required)
+        for field_name in ("effective_from", "effective_to"):
+            widget = form.fields[field_name].widget
+            self.assertEqual(widget.attrs["class"], "date-picker")
+            self.assertEqual(widget.attrs["placeholder"], "YYYY-MM-DD")
+
+        response = self.client.get(
+            reverse("plugins:solomon_facilities:spaceusage_add")
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "date-picker", count=2)
+        self.assertContains(response, 'placeholder="YYYY-MM-DD"', count=2)
+
     def test_plan_without_revision_shows_empty_state(self):
         level = BuildingLevel.objects.create(
             building_object=self.building_object,
@@ -133,6 +152,14 @@ class FloorPlanViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No plan revision yet")
         self.assertNotContains(response, "solomon_facilities/viewer.js")
+
+    def test_plan_view_loads_transform_aware_viewer(self):
+        response = self.client.get(
+            reverse("plugins:solomon_facilities:floorplan", kwargs={"pk": self.plan.pk})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "viewer.js?v=3")
 
     def test_draft_only_plan_renders_for_editor_with_upload_link(self):
         grant_object_permission(self.user, FloorPlan, "change")
@@ -166,6 +193,13 @@ class FloorPlanViewTest(TestCase):
         self.assertContains(editor_response, "No linkable objects loaded")
         self.assertContains(editor_response, "New space")
         self.assertContains(editor_response, "New door")
+        self.assertContains(editor_response, "Duplicate selected", count=2)
+        self.assertContains(editor_response, 'aria-keyshortcuts="Shift+D"')
+        self.assertContains(editor_response, 'id="cancel-edit"')
+        self.assertContains(editor_response, 'id="save-form"')
+        self.assertNotContains(editor_response, 'id="publish-form"')
+        self.assertNotContains(editor_response, ">Publish<")
+        self.assertContains(editor_response, "editor.js?v=10")
         self.assertContains(editor_response, "Refresh")
 
         data_response = self.client.get(data_url, {"draft": "1"})
@@ -343,6 +377,56 @@ class FloorPlanViewTest(TestCase):
 
         self.assertEqual(save_response.status_code, 200)
         self.assertEqual(draft.elements.get().door, door)
+
+    def test_editor_save_sequence_activates_saved_revision(self):
+        grant_object_permission(self.user, FloorPlan, "change")
+        grant_object_permission(self.user, PlanRevision, "change")
+        editor_url = reverse(
+            "plugins:solomon_facilities:floorplan_draw", kwargs={"pk": self.plan.pk}
+        )
+        self.assertEqual(self.client.get(editor_url).status_code, 200)
+        draft = self.plan.revisions.get(status="draft")
+        data_url = reverse(
+            "plugins:solomon_facilities:floorplan_data", kwargs={"pk": self.plan.pk}
+        )
+        save_response = self.client.put(
+            data_url,
+            data=json.dumps(
+                {
+                    "revision_id": draft.pk,
+                    "elements": [
+                        {
+                            "element_type": "wall",
+                            "geometry": {
+                                "type": "line",
+                                "x1": 10,
+                                "y1": 20,
+                                "x2": 190,
+                                "y2": 20,
+                            },
+                            "style": {"stroke_width": 7, "scale_x": 1.5},
+                        }
+                    ],
+                }
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(save_response.status_code, 200)
+
+        publish_response = self.client.post(
+            reverse(
+                "plugins:solomon_facilities:floorplan_publish",
+                kwargs={"pk": self.plan.pk},
+            ),
+            {"revision_id": draft.pk},
+        )
+
+        self.assertRedirects(publish_response, self.plan.get_absolute_url())
+        self.plan.refresh_from_db()
+        draft.refresh_from_db()
+        self.assertEqual(self.plan.active_revision, draft)
+        self.assertEqual(draft.status, "published")
+        self.assertEqual(draft.elements.get().geometry["x2"], 190)
 
     def test_floor_plan_rest_endpoint_serializes_url(self):
         response = self.client.get(

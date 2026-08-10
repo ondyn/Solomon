@@ -799,11 +799,17 @@ msgstr "Přidat popis"
 msgid "Delete selected"
 msgstr "Smazat vybrané"
 
+msgid "Duplicate selected"
+msgstr "Duplikovat vybrané"
+
 msgid "Edit source and scale"
 msgstr "Upravit zdroj a měřítko"
 
 msgid "Save"
 msgstr "Uložit"
+
+msgid "Cancel"
+msgstr "Zrušit"
 
 msgid "Publish"
 msgstr "Zveřejnit"

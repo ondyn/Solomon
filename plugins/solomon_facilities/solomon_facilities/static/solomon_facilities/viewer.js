@@ -10,6 +10,8 @@
   let canvas;
   let planData;
   let zoom = 1;
+  let selectedObject = null;
+  const defaultInspectorContent = Array.from(inspector.childNodes).map((node) => node.cloneNode(true));
 
   function objectTarget(element) {
     if (element.space_id) return planData.targets.spaces[String(element.space_id)];
@@ -27,11 +29,16 @@
       strokeWidth: Number(style.stroke_width || 2),
       opacity: style.opacity === undefined ? 1 : Number(style.opacity),
       angle: Number(style.angle || 0),
+      scaleX: Number(style.scale_x || 1),
+      scaleY: Number(style.scale_y || 1),
       selectable: Boolean(selectable && !element.locked),
       evented: true,
       hasControls: Boolean(selectable),
       lockMovementX: Boolean(element.locked),
       lockMovementY: Boolean(element.locked),
+      originX: "left",
+      originY: "top",
+      hoverCursor: "pointer",
     };
     let object;
     if (geometry.type === "rect") {
@@ -41,8 +48,6 @@
         top: geometry.y,
         width: geometry.width,
         height: geometry.height,
-        originX: "left",
-        originY: "top",
       });
     } else if (geometry.type === "line") {
       object = new fabric.Line(
@@ -71,6 +76,10 @@
         fontSize: Number(style.font_size || 18),
         fontFamily: "Avenir Next, Trebuchet MS, sans-serif",
       });
+    }
+    if (style.position_x !== undefined && style.position_y !== undefined) {
+      object.set({left: Number(style.position_x), top: Number(style.position_y)});
+      object.setCoords();
     }
     object.facilityElement = element;
     object.elementType = element.element_type;
@@ -175,6 +184,35 @@
     }
   }
 
+  function clearSelection(resetInspector) {
+    if (selectedObject) {
+      selectedObject.set(selectedObject.viewerBaseStyle);
+      selectedObject = null;
+    }
+    if (resetInspector) {
+      inspector.replaceChildren(...defaultInspectorContent.map((node) => node.cloneNode(true)));
+    }
+    canvas.requestRenderAll();
+  }
+
+  function selectObject(object) {
+    if (object === selectedObject) return;
+    clearSelection(false);
+    selectedObject = object;
+    object.set({
+      stroke: "#efb419",
+      strokeWidth: Math.max(Number(object.viewerBaseStyle.strokeWidth || 0), 4),
+      opacity: 1,
+      shadow: new fabric.Shadow({
+        color: "rgba(239, 180, 25, 0.65)",
+        blur: 10,
+        offsetX: 0,
+        offsetY: 0,
+      }),
+    });
+    canvas.requestRenderAll();
+  }
+
   function layerFor(elementType) {
     if (elementType === "space") return "space";
     if (elementType === "door") return "door";
@@ -209,13 +247,24 @@
         if (element.space_id && highlights.has(String(element.space_id))) {
           object.set({stroke: "#efb419", strokeWidth: 5, opacity: 1});
         }
+        object.viewerBaseStyle = {
+          stroke: object.stroke,
+          strokeWidth: object.strokeWidth,
+          opacity: object.opacity,
+          shadow: object.shadow,
+        };
         canvas.add(object);
       });
       fitCanvas();
       loading.classList.add("is-hidden");
     });
     canvas.on("mouse:down", (event) => {
-      if (event.target && event.target.target) showTarget(event.target.target);
+      if (!event.target) {
+        clearSelection(true);
+        return;
+      }
+      selectObject(event.target);
+      if (event.target.target) showTarget(event.target.target);
     });
     canvas.on("mouse:dblclick", (event) => {
       if (event.target && event.target.target) window.location.assign(event.target.target.url);

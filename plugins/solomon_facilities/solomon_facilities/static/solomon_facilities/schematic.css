@@ -141,6 +141,29 @@
   grid-template-columns: minmax(0, 1fr) 300px;
 }
 
+@media (min-width: 993px) {
+  .schematic-editor {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 9rem);
+    min-height: 32rem;
+  }
+
+  .schematic-editor .schematic-commandbar {
+    flex: 0 0 auto;
+  }
+
+  .schematic-editor-workspace {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .schematic-editor-workspace .schematic-stage,
+  .schematic-editor-workspace .editor-inspector {
+    min-height: 0;
+  }
+}
+
 .tool-palette .active {
   color: white;
   border-color: var(--schematic-space-stroke);

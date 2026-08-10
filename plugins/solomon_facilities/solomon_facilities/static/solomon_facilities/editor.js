@@ -27,9 +27,11 @@
   let panMode = false;
   let dragging = false;
   let lastPointer;
+  let dirty = false;
+  let leavingEditor = false;
 
   function getCsrfToken() {
-    const input = document.querySelector("#publish-form [name=csrfmiddlewaretoken]");
+    const input = document.querySelector("#save-form [name=csrfmiddlewaretoken]");
     if (input?.value) return input.value;
     const prefix = "csrftoken=";
     const cookie = document.cookie
@@ -63,6 +65,8 @@
       strokeWidth: Number(style.stroke_width || 2),
       opacity: style.opacity === undefined ? 1 : Number(style.opacity),
       angle: Number(style.angle || 0),
+      scaleX: Number(style.scale_x || 1),
+      scaleY: Number(style.scale_y || 1),
       selectable: !element.locked,
       lockMovementX: Boolean(element.locked),
       lockMovementY: Boolean(element.locked),
@@ -92,6 +96,10 @@
         fontFamily: "Avenir Next, Trebuchet MS, sans-serif",
       });
     }
+    if (style.position_x !== undefined && style.position_y !== undefined) {
+      object.set({left: Number(style.position_x), top: Number(style.position_y)});
+      object.setCoords();
+    }
     const target = targetFromElement(element);
     object.elementType = element.element_type;
     object.elementLabel = element.label || "";
@@ -101,45 +109,36 @@
     return object;
   }
 
-  function lineGeometry(object) {
-    const points = object.calcLinePoints();
-    const matrix = object.calcTransformMatrix();
-    const start = fabric.util.transformPoint(new fabric.Point(points.x1, points.y1), matrix);
-    const end = fabric.util.transformPoint(new fabric.Point(points.x2, points.y2), matrix);
-    return {type: "line", x1: start.x, y1: start.y, x2: end.x, y2: end.y};
-  }
-
   function serializeObject(object, index) {
     let geometry;
     if (object.type === "line") {
-      geometry = lineGeometry(object);
+      geometry = {
+        type: "line",
+        x1: object.x1,
+        y1: object.y1,
+        x2: object.x2,
+        y2: object.y2,
+      };
     } else if (object.type === "circle") {
       geometry = {
         type: "point",
-        x: object.left + object.radius * object.scaleX,
-        y: object.top + object.radius * object.scaleY,
+        x: object.left + object.radius,
+        y: object.top + object.radius,
       };
     } else if (object.type === "i-text" || object.type === "text") {
       geometry = {type: "text", x: object.left, y: object.top, text: object.text};
     } else if (object.type === "polygon" || object.type === "polyline") {
-      const matrix = object.calcTransformMatrix();
       geometry = {
         type: object.type,
-        points: object.points.map((point) => {
-          const transformed = fabric.util.transformPoint(
-            new fabric.Point(point.x - object.pathOffset.x, point.y - object.pathOffset.y),
-            matrix
-          );
-          return {x: transformed.x, y: transformed.y};
-        }),
+        points: object.points.map((point) => ({x: point.x, y: point.y})),
       };
     } else {
       geometry = {
         type: "rect",
         x: object.left,
         y: object.top,
-        width: object.width * object.scaleX,
-        height: object.height * object.scaleY,
+        width: object.width,
+        height: object.height,
       };
     }
     const item = {
@@ -152,6 +151,10 @@
         fill: object.fill && object.fill !== "transparent" ? object.fill : "transparent",
         opacity: object.opacity,
         angle: object.angle || 0,
+        scale_x: object.scaleX || 1,
+        scale_y: object.scaleY || 1,
+        position_x: object.left,
+        position_y: object.top,
         radius: object.radius || undefined,
         font_size: object.fontSize || undefined,
       },
@@ -263,6 +266,52 @@
     canvas.bringToFront(object);
     canvas.requestRenderAll();
     updateInspector(object);
+    markChanged();
+  }
+
+  function duplicateSelectedObject() {
+    const source = canvas.getActiveObject();
+    if (!source) return;
+    source.clone((duplicate) => {
+      const offset = 32 / zoom;
+      duplicate.set({
+        left: Number(source.left || 0) + offset,
+        top: Number(source.top || 0) + offset,
+      });
+      duplicate.elementType = source.elementType;
+      duplicate.elementLabel = source.elementLabel;
+      duplicate.targetKind = "";
+      duplicate.targetId = "";
+      duplicate.locked = Boolean(source.locked);
+      canvas.discardActiveObject();
+      canvas.add(duplicate);
+      canvas.setActiveObject(duplicate);
+      canvas.bringToFront(duplicate);
+      canvas.requestRenderAll();
+      updateInspector(duplicate);
+      markChanged();
+    });
+  }
+
+  function markChanged() {
+    dirty = true;
+    saveState.textContent = "Changed";
+  }
+
+  function objectDimensionBases(object) {
+    const strokeWidth = Number(object.strokeWidth || 0);
+    return {
+      width: Number(object.width || (object.type === "line" ? strokeWidth : 0)),
+      height: Number(object.height || (object.type === "line" ? strokeWidth : 0)),
+    };
+  }
+
+  function deleteSelectedObject() {
+    const object = canvas.getActiveObject();
+    if (!object) return;
+    canvas.remove(object);
+    updateInspector();
+    markChanged();
   }
 
   function populateTargetOptions() {
@@ -304,10 +353,9 @@
   }
 
   function updateInspector(selectedObject) {
-    const object = typeof selectedObject?.set === "function"
-      ? selectedObject
-      : canvas.getActiveObject();
+    const object = selectedObject || canvas.getActiveObject();
     const disabled = !object;
+    document.getElementById("duplicate-element").disabled = disabled;
     Object.values(fields).forEach((field) => { field.disabled = disabled; });
     if (!object) return;
     fields.type.value = object.elementType || "line";
@@ -316,8 +364,9 @@
     fields.target.value = object.targetKind && object.targetId ? `${object.targetKind}:${object.targetId}` : "";
     fields.x.value = Number(object.left || 0).toFixed(1);
     fields.y.value = Number(object.top || 0).toFixed(1);
-    fields.width.value = Number(object.width * object.scaleX || 0).toFixed(1);
-    fields.height.value = Number(object.height * object.scaleY || 0).toFixed(1);
+    const dimensionBases = objectDimensionBases(object);
+    fields.width.value = Number(dimensionBases.width * object.scaleX || 0).toFixed(1);
+    fields.height.value = Number(dimensionBases.height * object.scaleY || 0).toFixed(1);
     fields.stroke.value = /^#[0-9a-f]{6}$/i.test(object.stroke) ? object.stroke : "#27343a";
     fields.fill.value = /^#[0-9a-f]{6}$/i.test(object.fill) ? object.fill : "#dce9e4";
     fields.locked.checked = Boolean(object.locked);
@@ -341,12 +390,13 @@
       lockMovementY: fields.locked.checked,
       hasControls: !fields.locked.checked,
     });
-    if (object.width && Number(fields.width.value) > 0) object.scaleX = Number(fields.width.value) / object.width;
-    if (object.height && Number(fields.height.value) > 0) object.scaleY = Number(fields.height.value) / object.height;
+    const dimensionBases = objectDimensionBases(object);
+    if (dimensionBases.width && Number(fields.width.value) > 0) object.scaleX = Number(fields.width.value) / dimensionBases.width;
+    if (dimensionBases.height && Number(fields.height.value) > 0) object.scaleY = Number(fields.height.value) / dimensionBases.height;
     object.locked = fields.locked.checked;
     object.setCoords();
     canvas.requestRenderAll();
-    saveState.textContent = "Changed";
+    markChanged();
   }
 
   async function savePlan() {
@@ -363,6 +413,7 @@
     });
     const result = await responseData(response);
     if (!response.ok) throw new Error(typeof result.detail === "string" ? result.detail : JSON.stringify(result.detail));
+    dirty = false;
     saveState.textContent = "Saved";
     return result;
   }
@@ -393,10 +444,10 @@
       loading.classList.add("is-hidden");
       updateInspector();
     });
-    canvas.on("selection:created", updateInspector);
-    canvas.on("selection:updated", updateInspector);
-    canvas.on("selection:cleared", updateInspector);
-    canvas.on("object:modified", () => { updateInspector(); saveState.textContent = "Changed"; });
+    canvas.on("selection:created", () => updateInspector());
+    canvas.on("selection:updated", () => updateInspector());
+    canvas.on("selection:cleared", () => updateInspector());
+    canvas.on("object:modified", () => { updateInspector(); markChanged(); });
     canvas.on("mouse:down", (event) => {
       if (!panMode) return;
       dragging = true;
@@ -439,35 +490,43 @@
         button.disabled = false;
       }
     });
-    document.getElementById("delete-element").addEventListener("click", () => {
-      const object = canvas.getActiveObject();
-      if (object) canvas.remove(object);
-      updateInspector();
-      saveState.textContent = "Changed";
-    });
+    document.getElementById("duplicate-element").addEventListener("click", duplicateSelectedObject);
+    document.getElementById("delete-element").addEventListener("click", deleteSelectedObject);
     document.getElementById("zoom-in").addEventListener("click", () => { zoom = Math.min(3, zoom * 1.2); applyZoom(); });
     document.getElementById("zoom-out").addEventListener("click", () => { zoom = Math.max(0.1, zoom / 1.2); applyZoom(); });
     document.getElementById("zoom-fit").addEventListener("click", fitCanvas);
-    document.getElementById("save-plan").addEventListener("click", () => savePlan().catch((error) => { saveState.textContent = error.message; }));
-    const publishForm = document.getElementById("publish-form");
-    publishForm.addEventListener("submit", async (event) => {
+    const saveForm = document.getElementById("save-form");
+    saveForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       try {
         await savePlan();
-        HTMLFormElement.prototype.submit.call(publishForm);
+        leavingEditor = true;
+        HTMLFormElement.prototype.submit.call(saveForm);
       } catch (error) {
         saveState.textContent = error.message;
       }
     });
+    document.getElementById("cancel-edit").addEventListener("click", () => {
+      leavingEditor = true;
+      dirty = false;
+    });
     document.addEventListener("keydown", (event) => {
       if ((event.key === "Delete" || event.key === "Backspace") && !["INPUT", "SELECT", "TEXTAREA"].includes(event.target.tagName)) {
-        const object = canvas.getActiveObject();
-        if (object) canvas.remove(object);
+        deleteSelectedObject();
       }
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
         event.preventDefault();
-        savePlan().catch((error) => { saveState.textContent = error.message; });
+        saveForm.requestSubmit();
       }
+      if (event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase() === "d" && !["INPUT", "SELECT", "TEXTAREA"].includes(event.target.tagName) && !canvas.getActiveObject()?.isEditing) {
+        event.preventDefault();
+        duplicateSelectedObject();
+      }
+    });
+    window.addEventListener("beforeunload", (event) => {
+      if (!dirty || leavingEditor) return;
+      event.preventDefault();
+      event.returnValue = "";
     });
     window.addEventListener("resize", fitCanvas);
   }

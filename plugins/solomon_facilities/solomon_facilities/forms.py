@@ -14,6 +14,7 @@ from utilities.forms.fields import (
     DynamicModelChoiceField,
     DynamicModelMultipleChoiceField,
 )
+from utilities.forms.widgets import DatePicker
 
 from . import models
 
@@ -121,7 +122,11 @@ class SpaceFlatAssignmentForm(NetBoxModelForm):
             "notes",
             "tags",
         )
-        widgets = {"notes": forms.Textarea(attrs={"rows": 3})}
+        widgets = {
+            "effective_from": DatePicker(),
+            "effective_to": DatePicker(),
+            "notes": forms.Textarea(attrs={"rows": 3}),
+        }
 
 
 class SpaceUsageForm(NetBoxModelForm):
@@ -143,7 +148,11 @@ class SpaceUsageForm(NetBoxModelForm):
             "notes",
             "tags",
         )
-        widgets = {"notes": forms.Textarea(attrs={"rows": 3})}
+        widgets = {
+            "effective_from": DatePicker(),
+            "effective_to": DatePicker(),
+            "notes": forms.Textarea(attrs={"rows": 3}),
+        }
 
 
 class DoorForm(NetBoxModelForm):
