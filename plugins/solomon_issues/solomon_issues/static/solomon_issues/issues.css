@@ -1,0 +1,19 @@
+/* Solomon Issues - shared styling for public pages and the asset tag detail. */
+
+/* NetBox renders <code> with a low-contrast tint; the public tag code must stay
+   readable in both colour modes. */
+.issues-code {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--tblr-border-color);
+  border-radius: 0.25rem;
+  background-color: var(--tblr-bg-surface-secondary);
+  color: var(--tblr-body-color);
+  font-family: var(--tblr-font-monospace);
+  font-size: 0.9em;
+  letter-spacing: 0.08em;
+}
+
+.issues-label-caption {
+  font-weight: 600;
+}

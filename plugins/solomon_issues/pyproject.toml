@@ -1,0 +1,30 @@
+####
+## Solomon Issues Plugin
+##
+## QR-coded asset tags and public issue reporting for Solomon.
+####
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solomon-issues"
+version = "0.1.0"
+description = "Solomon QR asset tags, public problem reporting, and issue management"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+dependencies = ["qrcode>=7.4"]
+authors = [
+    {name = "Solomon Dev"},
+]
+
+[project.urls]
+Homepage = "https://github.com/ondyn/Solomon"
+
+[tool.setuptools.packages.find]
+include = ["solomon_issues*"]
+
+[tool.setuptools.package-data]
+solomon_issues = ["templates/**/*", "static/**/*", "locale/**/*", "fixtures/**/*"]

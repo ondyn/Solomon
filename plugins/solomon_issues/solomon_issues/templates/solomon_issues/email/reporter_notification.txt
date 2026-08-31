@@ -1,0 +1,16 @@
+{% load i18n %}{% trans "Hello" %}{% if issue.reporter_name %} {{ issue.reporter_name }}{% endif %},
+
+{% blocktrans with number=issue.number %}this is an update on the problem you reported ({{ number }}).{% endblocktrans %}
+
+{{ issue.title }}
+{% trans "Status" %}: {{ issue.get_status_display }}
+{% if issue.asset_tag %}{% trans "Item" %}: {{ issue.asset_tag.label }}
+{% endif %}
+{% if message %}{% trans "Message from the building manager" %}:
+{{ message }}
+{% endif %}{% if issue.resolution %}{% trans "Resolution" %}:
+{{ issue.resolution }}
+{% endif %}
+{% trans "Follow the progress here" %}: {{ public_url }}
+
+{% trans "Thank you for helping us keep the building in good shape." %}

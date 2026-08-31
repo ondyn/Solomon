@@ -1,0 +1,51 @@
+{% extends 'base/base.html' %}
+{% load i18n static %}
+
+{% comment %}Standalone layout for anonymous visitors who scanned a QR code.{% endcomment %}
+
+{% block title %}{% block public_title %}{% trans "Report a problem" %}{% endblock %}{% endblock %}
+
+{% block head %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'solomon_issues/issues.css' %}">
+{% endblock head %}
+
+{% block layout %}
+  <div class="page">
+    <div class="container container-tight py-4">
+
+      <header class="d-flex justify-content-between align-items-center gap-2 mb-4">
+        <a href="{% url 'home' %}">
+          <img src="{% static 'logo_netbox_dark_teal.svg' %}" alt="" class="hide-theme-dark" style="height: 2.5rem">
+          <img src="{% static 'logo_netbox_bright_teal.svg' %}" alt="" class="hide-theme-light" style="height: 2.5rem">
+        </a>
+        {% if language_options %}
+          <nav class="btn-group btn-group-sm" aria-label="{% trans 'Language' %}">
+            {% for option in language_options %}
+              <a class="btn {% if option.active %}btn-primary active{% else %}btn-outline-secondary{% endif %}"
+                 href="{{ option.url }}"
+                 hreflang="{{ option.code }}"
+                 title="{{ option.name }}"
+                 {% if option.active %}aria-current="true"{% endif %}>{{ option.code|upper }}</a>
+            {% endfor %}
+          </nav>
+        {% endif %}
+      </header>
+
+      {% if messages %}
+        <div class="mb-3">
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% block public_content %}{% endblock %}
+
+      <footer class="text-center text-secondary mt-4 small">
+        {% trans "Powered by Solomon facility management" %}
+      </footer>
+
+    </div>
+  </div>
+{% endblock layout %}

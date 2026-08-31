@@ -45,6 +45,8 @@ services:
       - ./plugins:/opt/netbox/plugins_dev:z
       # Serve Facilities assets from source so editor JS/CSS changes are immediate.
       - ./plugins/solomon_facilities/solomon_facilities/static/solomon_facilities:/opt/netbox/netbox/static/solomon_facilities:z,ro
+      # Serve Issues assets from source so public/detail CSS changes are immediate.
+      - ./plugins/solomon_issues/solomon_issues/static/solomon_issues:/opt/netbox/netbox/static/solomon_issues:z,ro
       # Source drawings and legal documents used by the facilities seed importer
       - ./support:/opt/netbox/support:z,ro
       # ── Django local_settings override (for MIGRATION_MODULES etc.) ──

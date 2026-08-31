@@ -1,0 +1,40 @@
+{% extends 'generic/object.html' %}
+{% load i18n %}
+
+{% block content %}
+<div class="row">
+  <div class="col col-md-6">
+    <div class="card">
+      <h5 class="card-header">{% trans "Category" %}</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table mb-0">
+          <tr><th scope="row">{% trans "Name" %}</th><td>{{ object.name }}</td></tr>
+          <tr><th scope="row">{% trans "Slug" %}</th><td>{{ object.slug }}</td></tr>
+          <tr><th scope="row">{% trans "Description" %}</th><td>{{ object.description|linebreaksbr|default:"&mdash;" }}</td></tr>
+          <tr>
+            <th scope="row">{% trans "Default priority" %}</th>
+            <td><span class="badge text-bg-{{ object.get_default_priority_color }}">{{ object.get_default_priority_display }}</span></td>
+          </tr>
+          <tr><th scope="row">{% trans "Default assignee" %}</th><td>{{ object.default_assignee|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Default team" %}</th><td>{{ object.default_group|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Active" %}</th><td>{{ object.is_active|yesno }}</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col col-md-6">
+    <div class="card">
+      <h5 class="card-header">{% trans "Routing and SLA" %}</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table mb-0">
+          <tr><th scope="row">{% trans "Notification recipients" %}</th><td>{{ object.notify_emails|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Response SLA (hours)" %}</th><td>{{ object.response_sla_hours|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Resolution SLA (hours)" %}</th><td>{{ object.resolution_sla_hours|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Open issues" %}</th><td>{{ open_issues }}</td></tr>
+          <tr><th scope="row">{% trans "Total issues" %}</th><td>{{ total_issues }}</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

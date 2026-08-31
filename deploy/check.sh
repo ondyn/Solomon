@@ -9,11 +9,11 @@ RUFF_IMAGE="${RUFF_IMAGE:-ghcr.io/astral-sh/ruff:0.12.7-alpine}"
 
 echo "Checking Python lint..."
 docker run --rm -v "$ROOT_DIR:/workspace" -w /workspace "$RUFF_IMAGE" \
-  ruff check plugins/solomon_theme plugins/solomon_property plugins/solomon_meetings plugins/solomon_facilities
+  ruff check plugins/solomon_theme plugins/solomon_property plugins/solomon_meetings plugins/solomon_facilities plugins/solomon_issues
 
 echo "Checking Python formatting..."
 docker run --rm -v "$ROOT_DIR:/workspace" -w /workspace "$RUFF_IMAGE" \
-  ruff format --check plugins/solomon_theme plugins/solomon_property plugins/solomon_meetings plugins/solomon_facilities
+  ruff format --check plugins/solomon_theme plugins/solomon_property plugins/solomon_meetings plugins/solomon_facilities plugins/solomon_issues
 
 echo "Building production image..."
 sh deploy/compose.sh -f docker-compose.yml -f deploy/docker-compose.test.yml build netbox
@@ -27,6 +27,8 @@ sh deploy/compose.sh -f docker-compose.yml -f deploy/docker-compose.test.yml run
   /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py test \
   solomon_property.tests solomon_meetings.tests \
   solomon_facilities.tests.test_models solomon_facilities.tests.test_views \
-  solomon_facilities.tests.test_import_command $KEEPDB_FLAG
+  solomon_facilities.tests.test_import_command \
+  solomon_issues \
+  $KEEPDB_FLAG
 
 echo "All checks passed."

@@ -17,6 +17,7 @@ PLUGINS = [
     "solomon_facilities",
     "solomon_property",
     "solomon_meetings",
+    "solomon_issues",
     # "netbox_bgp",
     # "netbox_topology_views",
     # "netbox_documents",
@@ -45,6 +46,17 @@ PLUGINS_CONFIG = {
     "solomon_property": {},
     "solomon_facilities": {},
     "solomon_meetings": {},
+    "solomon_issues": {
+        # Leave empty to derive public QR URLs from the incoming request.
+        "public_base_url": "",
+        "allow_anonymous_reports": True,
+        "public_issue_visibility": "open",
+        "public_languages": ["en", "cs"],
+        "default_label_caption": "",
+        "manager_emails": [],
+        "notifications_enabled": True,
+        "async_notifications": True,
+    },
     # "netbox_bgp": {
     #     "top_level_menu": True,
     # },

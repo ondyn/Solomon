@@ -1,0 +1,87 @@
+{% extends 'generic/object.html' %}
+{% load i18n static %}
+
+{% block head %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'solomon_issues/issues.css' %}">
+{% endblock head %}
+
+{% block content %}
+<div class="row">
+  <div class="col col-md-7">
+    <div class="card">
+      <h5 class="card-header">{% trans "Asset tag" %}</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table mb-0">
+          <tr><th scope="row">{% trans "Item name" %}</th><td>{{ object.label }}</td></tr>
+          <tr><th scope="row">{% trans "Public code" %}</th><td><span class="issues-code">{{ object.code }}</span></td></tr>
+          <tr>
+            <th scope="row">{% trans "Status" %}</th>
+            <td><span class="badge text-bg-{{ object.get_status_color }}">{{ object.get_status_display }}</span></td>
+          </tr>
+          <tr><th scope="row">{% trans "Location" %}</th><td>{{ object.location_hint|default:"&mdash;" }}</td></tr>
+          <tr>
+            <th scope="row">{% trans "Linked object" %}</th>
+            <td>
+              {% if object.assigned_object %}
+                <a href="{{ object.assigned_object.get_absolute_url }}">{{ object.assigned_object }}</a>
+              {% else %}&mdash;{% endif %}
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Default category" %}</th>
+            <td>{% if object.category %}<a href="{{ object.category.get_absolute_url }}">{{ object.category }}</a>{% else %}&mdash;{% endif %}</td>
+          </tr>
+          <tr><th scope="row">{% trans "Responsible team" %}</th><td>{{ object.assigned_group|default:"&mdash;" }}</td></tr>
+          <tr>
+            <th scope="row">{% trans "Default priority" %}</th>
+            <td><span class="badge text-bg-{{ object.get_default_priority_color }}">{{ object.get_default_priority_display }}</span></td>
+          </tr>
+          <tr><th scope="row">{% trans "Label caption" %}</th><td>{{ object.label_caption }}</td></tr>
+          <tr><th scope="row">{% trans "Allow anonymous reports" %}</th><td>{{ object.allow_public_reports|yesno }}</td></tr>
+          <tr><th scope="row">{% trans "Show open issues publicly" %}</th><td>{{ object.show_open_issues|yesno }}</td></tr>
+          <tr><th scope="row">{% trans "Require reporter contact" %}</th><td>{{ object.require_reporter_contact|yesno }}</td></tr>
+          <tr><th scope="row">{% trans "Notification recipients" %}</th><td>{{ object.notify_emails|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Last printed" %}</th><td>{{ object.printed_at|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Internal notes" %}</th><td>{{ object.notes|linebreaksbr|default:"&mdash;" }}</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col col-md-5">
+    <div class="card mb-3">
+      <h5 class="card-header">{% trans "QR code" %}</h5>
+      <div class="card-body text-center">
+        <img src="{% url 'plugins:solomon_issues:assettag_qr' pk=object.pk %}" alt="{% trans 'QR code' %}" style="width: 200px; height: 200px">
+        <p class="issues-label-caption mt-2 mb-1">{{ object.label_caption }}</p>
+        <p class="text-secondary small text-break mb-3">{{ public_url }}</p>
+        <div class="d-flex gap-2 justify-content-center flex-wrap">
+          <a class="btn btn-outline-secondary" href="{{ public_url }}" target="_blank" rel="noopener">
+            <i class="mdi mdi-open-in-new" aria-hidden="true"></i> {% trans "Open public page" %}
+          </a>
+          {% if perms.solomon_issues.print_assettag %}
+            <a class="btn btn-primary" href="{% url 'plugins:solomon_issues:assettag_labels' %}?pk={{ object.pk }}">
+              <i class="mdi mdi-printer" aria-hidden="true"></i> {% trans "Print label" %}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h5 class="card-header">{% trans "Open issues" %}</h5>
+      <ul class="list-group list-group-flush">
+        {% for issue in open_issues %}
+          <li class="list-group-item d-flex justify-content-between gap-2">
+            <a href="{{ issue.get_absolute_url }}">{{ issue.number }} - {{ issue.title }}</a>
+            <span class="badge text-bg-{{ issue.get_status_color }}">{{ issue.get_status_display }}</span>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-secondary">{% trans "No open issues." %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock content %}

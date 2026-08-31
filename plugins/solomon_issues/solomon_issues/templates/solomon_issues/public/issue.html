@@ -1,0 +1,77 @@
+{% extends 'solomon_issues/public/base.html' %}
+{% load i18n %}
+
+{% block public_title %}{{ issue.number }}{% endblock %}
+
+{% block public_content %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+        <h1 class="h3 mb-0">{{ issue.title }}</h1>
+        <span class="badge text-bg-{{ issue.get_status_color }}">{{ issue.get_status_display }}</span>
+      </div>
+      <p class="text-secondary small mb-2">
+        {{ issue.number }} &middot; {{ issue.created|date:"SHORT_DATETIME_FORMAT" }}
+        {% if issue.asset_tag %} &middot; {{ issue.asset_tag.label }}{% endif %}
+      </p>
+      <p class="mb-0">{{ issue.description|linebreaksbr }}</p>
+      {% if issue.resolution %}
+        <div class="alert alert-success mt-3 mb-0">
+          <strong>{% trans "Resolution" %}:</strong> {{ issue.resolution|linebreaksbr }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if attachments %}
+    <div class="card mb-3">
+      <h2 class="card-header h5">{% trans "Attachments" %}</h2>
+      <ul class="list-group list-group-flush">
+        {% for attachment in attachments %}
+          <li class="list-group-item">
+            <a href="{{ attachment.file.url }}" rel="noopener">{{ attachment.caption|default:attachment.file.name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="card mb-3">
+    <h2 class="card-header h5">{% trans "Timeline" %}</h2>
+    <ul class="list-group list-group-flush">
+      {% for event in timeline %}
+        <li class="list-group-item">
+          <div class="d-flex justify-content-between gap-2">
+            <span class="badge text-bg-{{ event.get_event_type_color }}">{{ event.get_event_type_display }}</span>
+            <span class="text-secondary small">{{ event.created|date:"SHORT_DATETIME_FORMAT" }}</span>
+          </div>
+          {% if event.message %}<div class="mt-1">{{ event.message|linebreaksbr }}</div>{% endif %}
+          <div class="text-secondary small">{{ event.display_actor }}</div>
+        </li>
+      {% empty %}
+        <li class="list-group-item text-secondary">{% trans "Nothing has happened yet." %}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2 class="card-header h5">{% trans "Add information" %}</h2>
+    <div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          {% if field.name == 'website' %}
+            <div style="position:absolute; left:-10000px" aria-hidden="true">{{ field }}</div>
+          {% else %}
+            <div class="mb-3">
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">{% trans "Send" %}</button>
+      </form>
+    </div>
+  </div>
+{% endblock public_content %}

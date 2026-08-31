@@ -9,12 +9,14 @@ COPY plugins/solomon_theme plugins/solomon_theme
 COPY plugins/solomon_property plugins/solomon_property
 COPY plugins/solomon_meetings plugins/solomon_meetings
 COPY plugins/solomon_facilities plugins/solomon_facilities
+COPY plugins/solomon_issues plugins/solomon_issues
 
 RUN mkdir /wheels && \
     python -m build --wheel --outdir /wheels plugins/solomon_theme && \
     python -m build --wheel --outdir /wheels plugins/solomon_property && \
     python -m build --wheel --outdir /wheels plugins/solomon_meetings && \
-    python -m build --wheel --outdir /wheels plugins/solomon_facilities
+    python -m build --wheel --outdir /wheels plugins/solomon_facilities && \
+    python -m build --wheel --outdir /wheels plugins/solomon_issues
 
 FROM docker.io/netboxcommunity/netbox:${NETBOX_VERSION}
 

@@ -1,0 +1,148 @@
+{% extends 'generic/object.html' %}
+{% load i18n static %}
+
+{% block head %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'solomon_issues/issues.css' %}">
+{% endblock head %}
+
+{% block content %}
+<div class="row">
+  <div class="col col-md-7">
+    <div class="card mb-3">
+      <h5 class="card-header">{% trans "Problem" %}</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table mb-0">
+          <tr><th scope="row">{% trans "Number" %}</th><td><span class="issues-code">{{ object.number }}</span></td></tr>
+          <tr><th scope="row">{% trans "Summary" %}</th><td>{{ object.title }}</td></tr>
+          <tr>
+            <th scope="row">{% trans "Status" %}</th>
+            <td><span class="badge text-bg-{{ object.get_status_color }}">{{ object.get_status_display }}</span></td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Priority" %}</th>
+            <td><span class="badge text-bg-{{ object.get_priority_color }}">{{ object.get_priority_display }}</span></td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Source" %}</th>
+            <td><span class="badge text-bg-{{ object.get_source_color }}">{{ object.get_source_display }}</span></td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Asset tag" %}</th>
+            <td>{% if object.asset_tag %}<a href="{{ object.asset_tag.get_absolute_url }}">{{ object.asset_tag }}</a>{% else %}&mdash;{% endif %}</td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Linked object" %}</th>
+            <td>{% if object.assigned_object %}<a href="{{ object.assigned_object.get_absolute_url }}">{{ object.assigned_object }}</a>{% else %}&mdash;{% endif %}</td>
+          </tr>
+          <tr>
+            <th scope="row">{% trans "Category" %}</th>
+            <td>{% if object.category %}<a href="{{ object.category.get_absolute_url }}">{{ object.category }}</a>{% else %}&mdash;{% endif %}</td>
+          </tr>
+          <tr><th scope="row">{% trans "Assigned to" %}</th><td>{{ object.assigned_to|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Assigned team" %}</th><td>{{ object.assigned_group|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Due date" %}</th><td>{{ object.due_date|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Description" %}</th><td>{{ object.description|linebreaksbr }}</td></tr>
+          <tr><th scope="row">{% trans "Resolution" %}</th><td>{{ object.resolution|linebreaksbr|default:"&mdash;" }}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h5 class="card-header">{% trans "Timeline" %}</h5>
+      <ul class="list-group list-group-flush">
+        {% for event in timeline %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between gap-2">
+              <span class="badge text-bg-{{ event.get_event_type_color }}">{{ event.get_event_type_display }}</span>
+              <span class="text-secondary small">{{ event.created|date:"SHORT_DATETIME_FORMAT" }}</span>
+            </div>
+            {% if event.message %}<div class="mt-1">{{ event.message|linebreaksbr }}</div>{% endif %}
+            <div class="text-secondary small">
+              {{ event.display_actor }}
+              {% if event.visibility == 'internal' %}
+                <span class="badge text-bg-red ms-1">{% trans "Internal" %}</span>
+              {% endif %}
+            </div>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-secondary">{% trans "No timeline entries." %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="col col-md-5">
+    <div class="card mb-3">
+      <h5 class="card-header">{% trans "Reporter" %}</h5>
+      <div class="card-body">
+        <table class="table table-hover attr-table mb-0">
+          <tr><th scope="row">{% trans "Name" %}</th><td>{{ object.reporter_display }}</td></tr>
+          <tr><th scope="row">{% trans "E-mail" %}</th><td>{{ object.reporter_email|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Phone" %}</th><td>{{ object.reporter_phone|default:"&mdash;" }}</td></tr>
+          <tr><th scope="row">{% trans "Notify reporter" %}</th><td>{{ object.notify_reporter|yesno }}</td></tr>
+          <tr>
+            <th scope="row">{% trans "Reporter link" %}</th>
+            <td class="text-break"><a href="{{ public_url }}" target="_blank" rel="noopener">{{ public_url }}</a></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    {% if can_manage %}
+      <div class="card mb-3">
+        <h5 class="card-header">{% trans "Update status" %}</h5>
+        <div class="card-body">
+          <form method="post" action="{% url 'plugins:solomon_issues:issue_status' pk=object.pk %}">
+            {% csrf_token %}
+            {{ status_form.as_p }}
+            <button type="submit" class="btn btn-primary">{% trans "Apply" %}</button>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if perms.solomon_issues.add_issuecomment %}
+      <div class="card mb-3">
+        <h5 class="card-header">{% trans "Add reply" %}</h5>
+        <div class="card-body">
+          <form method="post" action="{% url 'plugins:solomon_issues:issue_comment' pk=object.pk %}">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit" class="btn btn-primary">{% trans "Post reply" %}</button>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="card mb-3">
+      <h5 class="card-header">{% trans "Attachments" %}</h5>
+      <ul class="list-group list-group-flush">
+        {% for attachment in attachments %}
+          <li class="list-group-item">
+            <a href="{{ attachment.file.url }}" rel="noopener">{{ attachment.caption|default:attachment.file.name }}</a>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-secondary">{% trans "No attachments." %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="card">
+      <h5 class="card-header">{% trans "Notifications" %}</h5>
+      <ul class="list-group list-group-flush">
+        {% for notification in notifications %}
+          <li class="list-group-item d-flex justify-content-between gap-2">
+            <span class="text-break">{{ notification.recipient }}</span>
+            <span class="badge text-bg-{% if notification.success %}green{% else %}red{% endif %}">
+              {{ notification.sent_at|date:"SHORT_DATETIME_FORMAT" }}
+            </span>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-secondary">{% trans "No notifications sent." %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock content %}

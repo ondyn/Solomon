@@ -1,0 +1,51 @@
+{% extends 'base/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "QR labels" %}{% endblock %}
+
+{% block head %}
+  {{ block.super }}
+  <style>
+    .label-sheet { display: flex; flex-wrap: wrap; gap: 6mm; padding: 6mm; }
+    .qr-label {
+      width: 62mm; border: 1px dashed #999; border-radius: 3mm;
+      padding: 4mm; text-align: center; page-break-inside: avoid;
+    }
+    .qr-label svg { width: 34mm; height: 34mm; }
+    .qr-label .item { font-weight: 700; font-size: 11pt; margin: 2mm 0 0; }
+    .qr-label .caption { font-size: 9pt; margin: 1mm 0 0; }
+    .qr-label .code { font-family: monospace; font-size: 8pt; color: #555; margin: 1mm 0 0; }
+    @media print { .d-print-none { display: none !important; } .qr-label { border-color: #ddd; } }
+  </style>
+{% endblock head %}
+
+{% block layout %}
+  <div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3 d-print-none">
+      <h1 class="h4 mb-0">{% blocktrans %}{{ count }} QR labels{% endblocktrans %}</h1>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="{% url 'plugins:solomon_issues:assettag_list' %}">{% trans "Back to tags" %}</a>
+        <button type="button" class="btn btn-primary" onclick="window.print()">{% trans "Print" %}</button>
+        <form method="post" action="{% url 'plugins:solomon_issues:assettag_labels' %}">
+          {% csrf_token %}
+          {% for entry in labels %}<input type="hidden" name="pk" value="{{ entry.tag.pk }}">{% endfor %}
+          <button type="submit" class="btn btn-outline-primary">{% trans "Mark as printed" %}</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="label-sheet">
+      {% for entry in labels %}
+        <div class="qr-label">
+          {{ entry.svg|safe }}
+          <p class="item">{{ entry.tag.label }}</p>
+          <p class="caption">{{ entry.tag.label_caption }}</p>
+          {% if entry.tag.location_hint %}<p class="caption">{{ entry.tag.location_hint }}</p>{% endif %}
+          <p class="code">{{ entry.tag.code }}</p>
+        </div>
+      {% empty %}
+        <p class="text-secondary">{% trans "No asset tags selected." %}</p>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock layout %}

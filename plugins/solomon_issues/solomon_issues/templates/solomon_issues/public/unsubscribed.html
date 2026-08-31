@@ -1,0 +1,13 @@
+{% extends 'solomon_issues/public/base.html' %}
+{% load i18n %}
+
+{% block public_title %}{% trans "Unsubscribed" %}{% endblock %}
+
+{% block public_content %}
+  <div class="alert alert-success">
+    <h1 class="h4">{% trans "Unsubscribed" %}</h1>
+    <p class="mb-0">
+      {% blocktrans with email=subscriber.email %}{{ email }} will no longer receive updates about this problem.{% endblocktrans %}
+    </p>
+  </div>
+{% endblock public_content %}

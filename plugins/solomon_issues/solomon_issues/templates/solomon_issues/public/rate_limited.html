@@ -1,0 +1,13 @@
+{% extends 'solomon_issues/public/base.html' %}
+{% load i18n %}
+
+{% block public_title %}{% trans "Too many reports" %}{% endblock %}
+
+{% block public_content %}
+  <div class="alert alert-warning">
+    <h1 class="h4">{% trans "Too many reports" %}</h1>
+    <p class="mb-0">
+      {% trans "We have received several reports from your device recently. Please try again later or contact the building manager directly." %}
+    </p>
+  </div>
+{% endblock public_content %}

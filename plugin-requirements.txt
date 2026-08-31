@@ -14,3 +14,6 @@
 ##   netbox-topology-views
 ##   netbox-documents
 ####
+
+# Required by solomon_issues for QR label rendering
+qrcode>=7.4

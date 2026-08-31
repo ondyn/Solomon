@@ -1,0 +1,16 @@
+{% load i18n %}{% blocktrans with number=issue.number %}Issue {{ number }}{% endblocktrans %}
+{{ issue.title }}
+
+{% trans "Status" %}: {{ issue.get_status_display }}
+{% trans "Priority" %}: {{ issue.get_priority_display }}
+{% if issue.asset_tag %}{% trans "Item" %}: {{ issue.asset_tag.label }}{% if issue.asset_tag.location_hint %} ({{ issue.asset_tag.location_hint }}){% endif %}
+{% endif %}{% trans "Reported by" %}: {{ issue.reporter_display }}{% if issue.reporter_email %} <{{ issue.reporter_email }}>{% endif %}{% if issue.reporter_phone %}, {{ issue.reporter_phone }}{% endif %}
+
+{% trans "Description" %}:
+{{ issue.description }}
+{% if message %}
+{% trans "Latest update" %}:
+{{ message }}
+{% endif %}
+{% trans "Manage this issue" %}: {{ manager_url }}
+{% if tag_url %}{% trans "Public item page" %}: {{ tag_url }}{% endif %}

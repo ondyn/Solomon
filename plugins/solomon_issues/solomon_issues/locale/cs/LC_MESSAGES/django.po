@@ -1,0 +1,946 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 19:45+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+#: __init__.py:11
+msgid "Solomon Issues"
+msgstr "Solomon Problémy"
+
+#: choices.py:15 models.py:107 models.py:716
+#: templates/solomon_issues/issuecategory.html:20
+msgid "Active"
+msgstr "Aktivní"
+
+#: choices.py:16
+msgid "Inactive"
+msgstr "Neaktivní"
+
+#: choices.py:17
+msgid "Retired"
+msgstr "Vyřazeno"
+
+#: choices.py:35
+msgid "New"
+msgstr "Nový"
+
+#: choices.py:36
+msgid "Triaged"
+msgstr "Zatříděno"
+
+#: choices.py:37
+msgid "In progress"
+msgstr "Řeší se"
+
+#: choices.py:38
+msgid "Waiting for parts"
+msgstr "Čeká se na díly"
+
+#: choices.py:39
+msgid "Waiting for reporter"
+msgstr "Čeká se na hlásícího"
+
+#: choices.py:40 choices.py:130 models.py:384
+msgid "Resolved"
+msgstr "Vyřešeno"
+
+#: choices.py:41 choices.py:131 models.py:386
+msgid "Closed"
+msgstr "Uzavřeno"
+
+#: choices.py:42
+msgid "Rejected"
+msgstr "Zamítnuto"
+
+#: choices.py:43
+msgid "Duplicate"
+msgstr "Duplikát"
+
+#: choices.py:71
+msgid "Low"
+msgstr "Nízká"
+
+#: choices.py:72
+msgid "Normal"
+msgstr "Běžná"
+
+#: choices.py:73
+msgid "High"
+msgstr "Vysoká"
+
+#: choices.py:74
+msgid "Critical"
+msgstr "Kritická"
+
+#: choices.py:88
+msgid "QR scan"
+msgstr "Sken QR kódu"
+
+#: choices.py:89
+msgid "Signed-in portal"
+msgstr "Přihlášený portál"
+
+#: choices.py:90
+msgid "Staff entry"
+msgstr "Zadání správcem"
+
+#: choices.py:91 models.py:713 templates/solomon_issues/issue.html:81
+msgid "E-mail"
+msgstr "E-mail"
+
+#: choices.py:92 templates/solomon_issues/issue.html:82
+msgid "Phone"
+msgstr "Telefon"
+
+#: choices.py:103 models.py:637
+msgid "Public"
+msgstr "Veřejné"
+
+#: choices.py:104 templates/solomon_issues/issue.html:64
+msgid "Internal"
+msgstr "Interní"
+
+#: choices.py:124
+msgid "Reported"
+msgstr "Nahlášeno"
+
+#: choices.py:125
+msgid "Status changed"
+msgstr "Změna stavu"
+
+#: choices.py:126
+msgid "Priority changed"
+msgstr "Změna priority"
+
+#: choices.py:127
+msgid "Assigned"
+msgstr "Přiřazeno"
+
+#: choices.py:128
+msgid "Comment"
+msgstr "Komentář"
+
+#: choices.py:129
+msgid "Attachment added"
+msgstr "Přidána příloha"
+
+#: choices.py:132
+msgid "Reopened"
+msgstr "Znovu otevřeno"
+
+#: choices.py:133
+msgid "Notification sent"
+msgstr "Odesláno upozornění"
+
+#: choices.py:134
+msgid "Updated"
+msgstr "Aktualizováno"
+
+#: choices.py:146
+msgid "Hide all issues"
+msgstr "Skrýt všechny problémy"
+
+#: choices.py:147
+msgid "Show open issues"
+msgstr "Zobrazit otevřené problémy"
+
+#: choices.py:148
+msgid "Show all issues"
+msgstr "Zobrazit všechny problémy"
+
+#: filtersets.py:59
+msgid "Open only"
+msgstr "Pouze otevřené"
+
+#: forms.py:51 models.py:77 templates/solomon_issues/issuecategory.html:18
+msgid "Default assignee"
+msgstr "Výchozí řešitel"
+
+#: forms.py:56 models.py:85 templates/solomon_issues/issuecategory.html:19
+msgid "Default team"
+msgstr "Výchozí tým"
+
+#: forms.py:85 models.py:159 templates/solomon_issues/assettag.html:32
+msgid "Default category"
+msgstr "Výchozí kategorie"
+
+#: forms.py:90 models.py:221 templates/solomon_issues/assettag.html:35
+msgid "Responsible team"
+msgstr "Odpovědný tým"
+
+#: forms.py:96 models.py:147 models.py:311
+msgid "Linked object type"
+msgstr "Typ propojeného objektu"
+
+#: forms.py:103 templates/solomon_issues/assettag.html:24
+#: templates/solomon_issues/issue.html:35
+msgid "Linked object"
+msgstr "Propojený objekt"
+
+#: forms.py:104
+msgid "Choose a type first, then pick the item it is attached to."
+msgstr "Nejprve zvolte typ, poté vyberte položku, ke které je štítek připevněn."
+
+#: forms.py:133
+msgid "Leave blank to generate a new code automatically."
+msgstr "Ponechte prázdné pro automatické vygenerování kódu."
+
+#: forms.py:174
+#, python-format
+msgid "Select a %(model)s or clear the type."
+msgstr "Vyberte %(model)s, nebo zrušte volbu typu."
+
+#: forms.py:186 models.py:230 models.py:303
+#: templates/solomon_issues/assettag.html:13
+#: templates/solomon_issues/issue.html:31
+msgid "Asset tag"
+msgstr "Štítek zařízení"
+
+#: forms.py:191 forms.py:286 models.py:323
+#: templates/solomon_issues/issue.html:39
+#: templates/solomon_issues/issuecategory.html:8
+msgid "Category"
+msgstr "Kategorie"
+
+#: forms.py:194 models.py:369 templates/solomon_issues/issue.html:42
+msgid "Assigned to"
+msgstr "Přiřazeno"
+
+#: forms.py:197 models.py:377 templates/solomon_issues/issue.html:43
+msgid "Assigned team"
+msgstr "Přiřazený tým"
+
+#: forms.py:200 models.py:394
+msgid "Duplicate of"
+msgstr "Duplikát k"
+
+#: forms.py:237 models.py:592 models.py:680
+msgid "Message"
+msgstr "Zpráva"
+
+#: forms.py:243
+msgid "New status"
+msgstr "Nový stav"
+
+#: forms.py:245 models.py:337
+#: templates/solomon_issues/email/manager_notification.txt:5
+#: templates/solomon_issues/issue.html:23
+msgid "Priority"
+msgstr "Priorita"
+
+#: forms.py:248
+msgid "Assign to"
+msgstr "Přiřadit"
+
+#: forms.py:253
+msgid "Resolution or note"
+msgstr "Řešení nebo poznámka"
+
+#: forms.py:256
+msgid "Send notifications"
+msgstr "Odeslat upozornění"
+
+#: forms.py:271
+msgid "What is wrong?"
+msgstr "Co je špatně?"
+
+#: forms.py:272
+msgid "Short summary"
+msgstr "Stručné shrnutí"
+
+#: forms.py:275
+msgid "Describe the problem"
+msgstr "Popište problém"
+
+#: forms.py:281
+msgid "Urgency"
+msgstr "Naléhavost"
+
+#: forms.py:289
+msgid "Your name"
+msgstr "Vaše jméno"
+
+#: forms.py:291
+msgid "Your e-mail"
+msgstr "Váš e-mail"
+
+#: forms.py:293
+msgid "Your phone"
+msgstr "Váš telefon"
+
+#: forms.py:295
+msgid "Photo or document"
+msgstr "Fotografie nebo dokument"
+
+#: forms.py:300 forms.py:352
+msgid "Leave this field empty"
+msgstr "Toto pole nechte prázdné"
+
+#: forms.py:316 forms.py:357
+msgid "Submission rejected."
+msgstr "Odeslání bylo odmítnuto."
+
+#: forms.py:326
+msgid "An e-mail address is required so we can reply to you."
+msgstr "Zadejte e-mailovou adresu, abychom vám mohli odpovědět."
+
+#: forms.py:337
+#, python-format
+msgid "The file is larger than the %(limit)s MB limit."
+msgstr "Soubor je větší než limit %(limit)s MB."
+
+#: forms.py:347 templates/solomon_issues/public/issue.html:58
+msgid "Add information"
+msgstr "Doplnit informace"
+
+#: models.py:51
+msgid "Scan me and report a problem"
+msgstr "Naskenujte mě a nahlaste problém"
+
+#: models.py:61 models.py:714 templates/solomon_issues/issue.html:80
+#: templates/solomon_issues/issuecategory.html:11
+msgid "Name"
+msgstr "Název"
+
+#: models.py:62 templates/solomon_issues/issuecategory.html:12
+msgid "Slug"
+msgstr "Identifikátor"
+
+#: models.py:63 models.py:326
+#: templates/solomon_issues/email/manager_notification.txt:9
+#: templates/solomon_issues/issue.html:45
+#: templates/solomon_issues/issuecategory.html:13
+msgid "Description"
+msgstr "Popis"
+
+#: models.py:64
+msgid "Color"
+msgstr "Barva"
+
+#: models.py:69 models.py:205 templates/solomon_issues/assettag.html:37
+#: templates/solomon_issues/issuecategory.html:15
+msgid "Default priority"
+msgstr "Výchozí priorita"
+
+#: models.py:90 models.py:210 templates/solomon_issues/assettag.html:44
+#: templates/solomon_issues/issuecategory.html:30
+msgid "Notification recipients"
+msgstr "Příjemci upozornění"
+
+#: models.py:92
+msgid "Comma-separated addresses notified about issues in this category."
+msgstr ""
+"Adresy oddělené čárkou, které dostanou upozornění na problémy v této "
+"kategorii."
+
+#: models.py:99 templates/solomon_issues/issuecategory.html:31
+msgid "Response SLA (hours)"
+msgstr "SLA pro reakci (hodiny)"
+
+#: models.py:105 templates/solomon_issues/issuecategory.html:32
+msgid "Resolution SLA (hours)"
+msgstr "SLA pro vyřešení (hodiny)"
+
+#: models.py:111
+msgid "Issue category"
+msgstr "Kategorie problému"
+
+#: models.py:112
+msgid "Issue categories"
+msgstr "Kategorie problémů"
+
+#: models.py:135 templates/solomon_issues/assettag.html:17
+msgid "Public code"
+msgstr "Veřejný kód"
+
+#: models.py:137
+msgid "Opaque code used in the public QR URL. Generated when left blank."
+msgstr ""
+"Neveřejný kód použitý ve veřejné QR adrese. Při ponechání prázdného pole se "
+"vygeneruje."
+
+#: models.py:140 templates/solomon_issues/assettag.html:16
+msgid "Item name"
+msgstr "Název položky"
+
+#: models.py:164 templates/solomon_issues/assettag.html:22
+msgid "Location"
+msgstr "Umístění"
+
+#: models.py:166
+msgid ""
+"Where the label is physically placed, for example 'Entrance A, basement'."
+msgstr "Kde je štítek fyzicky umístěn, například „Vchod A, sklep“."
+
+#: models.py:173 models.py:331 templates/solomon_issues/assettag.html:19
+#: templates/solomon_issues/email/manager_notification.txt:4
+#: templates/solomon_issues/email/reporter_notification.txt:6
+#: templates/solomon_issues/issue.html:19
+msgid "Status"
+msgstr "Stav"
+
+#: models.py:178 templates/solomon_issues/assettag.html:40
+msgid "Label caption"
+msgstr "Text na štítku"
+
+#: models.py:180
+msgid ""
+"Text printed next to the QR code, for example 'Scan me and report a problem'."
+msgstr ""
+"Text vytištěný vedle QR kódu, například „Naskenujte mě a nahlaste problém“."
+
+#: models.py:185
+msgid "Public description"
+msgstr "Veřejný popis"
+
+#: models.py:186
+msgid "Shown to anyone who scans the code."
+msgstr "Zobrazí se každému, kdo naskenuje kód."
+
+#: models.py:190 templates/solomon_issues/assettag.html:41
+msgid "Allow anonymous reports"
+msgstr "Povolit anonymní hlášení"
+
+#: models.py:194 templates/solomon_issues/assettag.html:42
+msgid "Show open issues publicly"
+msgstr "Veřejně zobrazovat otevřené problémy"
+
+#: models.py:198 templates/solomon_issues/assettag.html:43
+msgid "Require reporter contact"
+msgstr "Vyžadovat kontakt na hlásícího"
+
+#: models.py:199
+msgid "Anonymous reporters must supply an e-mail address."
+msgstr "Anonymní hlásící musí uvést e-mailovou adresu."
+
+#: models.py:212
+msgid ""
+"Comma-separated addresses notified in addition to the category recipients."
+msgstr ""
+"Adresy oddělené čárkou, které dostanou upozornění navíc k příjemcům "
+"kategorie."
+
+#: models.py:223 templates/solomon_issues/assettag.html:46
+msgid "Internal notes"
+msgstr "Interní poznámky"
+
+#: models.py:225 templates/solomon_issues/assettag.html:45
+msgid "Last printed"
+msgstr "Naposledy vytištěno"
+
+#: models.py:231
+msgid "Asset tags"
+msgstr "Štítky zařízení"
+
+#: models.py:295 templates/solomon_issues/issue.html:16
+msgid "Number"
+msgstr "Číslo"
+
+#: models.py:325 templates/solomon_issues/issue.html:17
+msgid "Summary"
+msgstr "Shrnutí"
+
+#: models.py:343 templates/solomon_issues/issue.html:27
+msgid "Source"
+msgstr "Zdroj"
+
+#: models.py:351
+msgid "Reporting user"
+msgstr "Hlásící uživatel"
+
+#: models.py:354
+msgid "Reporter name"
+msgstr "Jméno hlásícího"
+
+#: models.py:356
+msgid "Reporter e-mail"
+msgstr "E-mail hlásícího"
+
+#: models.py:358
+msgid "Reporter phone"
+msgstr "Telefon hlásícího"
+
+#: models.py:361
+msgid "Access token"
+msgstr "Přístupový token"
+
+#: models.py:379 templates/solomon_issues/issue.html:44
+msgid "Due date"
+msgstr "Termín"
+
+#: models.py:381
+msgid "Acknowledged"
+msgstr "Převzato"
+
+#: models.py:387 templates/solomon_issues/email/reporter_notification.txt:11
+#: templates/solomon_issues/issue.html:46
+#: templates/solomon_issues/public/issue.html:20
+msgid "Resolution"
+msgstr "Řešení"
+
+#: models.py:398
+msgid "Visible on public page"
+msgstr "Viditelné na veřejné stránce"
+
+#: models.py:399
+msgid "Uncheck to hide this issue from anyone scanning the QR code."
+msgstr "Odškrtnutím skryjete tento problém před těmi, kdo naskenují QR kód."
+
+#: models.py:402 templates/solomon_issues/issue.html:83
+msgid "Notify reporter"
+msgstr "Informovat hlásícího"
+
+#: models.py:407 models.py:570 models.py:622 models.py:658 models.py:711
+#: models.py:751 tables.py:131
+msgid "Issue"
+msgstr "Problém"
+
+#: models.py:408 navigation.py:26 tables.py:15 views.py:573
+msgid "Issues"
+msgstr "Problémy"
+
+#: models.py:429
+msgid "An issue cannot be a duplicate of itself."
+msgstr "Problém nemůže být duplikátem sám sebe."
+
+#: models.py:488 models.py:612
+msgid "Anonymous"
+msgstr "Anonymní"
+
+#: models.py:578
+msgid "Author"
+msgstr "Autor"
+
+#: models.py:581
+msgid "Author name"
+msgstr "Jméno autora"
+
+#: models.py:584
+msgid "Posted by the reporter"
+msgstr "Zaslal hlásící"
+
+#: models.py:590 models.py:678
+msgid "Visibility"
+msgstr "Viditelnost"
+
+#: models.py:596
+msgid "Issue comment"
+msgstr "Komentář k problému"
+
+#: models.py:597
+msgid "Issue comments"
+msgstr "Komentáře k problémům"
+
+#: models.py:624
+msgid "File"
+msgstr "Soubor"
+
+#: models.py:625
+msgid "Caption"
+msgstr "Popisek"
+
+#: models.py:632
+msgid "Uploaded by"
+msgstr "Nahrál"
+
+#: models.py:635
+msgid "Uploader name"
+msgstr "Jméno nahrávajícího"
+
+#: models.py:641
+msgid "Issue attachment"
+msgstr "Příloha problému"
+
+#: models.py:642
+msgid "Issue attachments"
+msgstr "Přílohy problémů"
+
+#: models.py:661
+msgid "Event"
+msgstr "Událost"
+
+#: models.py:669
+msgid "User"
+msgstr "Uživatel"
+
+#: models.py:672
+msgid "Actor name"
+msgstr "Jméno aktéra"
+
+#: models.py:681
+msgid "Details"
+msgstr "Podrobnosti"
+
+#: models.py:682
+msgid "Created"
+msgstr "Vytvořeno"
+
+#: models.py:688
+msgid "Issue event"
+msgstr "Událost problému"
+
+#: models.py:689
+msgid "Issue events"
+msgstr "Události problémů"
+
+#: models.py:701
+msgid "System"
+msgstr "Systém"
+
+#: models.py:715 templates/solomon_issues/issue.html:77
+msgid "Reporter"
+msgstr "Hlásící"
+
+#: models.py:729
+msgid "Issue subscriber"
+msgstr "Odběratel problému"
+
+#: models.py:730
+msgid "Issue subscribers"
+msgstr "Odběratelé problémů"
+
+#: models.py:753 tables.py:132
+msgid "Recipient"
+msgstr "Příjemce"
+
+#: models.py:754 tables.py:133
+msgid "Subject"
+msgstr "Předmět"
+
+#: models.py:755
+msgid "Trigger"
+msgstr "Spouštěč"
+
+#: models.py:756 tables.py:134
+msgid "Delivered"
+msgstr "Doručeno"
+
+#: models.py:757
+msgid "Error"
+msgstr "Chyba"
+
+#: models.py:758 tables.py:135
+msgid "Sent"
+msgstr "Odesláno"
+
+#: models.py:764
+msgid "Issue notification"
+msgstr "Upozornění na problém"
+
+#: models.py:765
+msgid "Issue notifications"
+msgstr "Upozornění na problémy"
+
+#: navigation.py:14
+msgid "Add"
+msgstr "Přidat"
+
+#: navigation.py:29
+msgid "Reporting"
+msgstr "Hlášení"
+
+#: navigation.py:35
+msgid "Print QR Labels"
+msgstr "Tisk QR štítků"
+
+#: navigation.py:41
+msgid "Configuration"
+msgstr "Nastavení"
+
+#: notifications.py:50
+msgid "New problem reported"
+msgstr "Nahlášen nový problém"
+
+#: notifications.py:51
+msgid "Status updated"
+msgstr "Stav byl aktualizován"
+
+#: notifications.py:52
+msgid "Assignment updated"
+msgstr "Změna přiřazení"
+
+#: notifications.py:53
+msgid "New reply"
+msgstr "Nová odpověď"
+
+#: notifications.py:54
+msgid "Problem resolved"
+msgstr "Problém vyřešen"
+
+#: notifications.py:55
+msgid "Problem closed"
+msgstr "Problém uzavřen"
+
+#: notifications.py:56
+msgid "Problem reopened"
+msgstr "Problém znovu otevřen"
+
+#: notifications.py:58
+msgid "Update"
+msgstr "Aktualizace"
+
+#: signals.py:21
+msgid "Problem reported."
+msgstr "Problém byl nahlášen."
+
+#: tables.py:48 templates/solomon_issues/assettag.html:73
+#: templates/solomon_issues/issuecategory.html:33
+msgid "Open issues"
+msgstr "Otevřené problémy"
+
+#: tables.py:49
+msgid "Public reports"
+msgstr "Veřejná hlášení"
+
+#: templates/solomon_issues/assettag.html:54
+#: templates/solomon_issues/assettag.html:56
+msgid "QR code"
+msgstr "QR kód"
+
+#: templates/solomon_issues/assettag.html:61
+msgid "Open public page"
+msgstr "Otevřít veřejnou stránku"
+
+#: templates/solomon_issues/assettag.html:65
+msgid "Print label"
+msgstr "Vytisknout štítek"
+
+#: templates/solomon_issues/assettag.html:81
+msgid "No open issues."
+msgstr "Žádné otevřené problémy."
+
+#: templates/solomon_issues/assettag_labels.html:4
+msgid "QR labels"
+msgstr "QR štítky"
+
+#: templates/solomon_issues/assettag_labels.html:25
+#, python-format
+msgid "%(count)s QR labels"
+msgstr "%(count)s QR štítků"
+
+#: templates/solomon_issues/assettag_labels.html:27
+msgid "Back to tags"
+msgstr "Zpět na štítky"
+
+#: templates/solomon_issues/assettag_labels.html:28
+msgid "Print"
+msgstr "Tisk"
+
+#: templates/solomon_issues/assettag_labels.html:32
+msgid "Mark as printed"
+msgstr "Označit jako vytištěné"
+
+#: templates/solomon_issues/assettag_labels.html:47
+msgid "No asset tags selected."
+msgstr "Nebyly vybrány žádné štítky."
+
+#: templates/solomon_issues/email/manager_notification.txt:1
+#, python-format
+msgid "Issue %(number)s"
+msgstr "Problém %(number)s"
+
+#: templates/solomon_issues/email/manager_notification.txt:6
+#: templates/solomon_issues/email/reporter_notification.txt:7
+msgid "Item"
+msgstr "Položka"
+
+#: templates/solomon_issues/email/manager_notification.txt:7
+msgid "Reported by"
+msgstr "Nahlásil"
+
+#: templates/solomon_issues/email/manager_notification.txt:12
+msgid "Latest update"
+msgstr "Poslední aktualizace"
+
+#: templates/solomon_issues/email/manager_notification.txt:15
+msgid "Manage this issue"
+msgstr "Spravovat tento problém"
+
+#: templates/solomon_issues/email/manager_notification.txt:16
+msgid "Public item page"
+msgstr "Veřejná stránka položky"
+
+#: templates/solomon_issues/email/reporter_notification.txt:1
+msgid "Hello"
+msgstr "Dobrý den"
+
+#: templates/solomon_issues/email/reporter_notification.txt:3
+#, python-format
+msgid "this is an update on the problem you reported (%(number)s)."
+msgstr "toto je aktualizace k problému, který jste nahlásili (%(number)s)."
+
+#: templates/solomon_issues/email/reporter_notification.txt:9
+msgid "Message from the building manager"
+msgstr "Zpráva od správce budovy"
+
+#: templates/solomon_issues/email/reporter_notification.txt:14
+msgid "Follow the progress here"
+msgstr "Průběh řešení sledujte zde"
+
+#: templates/solomon_issues/email/reporter_notification.txt:16
+msgid "Thank you for helping us keep the building in good shape."
+msgstr "Děkujeme, že pomáháte udržovat budovu v dobrém stavu."
+
+#: templates/solomon_issues/issue.html:13
+msgid "Problem"
+msgstr "Problém"
+
+#: templates/solomon_issues/issue.html:52
+#: templates/solomon_issues/public/issue.html:40
+msgid "Timeline"
+msgstr "Časová osa"
+
+#: templates/solomon_issues/issue.html:69
+msgid "No timeline entries."
+msgstr "Žádné záznamy v časové ose."
+
+#: templates/solomon_issues/issue.html:85
+msgid "Reporter link"
+msgstr "Odkaz pro hlásícího"
+
+#: templates/solomon_issues/issue.html:94
+msgid "Update status"
+msgstr "Změnit stav"
+
+#: templates/solomon_issues/issue.html:99
+msgid "Apply"
+msgstr "Použít"
+
+#: templates/solomon_issues/issue.html:107
+msgid "Add reply"
+msgstr "Přidat odpověď"
+
+#: templates/solomon_issues/issue.html:112
+msgid "Post reply"
+msgstr "Odeslat odpověď"
+
+#: templates/solomon_issues/issue.html:119
+#: templates/solomon_issues/public/issue.html:28
+msgid "Attachments"
+msgstr "Přílohy"
+
+#: templates/solomon_issues/issue.html:126
+msgid "No attachments."
+msgstr "Žádné přílohy."
+
+#: templates/solomon_issues/issue.html:132
+msgid "Notifications"
+msgstr "Upozornění"
+
+#: templates/solomon_issues/issue.html:142
+msgid "No notifications sent."
+msgstr "Nebyla odeslána žádná upozornění."
+
+#: templates/solomon_issues/issuecategory.html:27
+msgid "Routing and SLA"
+msgstr "Směrování a SLA"
+
+#: templates/solomon_issues/issuecategory.html:34
+msgid "Total issues"
+msgstr "Celkem problémů"
+
+#: templates/solomon_issues/public/base.html:7
+msgid "Report a problem"
+msgstr "Nahlásit problém"
+
+#: templates/solomon_issues/public/base.html:24
+msgid "Language"
+msgstr "Jazyk"
+
+#: templates/solomon_issues/public/base.html:47
+msgid "Powered by Solomon facility management"
+msgstr "Provozováno správou budov Solomon"
+
+#: templates/solomon_issues/public/issue.html:52
+msgid "Nothing has happened yet."
+msgstr "Zatím se nic nestalo."
+
+#: templates/solomon_issues/public/issue.html:73
+msgid "Send"
+msgstr "Odeslat"
+
+#: templates/solomon_issues/public/rate_limited.html:4
+#: templates/solomon_issues/public/rate_limited.html:8
+msgid "Too many reports"
+msgstr "Příliš mnoho hlášení"
+
+#: templates/solomon_issues/public/rate_limited.html:10
+msgid ""
+"We have received several reports from your device recently. Please try again "
+"later or contact the building manager directly."
+msgstr ""
+"V poslední době jsme z vašeho zařízení obdrželi několik hlášení. Zkuste to "
+"prosím později, nebo kontaktujte přímo správce budovy."
+
+#: templates/solomon_issues/public/tag.html:23
+msgid "Already reported"
+msgstr "Již nahlášeno"
+
+#: templates/solomon_issues/public/tag.html:65
+msgid "Send report"
+msgstr "Odeslat hlášení"
+
+#: templates/solomon_issues/public/tag.html:71
+msgid ""
+"Reporting problems for this item is currently disabled. Please contact the "
+"building manager."
+msgstr ""
+"Hlášení problémů pro tuto položku je nyní vypnuto. Obraťte se prosím na "
+"správce budovy."
+
+#: templates/solomon_issues/public/unsubscribed.html:4
+#: templates/solomon_issues/public/unsubscribed.html:8
+msgid "Unsubscribed"
+msgstr "Odhlášeno"
+
+#: templates/solomon_issues/public/unsubscribed.html:10
+#, python-format
+msgid "%(email)s will no longer receive updates about this problem."
+msgstr "%(email)s již nebude dostávat informace o tomto problému."
+
+#: utils.py:56
+#, python-format
+msgid "%(address)s is not a valid e-mail address."
+msgstr "%(address)s není platná e-mailová adresa."
+
+#: views.py:157
+#, python-format
+msgid "Marked %(count)s labels as printed."
+msgstr "Označeno %(count)s štítků jako vytištěné."
+
+#: views.py:229
+msgid "The reply could not be saved."
+msgstr "Odpověď se nepodařilo uložit."
+
+#: views.py:251
+msgid "Reply added."
+msgstr "Odpověď byla přidána."
+
+#: views.py:262
+msgid "The status update could not be saved."
+msgstr "Změnu stavu se nepodařilo uložit."
+
+#: views.py:305
+msgid "Issue updated."
+msgstr "Problém byl aktualizován."
+
+#~ msgid "Linked object ID"
+#~ msgstr "ID propojeného objektu"
+
+#~ msgid "Numeric ID of the flat, space, door, or technical asset."
+#~ msgstr "Číselné ID bytu, prostoru, dveří nebo technického zařízení."
