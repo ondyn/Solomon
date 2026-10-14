@@ -47,10 +47,42 @@ class SpaceTable(NetBoxTable):
     reference = tables.Column(linkify=True)
     level = tables.Column(linkify=True)
     building = tables.Column(linkify=True)
+    flat_assignments = columns.TemplateColumn(
+        template_name="solomon_facilities/columns/space_flat_assignments.html",
+        accessor="current_flat_assignments",
+        verbose_name=_("Flat assignments"),
+        orderable=False,
+    )
+    usages = columns.TemplateColumn(
+        template_name="solomon_facilities/columns/space_usages.html",
+        accessor="current_usages",
+        verbose_name=_("Rentals and occupancy"),
+        orderable=False,
+    )
+    technical_assets = columns.TemplateColumn(
+        template_name="solomon_facilities/columns/space_technical_assets.html",
+        accessor="visible_technical_assets",
+        verbose_name=_("Technical assets"),
+        orderable=False,
+    )
 
     class Meta(NetBoxTable.Meta):
         model = models.Space
         fields = (
+            "pk",
+            "reference",
+            "name",
+            "kind",
+            "level",
+            "building",
+            "area_m2",
+            "status",
+            "flat_assignments",
+            "usages",
+            "technical_assets",
+            "actions",
+        )
+        default_columns = (
             "pk",
             "reference",
             "name",

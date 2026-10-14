@@ -1,0 +1,12 @@
+{% extends 'generic/object.html' %}
+{% load i18n %}
+
+{% block extra_controls %}
+  {{ block.super }}
+  {% if schematic_plan %}
+    <a class="btn btn-outline-primary" href="{{ schematic_plan.get_absolute_url }}?highlight={{ object.pk }}">
+      <i class="mdi mdi-floor-plan" aria-hidden="true"></i>
+      {% trans "View schematic" %}
+    </a>
+  {% endif %}
+{% endblock extra_controls %}

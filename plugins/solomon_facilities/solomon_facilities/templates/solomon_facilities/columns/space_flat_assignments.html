@@ -1,0 +1,3 @@
+{% for assignment in value %}
+  <div><a href="{{ assignment.flat.get_absolute_url }}">{{ assignment.flat }}</a> ({{ assignment.get_role_display }})</div>
+{% endfor %}

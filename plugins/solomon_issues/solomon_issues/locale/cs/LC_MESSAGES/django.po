@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 19:45+0000\n"
+"POT-Creation-Date: 2026-09-01 06:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -194,117 +194,118 @@ msgstr "Propojený objekt"
 
 #: forms.py:104
 msgid "Choose a type first, then pick the item it is attached to."
-msgstr "Nejprve zvolte typ, poté vyberte položku, ke které je štítek připevněn."
+msgstr ""
+"Nejprve zvolte typ, poté vyberte položku, ke které je štítek připevněn."
 
 #: forms.py:133
 msgid "Leave blank to generate a new code automatically."
 msgstr "Ponechte prázdné pro automatické vygenerování kódu."
 
-#: forms.py:174
+#: forms.py:176
 #, python-format
 msgid "Select a %(model)s or clear the type."
 msgstr "Vyberte %(model)s, nebo zrušte volbu typu."
 
-#: forms.py:186 models.py:230 models.py:303
+#: forms.py:188 models.py:230 models.py:303
 #: templates/solomon_issues/assettag.html:13
 #: templates/solomon_issues/issue.html:31
 msgid "Asset tag"
 msgstr "Štítek zařízení"
 
-#: forms.py:191 forms.py:286 models.py:323
+#: forms.py:193 forms.py:288 models.py:323
 #: templates/solomon_issues/issue.html:39
 #: templates/solomon_issues/issuecategory.html:8
 msgid "Category"
 msgstr "Kategorie"
 
-#: forms.py:194 models.py:369 templates/solomon_issues/issue.html:42
+#: forms.py:196 models.py:369 templates/solomon_issues/issue.html:42
 msgid "Assigned to"
 msgstr "Přiřazeno"
 
-#: forms.py:197 models.py:377 templates/solomon_issues/issue.html:43
+#: forms.py:199 models.py:377 templates/solomon_issues/issue.html:43
 msgid "Assigned team"
 msgstr "Přiřazený tým"
 
-#: forms.py:200 models.py:394
+#: forms.py:202 models.py:394
 msgid "Duplicate of"
 msgstr "Duplikát k"
 
-#: forms.py:237 models.py:592 models.py:680
+#: forms.py:239 models.py:592 models.py:680
 msgid "Message"
 msgstr "Zpráva"
 
-#: forms.py:243
+#: forms.py:245
 msgid "New status"
 msgstr "Nový stav"
 
-#: forms.py:245 models.py:337
+#: forms.py:247 models.py:337
 #: templates/solomon_issues/email/manager_notification.txt:5
 #: templates/solomon_issues/issue.html:23
 msgid "Priority"
 msgstr "Priorita"
 
-#: forms.py:248
+#: forms.py:250
 msgid "Assign to"
 msgstr "Přiřadit"
 
-#: forms.py:253
+#: forms.py:255
 msgid "Resolution or note"
 msgstr "Řešení nebo poznámka"
 
-#: forms.py:256
+#: forms.py:258
 msgid "Send notifications"
 msgstr "Odeslat upozornění"
 
-#: forms.py:271
+#: forms.py:273
 msgid "What is wrong?"
 msgstr "Co je špatně?"
 
-#: forms.py:272
+#: forms.py:274
 msgid "Short summary"
 msgstr "Stručné shrnutí"
 
-#: forms.py:275
+#: forms.py:277
 msgid "Describe the problem"
 msgstr "Popište problém"
 
-#: forms.py:281
+#: forms.py:283
 msgid "Urgency"
 msgstr "Naléhavost"
 
-#: forms.py:289
+#: forms.py:291
 msgid "Your name"
 msgstr "Vaše jméno"
 
-#: forms.py:291
+#: forms.py:293
 msgid "Your e-mail"
 msgstr "Váš e-mail"
 
-#: forms.py:293
+#: forms.py:295
 msgid "Your phone"
 msgstr "Váš telefon"
 
-#: forms.py:295
+#: forms.py:297
 msgid "Photo or document"
 msgstr "Fotografie nebo dokument"
 
-#: forms.py:300 forms.py:352
+#: forms.py:302 forms.py:354
 msgid "Leave this field empty"
 msgstr "Toto pole nechte prázdné"
 
-#: forms.py:316 forms.py:357
+#: forms.py:318 forms.py:359
 msgid "Submission rejected."
 msgstr "Odeslání bylo odmítnuto."
 
-#: forms.py:326
+#: forms.py:328
 msgid "An e-mail address is required so we can reply to you."
 msgstr "Zadejte e-mailovou adresu, abychom vám mohli odpovědět."
 
-#: forms.py:337
+#: forms.py:339
 #, python-format
 msgid "The file is larger than the %(limit)s MB limit."
 msgstr "Soubor je větší než limit %(limit)s MB."
 
-#: forms.py:347 templates/solomon_issues/public/issue.html:58
+#: forms.py:349 templates/solomon_issues/public/issue.html:58
 msgid "Add information"
 msgstr "Doplnit informace"
 
@@ -510,7 +511,7 @@ msgstr "Informovat hlásícího"
 msgid "Issue"
 msgstr "Problém"
 
-#: models.py:408 navigation.py:26 tables.py:15 views.py:573
+#: models.py:408 navigation.py:26 navigation.py:31 tables.py:15 views.py:573
 msgid "Issues"
 msgstr "Problémy"
 
@@ -654,6 +655,10 @@ msgstr "Přidat"
 msgid "Reporting"
 msgstr "Hlášení"
 
+#: navigation.py:32
+msgid "QR Asset Tags"
+msgstr "QR štítky zařízení"
+
 #: navigation.py:35
 msgid "Print QR Labels"
 msgstr "Tisk QR štítků"
@@ -661,6 +666,10 @@ msgstr "Tisk QR štítků"
 #: navigation.py:41
 msgid "Configuration"
 msgstr "Nastavení"
+
+#: navigation.py:42
+msgid "Issue Categories"
+msgstr "Kategorie problémů"
 
 #: notifications.py:50
 msgid "New problem reported"

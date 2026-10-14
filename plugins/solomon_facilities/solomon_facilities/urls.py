@@ -79,6 +79,11 @@ urlpatterns = [
     ),
     path("spaces/", views.SpaceListView.as_view(), name="space_list"),
     path("spaces/add/", views.SpaceEditView.as_view(), name="space_add"),
+    path(
+        "spaces/edit/",
+        views.SpaceBulkEditView.as_view(),
+        name="space_bulk_edit",
+    ),
     path("spaces/<int:pk>/", views.SpaceView.as_view(), name="space"),
     path("spaces/<int:pk>/edit/", views.SpaceEditView.as_view(), name="space_edit"),
     path(

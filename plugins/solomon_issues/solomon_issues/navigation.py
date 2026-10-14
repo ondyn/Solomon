@@ -5,7 +5,7 @@ from netbox.plugins.navigation import PluginMenu, PluginMenuButton, PluginMenuIt
 def item(link, text, model, buttons=True):
     return PluginMenuItem(
         link=f"plugins:solomon_issues:{link}_list",
-        link_text=_(text),
+        link_text=text,
         permissions=[f"solomon_issues.view_{model}"],
         buttons=(
             (
@@ -28,8 +28,8 @@ menu = PluginMenu(
         (
             _("Reporting"),
             (
-                item("issue", "Issues", "issue"),
-                item("assettag", "QR Asset Tags", "assettag"),
+                item("issue", _("Issues"), "issue"),
+                item("assettag", _("QR Asset Tags"), "assettag"),
                 PluginMenuItem(
                     link="plugins:solomon_issues:assettag_labels",
                     link_text=_("Print QR Labels"),
@@ -39,7 +39,7 @@ menu = PluginMenu(
         ),
         (
             _("Configuration"),
-            (item("issuecategory", "Issue Categories", "issuecategory"),),
+            (item("issuecategory", _("Issue Categories"), "issuecategory"),),
         ),
     ),
     icon_class="mdi mdi-qrcode-scan",

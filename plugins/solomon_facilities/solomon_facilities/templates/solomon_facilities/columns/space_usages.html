@@ -1,0 +1,3 @@
+{% for usage in value %}
+  <div>{% if usage.person %}<a href="{{ usage.person.get_absolute_url }}">{{ usage.person }}</a>{% else %}<a href="{{ usage.owner.get_absolute_url }}">{{ usage.owner }}</a>{% endif %} ({{ usage.get_usage_type_display }})</div>
+{% endfor %}

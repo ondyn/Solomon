@@ -5,7 +5,7 @@ import json
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.db import transaction
-from django.db.models import Max, Q
+from django.db.models import Max, Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
@@ -16,7 +16,7 @@ from netbox.ui import layout
 from netbox.ui.panels import ContextTablePanel
 from netbox.views import generic
 from netbox.views.generic import ObjectChangeLogView
-from solomon_property.models import Building, Flat, PropertyOwner
+from solomon_property.models import Building, Flat, Person, PropertyOwner
 from utilities.views import ViewTab, register_model_view
 
 from . import filtersets, forms, models, tables
@@ -64,18 +64,7 @@ class FloorPlanView(generic.ObjectView):
     template_name = "solomon_facilities/floorplan.html"
 
     def get_extra_context(self, request, instance):
-        revision = _display_revision(instance)
-        can_edit = request.user.has_perms(
-            (
-                "solomon_facilities.change_floorplan",
-                "solomon_facilities.change_planrevision",
-            )
-        )
-        if revision is None and can_edit:
-            revision = (
-                instance.revisions.filter(status="draft").order_by("-revision").first()
-            )
-        return {"revision": revision}
+        return {"revision": _viewer_revision(request, instance)}
 
 
 class FloorPlanEditView(generic.ObjectEditView):
@@ -254,6 +243,18 @@ def _display_revision(plan):
     return plan.revisions.filter(status="published").order_by("-revision").first()
 
 
+def _viewer_revision(request, plan):
+    revision = _display_revision(plan)
+    if revision is None and request.user.has_perms(
+        (
+            "solomon_facilities.change_floorplan",
+            "solomon_facilities.change_planrevision",
+        )
+    ):
+        revision = plan.revisions.filter(status="draft").order_by("-revision").first()
+    return revision
+
+
 def _serialize_plan(request, plan, revision):
     level = plan.level
     can_view_people = request.user.has_perm("solomon_property.view_person")
@@ -387,10 +388,44 @@ class SpaceListView(generic.ObjectListView):
     table = tables.SpaceTable
     filterset = filtersets.SpaceFilterSet
 
+    def get_queryset(self, request):
+        today = timezone.localdate()
+        current_dates = (
+            (Q(effective_from__isnull=True) | Q(effective_from__lte=today))
+            & (Q(effective_to__isnull=True) | Q(effective_to__gte=today))
+        )
+        assignments = (
+            models.SpaceFlatAssignment.objects.restrict(request.user, "view")
+            .filter(current_dates, flat__in=Flat.objects.restrict(request.user, "view"))
+            .select_related("flat__building")
+        )
+        usages = (
+            models.SpaceUsage.objects.restrict(request.user, "view")
+            .filter(current_dates)
+            .filter(
+                Q(person__in=Person.objects.restrict(request.user, "view"))
+                | Q(owner__in=PropertyOwner.objects.restrict(request.user, "view"))
+            )
+            .select_related("person", "owner")
+        )
+        return super().get_queryset(request).prefetch_related(
+            Prefetch(
+                "flat_assignments",
+                queryset=assignments,
+                to_attr="current_flat_assignments",
+            ),
+            Prefetch("usages", queryset=usages, to_attr="current_usages"),
+            Prefetch(
+                "technical_assets",
+                queryset=models.TechnicalAsset.objects.restrict(request.user, "view"),
+                to_attr="visible_technical_assets",
+            ),
+        )
+
 
 class SpaceView(generic.ObjectView):
     queryset = models.Space.objects.select_related("level", "building", "parent")
-    template_name = "generic/object.html"
+    template_name = "solomon_facilities/space.html"
     layout = layout.SimpleLayout(
         left_panels=[SpacePanel(), CustomFieldsPanel(), TagsPanel()],
         bottom_panels=[
@@ -408,7 +443,21 @@ class SpaceView(generic.ObjectView):
         asset_table = tables.TechnicalAssetTable(instance.technical_assets.all())
         for table in (assignment_table, usage_table, asset_table):
             table.configure(request)
+        schematic_plan = None
+        plan = (
+            models.FloorPlan.objects.restrict(request.user, "view")
+            .select_related("active_revision")
+            .filter(level_id=instance.level_id)
+            .first()
+        )
+        if plan is not None:
+            revision = _viewer_revision(request, plan)
+            if revision is not None and revision.elements.filter(
+                space_id=instance.pk
+            ).exists():
+                schematic_plan = plan
         return {
+            "schematic_plan": schematic_plan,
             "assignment_table": assignment_table,
             "usage_table": usage_table,
             "asset_table": asset_table,
@@ -422,6 +471,13 @@ class SpaceEditView(generic.ObjectEditView):
 
 class SpaceDeleteView(generic.ObjectDeleteView):
     queryset = models.Space.objects.all()
+
+
+class SpaceBulkEditView(generic.BulkEditView):
+    queryset = models.Space.objects.select_related("level", "building", "parent")
+    table = tables.SpaceTable
+    form = forms.SpaceBulkEditForm
+    filterset = filtersets.SpaceFilterSet
 
 
 class SpaceFlatAssignmentListView(generic.ObjectListView):

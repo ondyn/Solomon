@@ -10,6 +10,7 @@
   const fields = {
     type: document.getElementById("element-type"),
     label: document.getElementById("element-label"),
+    labelVisible: document.getElementById("element-label-visible"),
     target: document.getElementById("element-target"),
     x: document.getElementById("element-x"),
     y: document.getElementById("element-y"),
@@ -18,6 +19,7 @@
     stroke: document.getElementById("element-stroke"),
     fill: document.getElementById("element-fill"),
     locked: document.getElementById("element-locked"),
+    transparent: document.getElementById("element-transparent"),
   };
   const targetHelp = document.getElementById("element-target-help");
   const targetActions = document.getElementById("element-target-actions");
@@ -29,6 +31,8 @@
   let lastPointer;
   let dirty = false;
   let leavingEditor = false;
+  let seeThrough = SolomonPlanLabels.loadSeeThrough();
+  const TRANSPARENT_OPACITY = 0.62;
 
   function getCsrfToken() {
     const input = document.querySelector("#save-form [name=csrfmiddlewaretoken]");
@@ -63,6 +67,7 @@
       fill: style.fill || "transparent",
       stroke: style.stroke || "#27343a",
       strokeWidth: Number(style.stroke_width || 2),
+      strokeUniform: true,
       opacity: style.opacity === undefined ? 1 : Number(style.opacity),
       angle: Number(style.angle || 0),
       scaleX: Number(style.scale_x || 1),
@@ -102,11 +107,31 @@
     }
     const target = targetFromElement(element);
     object.elementType = element.element_type;
-    object.elementLabel = element.label || "";
+    object.itemOpacity = common.opacity;
+    prepareObject(object);
+    SolomonPlanLabels.attach(object, element.label, style.label_visible !== false);
     object.targetKind = target.kind;
     object.targetId = target.id ? String(target.id) : "";
     object.locked = Boolean(element.locked);
     return object;
+  }
+
+  function prepareObject(object) {
+    object.set({strokeUniform: true, opacity: SolomonPlanLabels.displayOpacity(object, seeThrough)});
+    if (object.type === "i-text" || object.type === "text") {
+      SolomonPlanLabels.normalizeTextScale(object);
+      // Only corner handles, so text grows proportionally and is never stretched.
+      object.setControlsVisibility({mt: false, mb: false, ml: false, mr: false});
+      object.lockScalingFlip = true;
+    }
+  }
+
+  function applySeeThrough() {
+    const button = document.getElementById("toggle-see-through");
+    button.classList.toggle("active", seeThrough);
+    button.setAttribute("aria-pressed", seeThrough ? "true" : "false");
+    canvas.forEachObject((object) => object.set({opacity: SolomonPlanLabels.displayOpacity(object, seeThrough)}));
+    canvas.requestRenderAll();
   }
 
   function serializeObject(object, index) {
@@ -149,7 +174,7 @@
         stroke: object.stroke || "#27343a",
         stroke_width: object.strokeWidth || 2,
         fill: object.fill && object.fill !== "transparent" ? object.fill : "transparent",
-        opacity: object.opacity,
+        opacity: object.itemOpacity === undefined ? object.opacity : object.itemOpacity,
         angle: object.angle || 0,
         scale_x: object.scaleX || 1,
         scale_y: object.scaleY || 1,
@@ -157,6 +182,7 @@
         position_y: object.top,
         radius: object.radius || undefined,
         font_size: object.fontSize || undefined,
+        label_visible: object.labelVisible,
       },
       z_index: index,
       locked: Boolean(object.locked),
@@ -233,7 +259,7 @@
         width: 140,
         height: 100,
         fill: "#dce9e4",
-        opacity: 0.62,
+        opacity: TRANSPARENT_OPACITY,
         stroke: "#39806a",
         strokeWidth: 2,
       });
@@ -256,7 +282,9 @@
       });
     }
     object.elementType = elementType;
-    object.elementLabel = elementType === "text" ? "Label" : "";
+    object.itemOpacity = elementType === "space" ? TRANSPARENT_OPACITY : 1;
+    prepareObject(object);
+    SolomonPlanLabels.attach(object, elementType === "text" ? "Label" : "");
     object.targetKind = "";
     object.targetId = "";
     object.locked = false;
@@ -279,7 +307,9 @@
         top: Number(source.top || 0) + offset,
       });
       duplicate.elementType = source.elementType;
-      duplicate.elementLabel = source.elementLabel;
+      duplicate.itemOpacity = source.itemOpacity;
+      prepareObject(duplicate);
+      SolomonPlanLabels.attach(duplicate, source.elementLabel, source.labelVisible);
       duplicate.targetKind = "";
       duplicate.targetId = "";
       duplicate.locked = Boolean(source.locked);
@@ -311,6 +341,20 @@
     if (!object) return;
     canvas.remove(object);
     updateInspector();
+    markChanged();
+  }
+
+  function reorderSelectedObject(direction) {
+    const object = canvas.getActiveObject();
+    if (!object) return;
+    const objects = canvas.getObjects();
+    const index = objects.indexOf(object);
+    if (direction === "front") canvas.bringToFront(object);
+    if (direction === "back") canvas.sendToBack(object);
+    if (direction === "forward") canvas.bringForward(object);
+    if (direction === "backward") canvas.sendBackwards(object);
+    if (canvas.getObjects().indexOf(object) === index) return;
+    canvas.requestRenderAll();
     markChanged();
   }
 
@@ -356,10 +400,12 @@
     const object = selectedObject || canvas.getActiveObject();
     const disabled = !object;
     document.getElementById("duplicate-element").disabled = disabled;
+    document.querySelectorAll("[data-order]").forEach((button) => { button.disabled = disabled; });
     Object.values(fields).forEach((field) => { field.disabled = disabled; });
     if (!object) return;
     fields.type.value = object.elementType || "line";
     fields.label.value = object.elementLabel || (object.type === "i-text" ? object.text : "");
+    fields.labelVisible.checked = object.labelVisible;
     populateTargetOptions();
     fields.target.value = object.targetKind && object.targetId ? `${object.targetKind}:${object.targetId}` : "";
     fields.x.value = Number(object.left || 0).toFixed(1);
@@ -370,14 +416,24 @@
     fields.stroke.value = /^#[0-9a-f]{6}$/i.test(object.stroke) ? object.stroke : "#27343a";
     fields.fill.value = /^#[0-9a-f]{6}$/i.test(object.fill) ? object.fill : "#dce9e4";
     fields.locked.checked = Boolean(object.locked);
+    fields.transparent.checked = Number(object.itemOpacity === undefined ? 1 : object.itemOpacity) < 1;
+  }
+
+  function updateLabel() {
+    const object = canvas.getActiveObject();
+    if (!object) return;
+    object.elementLabel = fields.label.value;
+    object.labelVisible = fields.labelVisible.checked;
+    if (object.type === "i-text") object.set({text: fields.label.value || "Label"});
+    object.setCoords();
+    canvas.requestRenderAll();
+    markChanged();
   }
 
   function updateObject() {
     const object = canvas.getActiveObject();
     if (!object) return;
     object.elementType = fields.type.value;
-    object.elementLabel = fields.label.value;
-    if (object.type === "i-text") object.set({text: fields.label.value || "Label"});
     const [targetKind = "", targetId = ""] = fields.target.value.split(":");
     object.targetKind = targetKind;
     object.targetId = targetId;
@@ -393,7 +449,13 @@
     const dimensionBases = objectDimensionBases(object);
     if (dimensionBases.width && Number(fields.width.value) > 0) object.scaleX = Number(fields.width.value) / dimensionBases.width;
     if (dimensionBases.height && Number(fields.height.value) > 0) object.scaleY = Number(fields.height.value) / dimensionBases.height;
+    SolomonPlanLabels.normalizeTextScale(object);
     object.locked = fields.locked.checked;
+    const currentOpacity = object.itemOpacity === undefined ? 1 : Number(object.itemOpacity);
+    if (fields.transparent.checked !== currentOpacity < 1) {
+      object.itemOpacity = fields.transparent.checked ? TRANSPARENT_OPACITY : 1;
+    }
+    object.set({opacity: SolomonPlanLabels.displayOpacity(object, seeThrough)});
     object.setCoords();
     canvas.requestRenderAll();
     markChanged();
@@ -447,7 +509,16 @@
     canvas.on("selection:created", () => updateInspector());
     canvas.on("selection:updated", () => updateInspector());
     canvas.on("selection:cleared", () => updateInspector());
-    canvas.on("object:modified", () => { updateInspector(); markChanged(); });
+    canvas.on("object:modified", (event) => {
+      if (event.target) SolomonPlanLabels.normalizeTextScale(event.target);
+      updateInspector();
+      markChanged();
+    });
+    canvas.on("text:changed", (event) => {
+      event.target.elementLabel = event.target.text;
+      updateInspector(event.target);
+      markChanged();
+    });
     canvas.on("mouse:down", (event) => {
       if (!panMode) return;
       dragging = true;
@@ -468,8 +539,11 @@
     }));
     document.querySelectorAll("[data-tool]").forEach((button) => button.addEventListener("click", () => setTool(button.dataset.tool)));
     Object.entries(fields).forEach(([name, field]) => {
-      if (name !== "type") field.addEventListener("change", updateObject);
+      if (!["type", "label", "labelVisible"].includes(name)) field.addEventListener("change", updateObject);
     });
+    fields.label.addEventListener("input", updateLabel);
+    fields.label.addEventListener("change", updateLabel);
+    fields.labelVisible.addEventListener("change", updateLabel);
     fields.type.addEventListener("change", () => {
       const object = canvas.getActiveObject();
       if (!object) return;
@@ -492,6 +566,17 @@
     });
     document.getElementById("duplicate-element").addEventListener("click", duplicateSelectedObject);
     document.getElementById("delete-element").addEventListener("click", deleteSelectedObject);
+    document.querySelectorAll("[data-order]").forEach((button) => button.addEventListener("click", () => {
+      reorderSelectedObject(button.dataset.order);
+    }));
+    const seeThroughButton = document.getElementById("toggle-see-through");
+    seeThroughButton.classList.toggle("active", seeThrough);
+    seeThroughButton.setAttribute("aria-pressed", seeThrough ? "true" : "false");
+    seeThroughButton.addEventListener("click", () => {
+      seeThrough = !seeThrough;
+      SolomonPlanLabels.storeSeeThrough(seeThrough);
+      applySeeThrough();
+    });
     document.getElementById("zoom-in").addEventListener("click", () => { zoom = Math.min(3, zoom * 1.2); applyZoom(); });
     document.getElementById("zoom-out").addEventListener("click", () => { zoom = Math.max(0.1, zoom / 1.2); applyZoom(); });
     document.getElementById("zoom-fit").addEventListener("click", fitCanvas);
@@ -521,6 +606,12 @@
       if (event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase() === "d" && !["INPUT", "SELECT", "TEXTAREA"].includes(event.target.tagName) && !canvas.getActiveObject()?.isEditing) {
         event.preventDefault();
         duplicateSelectedObject();
+      }
+      const typing = ["INPUT", "SELECT", "TEXTAREA"].includes(event.target.tagName) || canvas.getActiveObject()?.isEditing;
+      const orderKeys = {"]": "forward", "[": "backward", "}": "front", "{": "back"};
+      if (!typing && !event.ctrlKey && !event.metaKey && !event.altKey && orderKeys[event.key]) {
+        event.preventDefault();
+        reorderSelectedObject(orderKeys[event.key]);
       }
     });
     window.addEventListener("beforeunload", (event) => {

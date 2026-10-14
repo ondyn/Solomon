@@ -11,6 +11,7 @@
   let planData;
   let zoom = 1;
   let selectedObject = null;
+  let seeThrough = SolomonPlanLabels.loadSeeThrough();
   const defaultInspectorContent = Array.from(inspector.childNodes).map((node) => node.cloneNode(true));
 
   function objectTarget(element) {
@@ -27,6 +28,7 @@
       fill: style.fill || "transparent",
       stroke: style.stroke || "#27343a",
       strokeWidth: Number(style.stroke_width || 2),
+      strokeUniform: true,
       opacity: style.opacity === undefined ? 1 : Number(style.opacity),
       angle: Number(style.angle || 0),
       scaleX: Number(style.scale_x || 1),
@@ -82,6 +84,9 @@
       object.setCoords();
     }
     object.facilityElement = element;
+    object.itemOpacity = common.opacity;
+    SolomonPlanLabels.normalizeTextScale(object);
+    SolomonPlanLabels.attach(object, element.label, style.label_visible !== false);
     object.elementType = element.element_type;
     object.target = objectTarget(element);
     return object;
@@ -154,8 +159,8 @@
   }
 
   function showTarget(target) {
-    if (!target) return;
     inspector.replaceChildren();
+    if (!target) return;
     const heading = document.createElement("h2");
     const link = document.createElement("a");
     link.href = target.url;
@@ -220,6 +225,18 @@
     return "structure";
   }
 
+  function applySeeThrough() {
+    const button = document.getElementById("toggle-see-through");
+    button.classList.toggle("active", seeThrough);
+    button.setAttribute("aria-pressed", seeThrough ? "true" : "false");
+    canvas.getObjects().forEach((object) => {
+      const opacity = SolomonPlanLabels.displayOpacity(object, seeThrough);
+      object.viewerBaseStyle.opacity = opacity;
+      if (object !== selectedObject) object.set({opacity});
+    });
+    canvas.requestRenderAll();
+  }
+
   function exportSvg() {
     const blob = new Blob([canvas.toSVG()], {type: "image/svg+xml;charset=utf-8"});
     const link = document.createElement("a");
@@ -242,20 +259,27 @@
     });
     const highlights = new Set(app.dataset.highlight.split(",").filter(Boolean));
     addBackground(planData.revision.background_url, function () {
+      let initialSelection = null;
       planData.elements.forEach((element) => {
         const object = objectFromElement(element, false);
-        if (element.space_id && highlights.has(String(element.space_id))) {
-          object.set({stroke: "#efb419", strokeWidth: 5, opacity: 1});
-        }
+        object.set({opacity: SolomonPlanLabels.displayOpacity(object, seeThrough)});
         object.viewerBaseStyle = {
           stroke: object.stroke,
           strokeWidth: object.strokeWidth,
           opacity: object.opacity,
           shadow: object.shadow,
         };
+        if (element.space_id && highlights.has(String(element.space_id))) {
+          object.set({stroke: "#efb419", strokeWidth: 5, opacity: 1});
+          if (!initialSelection) initialSelection = object;
+        }
         canvas.add(object);
       });
       fitCanvas();
+      if (initialSelection) {
+        selectObject(initialSelection);
+        showTarget(initialSelection.target);
+      }
       loading.classList.add("is-hidden");
     });
     canvas.on("mouse:down", (event) => {
@@ -264,7 +288,7 @@
         return;
       }
       selectObject(event.target);
-      if (event.target.target) showTarget(event.target.target);
+      showTarget(event.target.target);
     });
     canvas.on("mouse:dblclick", (event) => {
       if (event.target && event.target.target) window.location.assign(event.target.target.url);
@@ -281,6 +305,14 @@
     document.getElementById("zoom-out").addEventListener("click", () => { zoom = Math.max(0.1, zoom / 1.2); applyZoom(); });
     document.getElementById("zoom-fit").addEventListener("click", fitCanvas);
     document.getElementById("export-svg").addEventListener("click", exportSvg);
+    const seeThroughButton = document.getElementById("toggle-see-through");
+    seeThroughButton.classList.toggle("active", seeThrough);
+    seeThroughButton.setAttribute("aria-pressed", seeThrough ? "true" : "false");
+    seeThroughButton.addEventListener("click", () => {
+      seeThrough = !seeThrough;
+      SolomonPlanLabels.storeSeeThrough(seeThrough);
+      applySeeThrough();
+    });
     window.addEventListener("resize", fitCanvas);
   }
 

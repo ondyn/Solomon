@@ -46,6 +46,18 @@
         <button type="button" class="btn btn-outline-secondary btn-icon" id="duplicate-element" title="{% trans 'Duplicate selected' %} (Shift+D)" aria-label="{% trans 'Duplicate selected' %}" aria-keyshortcuts="Shift+D" disabled>
           <i class="mdi mdi-content-copy"></i>
         </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" data-order="front" title="{% trans 'Bring to front' %} (Shift+])" aria-label="{% trans 'Bring to front' %}" disabled>
+          <i class="mdi mdi-arrange-bring-to-front"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" data-order="forward" title="{% trans 'Bring forward' %} (])" aria-label="{% trans 'Bring forward' %}" disabled>
+          <i class="mdi mdi-arrange-bring-forward"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" data-order="backward" title="{% trans 'Send backward' %} ([)" aria-label="{% trans 'Send backward' %}" disabled>
+          <i class="mdi mdi-arrange-send-backward"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" data-order="back" title="{% trans 'Send to back' %} (Shift+[)" aria-label="{% trans 'Send to back' %}" disabled>
+          <i class="mdi mdi-arrange-send-to-back"></i>
+        </button>
         <button type="button" class="btn btn-outline-danger btn-icon" id="delete-element" title="{% trans 'Delete selected' %}" aria-label="{% trans 'Delete selected' %}">
           <i class="mdi mdi-delete-outline"></i>
         </button>
@@ -54,6 +66,7 @@
         <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-out" title="{% trans 'Zoom out' %}" aria-label="{% trans 'Zoom out' %}"><i class="mdi mdi-magnify-minus-outline"></i></button>
         <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-fit" title="{% trans 'Fit floor' %}" aria-label="{% trans 'Fit floor' %}"><i class="mdi mdi-fit-to-screen-outline"></i></button>
         <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-in" title="{% trans 'Zoom in' %}" aria-label="{% trans 'Zoom in' %}"><i class="mdi mdi-magnify-plus-outline"></i></button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" id="toggle-see-through" title="{% trans 'Transparent items' %}" aria-label="{% trans 'Transparent items' %}" aria-pressed="false"><i class="mdi mdi-circle-opacity"></i></button>
       </div>
       <div class="schematic-command-actions">
         <span class="schematic-save-state" id="save-state" aria-live="polite"></span>
@@ -99,6 +112,10 @@
         <div class="mb-3">
           <label class="form-label" for="element-label">{% trans "Label" %}</label>
           <input class="form-control" id="element-label" maxlength="200">
+          <label class="form-check form-switch mt-2">
+            <input class="form-check-input" type="checkbox" role="switch" id="element-label-visible" checked>
+            <span class="form-check-label">{% trans "Show label on floor plan" %}</span>
+          </label>
         </div>
         <div class="mb-3">
           <label class="form-label" for="element-target">{% trans "Linked object" %} <span class="text-secondary">({% trans "optional" %})</span></label>
@@ -130,8 +147,13 @@
           <input class="form-check-input" type="checkbox" id="element-locked">
           <span class="form-check-label">{% trans "Locked" %}</span>
         </label>
+        <label class="form-check form-switch mt-2">
+          <input class="form-check-input" type="checkbox" role="switch" id="element-transparent">
+          <span class="form-check-label">{% trans "Transparent" %}</span>
+        </label>
       </aside>
     </div>
   </div>
-  <script src="{% static 'solomon_facilities/editor.js' %}?v=10"></script>
+  <script src="{% static 'solomon_facilities/labels.js' %}?v=3"></script>
+  <script src="{% static 'solomon_facilities/editor.js' %}?v=13"></script>
 {% endblock content %}

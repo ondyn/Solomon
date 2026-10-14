@@ -11,6 +11,9 @@ __pycache__/
 dist/
 build/
 
+# Django
+*.mo
+
 # macOS
 .DS_Store
 

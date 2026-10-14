@@ -2,7 +2,7 @@
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from netbox.forms import NetBoxModelForm
+from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelForm
 from solomon_property.models import (
     Building,
     BuildingObject,
@@ -10,10 +10,12 @@ from solomon_property.models import (
     Person,
     PropertyOwner,
 )
+from utilities.forms import add_blank_choice
 from utilities.forms.fields import (
     DynamicModelChoiceField,
     DynamicModelMultipleChoiceField,
 )
+from utilities.forms.rendering import FieldSet
 from utilities.forms.widgets import DatePicker
 
 from . import models
@@ -105,6 +107,44 @@ class SpaceForm(NetBoxModelForm):
             "tags",
         )
         widgets = {"notes": forms.Textarea(attrs={"rows": 3})}
+
+
+class SpaceBulkEditForm(NetBoxModelBulkEditForm):
+    level = DynamicModelChoiceField(
+        queryset=models.BuildingLevel.objects.all(), label=_("Level"), required=False
+    )
+    building = DynamicModelChoiceField(
+        queryset=Building.objects.all(),
+        label=_("Entrance or building"),
+        required=False,
+    )
+    parent = DynamicModelChoiceField(
+        queryset=models.Space.objects.all(), label=_("Parent space"), required=False
+    )
+    name = models.Space._meta.get_field("name").formfield(required=False)
+    kind = forms.ChoiceField(
+        label=_("Type"),
+        choices=add_blank_choice(models.SPACE_KIND_CHOICES),
+        required=False,
+        initial="",
+    )
+    status = forms.ChoiceField(
+        label=_("Status"),
+        choices=add_blank_choice(models.SPACE_STATUS_CHOICES),
+        required=False,
+        initial="",
+    )
+    area_m2 = models.Space._meta.get_field("area_m2").formfield(required=False)
+    notes = models.Space._meta.get_field("notes").formfield(
+        required=False, widget=forms.Textarea(attrs={"rows": 3})
+    )
+
+    model = models.Space
+    fieldsets = (
+        FieldSet("level", "building", "parent", "name", "kind", "status", "area_m2"),
+        FieldSet("notes"),
+    )
+    nullable_fields = ("building", "parent", "area_m2", "notes")
 
 
 class SpaceFlatAssignmentForm(NetBoxModelForm):
