@@ -10,12 +10,18 @@ class Field {
     this.dataset = {};
     this.handlers = {};
     this.childNodes = [];
-    this.classList = {add() {}, remove() {}, toggle() {}};
+    this.attributes = {};
+    this.classes = new Set();
+    this.classList = {
+      add: (name) => this.classes.add(name),
+      remove: (name) => this.classes.delete(name),
+      toggle: (name, enabled) => enabled ? this.classes.add(name) : this.classes.delete(name),
+    };
   }
   addEventListener(name, handler) { this.handlers[name] = handler; }
   replaceChildren() { this.childNodes = []; }
   appendChild(node) { this.childNodes.push(node); }
-  setAttribute() {}
+  setAttribute(name, value) { this.attributes[name] = value; }
   reportValidity() { return this.value !== "" && Number(this.value) >= 1; }
   change(value) {
     this.value = String(value);
@@ -29,6 +35,9 @@ class Shape {
   }
   set(options) { Object.assign(this, options); }
   setCoords() {}
+  getCenterPoint() { return {x: this.left, y: this.top}; }
+  translateToOriginPoint(point) { return point; }
+  setPositionByOrigin(point, originX, originY) { this.anchor = {point, originX, originY}; }
   setControlsVisibility() {}
   rotate(angle) { this.angle = angle; }
   clone(callback) { callback(new Shape({...this})); }
@@ -49,7 +58,7 @@ function source(name) {
   return fs.readFileSync(path.join(__dirname, "../static/solomon_facilities", name), "utf8");
 }
 
-async function loadEditor(elements, translations = {}, targets = {spaces: {}, doors: {}, technical_assets: {}}) {
+async function loadEditor(elements, translations = {}, targets = {spaces: {}, doors: {}, technical_assets: {}}, snapEnabled = false) {
   const fields = {};
   const field = (id) => fields[id] ||= new Field();
   field("schematic-editor").dataset = {url: "/data/", saveUrl: "/data/", revisionId: "1"};
@@ -63,6 +72,8 @@ async function loadEditor(elements, translations = {}, targets = {spaces: {}, do
       this.objects = [];
       this.handlers = {};
       this.viewportTransform = [1, 0, 0, 1, 0, 0];
+      this.uniformScaling = true;
+      this.uniScaleKey = "shiftKey";
     }
     add(object) { this.objects.push(object); }
     on(name, handler) { this.handlers[name] = handler; }
@@ -73,17 +84,35 @@ async function loadEditor(elements, translations = {}, targets = {spaces: {}, do
     forEachObject(callback) { this.objects.forEach(callback); }
     bringToFront() {}
     setDimensions() {}
+    getWidth() { return 1000 * this.viewportTransform[0]; }
+    getHeight() { return 800 * this.viewportTransform[3]; }
+    getContext() { return this.context; }
     setViewportTransform(transform) { this.viewportTransform = transform; }
     requestRenderAll() {}
   }
-  const fabric = {Canvas, Rect: Shape, IText: Text, Text};
+  const fabric = {
+    Canvas, Rect: Shape, IText: Text, Text,
+    Point: class { constructor(x, y) { this.x = x; this.y = y; } },
+    util: {
+      invertTransform: ([a, , , d, x, y]) => [1 / a, 0, 0, 1 / d, -x / a, -y / d],
+      transformPoint: (point, [a, , , d, x, y]) => ({x: point.x * a + x, y: point.y * d + y}),
+    },
+  };
+  const buttons = {add: new Field(), pan: new Field(), select: new Field()};
+  buttons.add.dataset.add = "space";
+  buttons.pan.dataset.tool = "pan";
+  buttons.select.dataset.tool = "select";
   const window = {fabric, addEventListener() {}};
   vm.runInNewContext(source("labels.js"), {window, fabric});
   vm.runInNewContext(source("editor.js"), {
     window, fabric, SolomonPlanLabels: window.SolomonPlanLabels,
     document: {
       getElementById: field,
-      querySelectorAll: () => [],
+      querySelectorAll: (selector) => {
+        if (selector === "[data-add]") return [buttons.add];
+        if (selector === "[data-tool]") return [buttons.pan, buttons.select];
+        return [];
+      },
       querySelector: () => ({value: "csrf-token"}),
       createElement: () => new Field(),
       addEventListener() {},
@@ -105,8 +134,9 @@ async function loadEditor(elements, translations = {}, targets = {spaces: {}, do
   });
   await new Promise((resolve) => setImmediate(resolve));
   assert.ok(canvas?.handlers["selection:created"], field("schematic-loading").textContent);
+  if (!snapEnabled) field("toggle-snap-grid").handlers.click();
   return {
-    canvas, field,
+    canvas, field, buttons,
     select(object) {
       canvas.setActiveObject(object);
       canvas.handlers["selection:created"]();
@@ -129,6 +159,263 @@ const textElement = {
   geometry: {type: "text", x: 200, y: 100, text: "Note"},
   style: {font_size: 24},
 };
+
+test("snapping starts enabled without changing existing objects or marking the plan changed", async () => {
+  const editor = await loadEditor([{...rectangle, geometry: {...rectangle.geometry, x: 23, y: 42}}], {}, undefined, true);
+  const button = editor.field("toggle-snap-grid");
+  const object = editor.canvas.objects[0];
+  assert.equal(button.attributes["aria-pressed"], "true");
+  assert.ok(button.classes.has("active"));
+  assert.equal(object.left, 23);
+  assert.equal(object.top, 42);
+  assert.notEqual(editor.field("save-state").textContent, "Changed");
+  editor.select(object);
+  editor.canvas.handlers["object:moving"]({target: object});
+  assert.equal(object.left, 25);
+  assert.equal(object.top, 40);
+  button.handlers.click();
+  assert.equal(button.attributes["aria-pressed"], "false");
+  assert.ok(!button.classes.has("active"));
+});
+
+test("grid toggle snaps movement to 5 plan units and saves positions without changing geometry", async () => {
+  const editor = await loadEditor([rectangle, textElement]);
+  const object = editor.canvas.objects[0];
+  editor.select(object);
+  const move = (x, y) => {
+    object.set({left: x, top: y});
+    editor.canvas.handlers["object:moving"]({target: object});
+  };
+  move(31, 49);
+  assert.equal(object.left, 31, "Disabled snapping leaves movement exact");
+  assert.equal(object.top, 49);
+  const button = editor.field("toggle-snap-grid");
+  button.handlers.click();
+  assert.equal(button.attributes["aria-pressed"], "true");
+  assert.ok(button.classes.has("active"));
+  assert.equal(object.left, 31, "Enabling does not move existing elements");
+  assert.notEqual(editor.field("save-state").textContent, "Changed");
+  for (const [x, y, expectedX, expectedY] of [[31, 49, 30, 50], [32.4, 52.6, 30, 55], [-31, -49, -30, -50], [40, 60, 40, 60]]) {
+    move(x, y);
+    assert.equal(object.left, expectedX);
+    assert.equal(object.top, expectedY);
+    assert.ok(Math.abs(object.left - x) <= 2.5);
+    assert.ok(Math.abs(object.top - y) <= 2.5);
+  }
+  assert.equal(editor.field("element-x").value, "40.0");
+  assert.equal(editor.field("element-y").value, "60.0");
+  assert.equal(object.angle, 25);
+  assert.equal(object.scaleX, 2);
+  assert.equal(object.scaleY, 3);
+  editor.canvas.handlers["object:modified"]({target: object});
+  const saved = await editor.save();
+  assert.equal(saved.elements[0].style.position_x, 40);
+  assert.equal(saved.elements[0].style.position_y, 60);
+  assert.equal(saved.elements.length, 2, "The grid is not a saved object");
+  const reloaded = await loadEditor(saved.elements);
+  assert.equal(reloaded.canvas.objects[0].left, 40);
+  assert.equal(reloaded.canvas.objects[0].top, 60);
+  button.handlers.click();
+  assert.equal(button.attributes["aria-pressed"], "false");
+  assert.ok(!button.classes.has("active"));
+  move(31, 49);
+  assert.equal(object.left, 31);
+  assert.equal(object.top, 49);
+});
+
+test("snapping respects movement locks, pan mode, zoom, and exact inspector input", async () => {
+  const editor = await loadEditor([rectangle, {...rectangle, locked: true}]);
+  const object = editor.canvas.objects[0];
+  editor.select(object);
+  editor.field("toggle-snap-grid").handlers.click();
+  object.set({left: 31, top: 49, lockMovementX: true});
+  editor.canvas.handlers["object:moving"]({target: object});
+  assert.equal(object.left, 31);
+  assert.equal(object.top, 50);
+  const locked = editor.canvas.objects[1];
+  locked.set({left: 31, top: 49});
+  editor.canvas.handlers["object:moving"]({target: locked});
+  assert.equal(locked.left, 31);
+  assert.equal(locked.top, 49);
+  editor.buttons.pan.handlers.click();
+  object.set({left: 31, top: 49, lockMovementX: false});
+  editor.canvas.handlers["object:moving"]({target: object});
+  assert.equal(object.top, 49);
+  editor.buttons.select.handlers.click();
+  editor.select(object);
+  editor.field("zoom-out").handlers.click();
+  editor.canvas.viewportTransform[4] = 127;
+  editor.canvas.viewportTransform[5] = -59;
+  editor.canvas.handlers["object:moving"]({target: object});
+  assert.equal(object.left, 30);
+  assert.equal(object.top, 50);
+  editor.field("element-x").change(33);
+  assert.equal(object.left, 33, "Inspector input stays exact");
+});
+
+test("new and duplicated objects snap only when enabled", async () => {
+  const editor = await loadEditor([rectangle]);
+  editor.select(editor.canvas.objects[0]);
+  editor.field("duplicate-element").handlers.click();
+  assert.equal(editor.canvas.objects[1].left, 52);
+  editor.field("toggle-snap-grid").handlers.click();
+  editor.select(editor.canvas.objects[0]);
+  editor.field("duplicate-element").handlers.click();
+  assert.equal(editor.canvas.objects[2].left, 50);
+  assert.equal(editor.canvas.objects[2].top, 70);
+  editor.buttons.add.handlers.click({currentTarget: editor.buttons.add});
+  assert.equal(editor.canvas.active.left, 430);
+  assert.equal(editor.canvas.active.top, 350);
+});
+
+test("grid dots follow the viewport and are omitted when snapping is disabled", async () => {
+  const editor = await loadEditor([]);
+  const dots = [];
+  editor.canvas.context = {
+    save() {}, restore() {},
+    fillRect: (...args) => dots.push(args),
+  };
+  editor.canvas.handlers["after:render"]();
+  assert.equal(dots.length, 0);
+  editor.field("toggle-snap-grid").handlers.click();
+  editor.canvas.handlers["after:render"]();
+  assert.deepEqual(dots[0], [-1, -1, 2, 2]);
+  assert.deepEqual(dots[1], [-1, 9, 2, 2]);
+  editor.field("zoom-out").handlers.click();
+  editor.canvas.viewportTransform[4] = -10;
+  editor.canvas.viewportTransform[5] = -10;
+  dots.length = 0;
+  editor.canvas.handlers["after:render"]();
+  assert.ok(Math.abs(dots[0][0] - (20 / 1.2 - 11)) < 1e-9);
+  assert.ok(Math.abs(dots[0][1] - (20 / 1.2 - 11)) < 1e-9);
+  editor.field("toggle-snap-grid").handlers.click();
+  dots.length = 0;
+  editor.canvas.handlers["after:render"]();
+  assert.equal(dots.length, 0);
+});
+
+test("resizing snaps dimensions, keeps the fixed anchor, and saves scales", async () => {
+  const editor = await loadEditor([rectangle]);
+  const object = editor.canvas.objects[0];
+  editor.select(object);
+  const resize = (action, scaleX, scaleY, shiftKey = false) => {
+    object.set({scaleX, scaleY});
+    editor.canvas.handlers["object:scaling"]({
+      target: object, transform: {action, originX: "right", originY: "bottom"}, e: {shiftKey},
+    });
+  };
+  resize("scaleX", 1.23, 1.17);
+  assert.equal(object.scaleX, 1.23, "Disabled snapping leaves resizing exact");
+  editor.field("toggle-snap-grid").handlers.click();
+  resize("scaleX", 1.23, 1.17);
+  assert.equal(object.width * object.scaleX, 125);
+  assert.equal(object.scaleY, 1.17, "Horizontal handles leave height unchanged");
+  assert.equal(object.anchor.originX, "right");
+  assert.equal(object.anchor.originY, "bottom");
+  assert.equal(object.anchor.point.x, 20);
+  assert.equal(object.anchor.point.y, 40);
+  resize("scaleY", 1.23, 1.17);
+  assert.equal(object.scaleX, 1.23);
+  assert.equal(object.height * object.scaleY, 60);
+  resize("scale", 1.23, 1.17, true);
+  assert.equal(object.width * object.scaleX, 125);
+  assert.equal(object.height * object.scaleY, 60);
+  assert.equal(object.angle, 25);
+  assert.equal(editor.field("element-width").value, "125.0");
+  assert.equal(editor.field("element-height").value, "60.0");
+  editor.canvas.handlers["object:modified"]({target: object});
+  const saved = await editor.save();
+  assert.equal(saved.elements[0].style.scale_x, 1.25);
+  assert.equal(saved.elements[0].style.scale_y, 1.2);
+  editor.field("element-width").change(123);
+  assert.equal(object.width * object.scaleX, 123, "Inspector dimensions remain exact");
+});
+
+test("proportional resizing snaps the larger dimension without stretching shapes or text", async () => {
+  const editor = await loadEditor([rectangle, textElement]);
+  editor.field("toggle-snap-grid").handlers.click();
+  for (const object of editor.canvas.objects) {
+    editor.select(object);
+    object.set({scaleX: 1.23, scaleY: 2.46});
+    editor.canvas.handlers["object:scaling"]({
+      target: object, transform: {action: "scale", originX: "left", originY: "top"}, e: {},
+    });
+    assert.equal(object.width * object.scaleX, 125);
+    assert.equal(object.scaleY / object.scaleX, 2);
+  }
+  const text = editor.canvas.objects[1];
+  text.set({scaleX: 1.23, scaleY: 1.23});
+  editor.canvas.handlers["object:scaling"]({
+    target: text, transform: {action: "scale", originX: "left", originY: "top"}, e: {shiftKey: true},
+  });
+  assert.equal(text.scaleX, text.scaleY, "Text stays proportional even with Shift");
+  editor.canvas.handlers["object:modified"]({target: text});
+  assert.equal(text.scaleX, 1);
+  assert.equal(text.scaleY, 1);
+  assert.equal(text.fontSize, 30);
+});
+
+test("resize snapping respects scale locks, minimum size, zero dimensions, flips, and pan mode", async () => {
+  const editor = await loadEditor([rectangle]);
+  const object = editor.canvas.objects[0];
+  editor.select(object);
+  editor.field("toggle-snap-grid").handlers.click();
+  const resize = () => editor.canvas.handlers["object:scaling"]({
+    target: object, transform: {action: "scale", originX: "left", originY: "top"}, e: {shiftKey: true},
+  });
+  object.set({scaleX: 1.23, scaleY: 1.17, lockScalingX: true});
+  resize();
+  assert.equal(object.scaleX, 1.23);
+  assert.equal(object.scaleY, 1.2);
+  object.set({scaleX: 0.001, scaleY: -0.001, lockScalingX: false});
+  resize();
+  assert.equal(object.width * object.scaleX, 5);
+  assert.equal(object.height * object.scaleY, -5);
+  object.set({width: 0, scaleX: 1.23, scaleY: 1.17});
+  resize();
+  assert.equal(object.scaleX, 1.23, "Zero-width lines do not divide by zero");
+  assert.equal(object.scaleY, 1.2);
+  object.set({locked: true, scaleY: 1.17});
+  resize();
+  assert.equal(object.scaleY, 1.17);
+  object.locked = false;
+  editor.buttons.pan.handlers.click();
+  resize();
+  assert.equal(object.scaleY, 1.17);
+});
+
+test("rotation snaps in 15-degree steps only when enabled and persists", async () => {
+  const editor = await loadEditor([rectangle]);
+  const object = editor.canvas.objects[0];
+  editor.select(object);
+  const rotate = (angle) => {
+    object.angle = angle;
+    editor.canvas.handlers["object:rotating"]({target: object});
+  };
+  rotate(23);
+  assert.equal(object.angle, 23);
+  editor.field("toggle-snap-grid").handlers.click();
+  for (const [angle, expected] of [[22.4, 15], [22.6, 30], [89, 90], [359, 360], [-23, -30]]) {
+    rotate(angle);
+    assert.equal(object.angle, expected);
+    assert.ok(Math.abs(object.angle - angle) <= 7.5);
+  }
+  object.lockRotation = true;
+  rotate(23);
+  assert.equal(object.angle, 23);
+  object.lockRotation = false;
+  object.locked = true;
+  rotate(23);
+  assert.equal(object.angle, 23);
+  object.locked = false;
+  rotate(44);
+  editor.canvas.handlers["object:modified"]({target: object});
+  const saved = await editor.save();
+  assert.equal(saved.elements[0].style.angle, 45);
+  editor.field("toggle-snap-grid").handlers.click();
+  rotate(23);
+  assert.equal(object.angle, 23);
+});
 
 test("editor translates save states and linked-object options without changing labels", async () => {
   const editor = await loadEditor([rectangle], {

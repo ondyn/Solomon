@@ -35,6 +35,63 @@
   let leavingEditor = false;
   let seeThrough = SolomonPlanLabels.loadSeeThrough();
   const TRANSPARENT_OPACITY = 0.62;
+  const GRID_SIZE = 5;
+  const ROTATION_STEP = 15;
+  let snapToGrid = true;
+
+  function snapPosition(object) {
+    if (!snapToGrid || panMode || object.locked) return;
+    if (!object.lockMovementX) object.set({left: Math.round(object.left / GRID_SIZE) * GRID_SIZE});
+    if (!object.lockMovementY) object.set({top: Math.round(object.top / GRID_SIZE) * GRID_SIZE});
+    object.setCoords();
+  }
+
+  function snapResize(event) {
+    const object = event.target;
+    const transform = event.transform;
+    if (!snapToGrid || panMode || object.locked || !transform) return;
+    const scaleX = transform.action !== "scaleY" && !object.lockScalingX;
+    const scaleY = transform.action !== "scaleX" && !object.lockScalingY;
+    if (!scaleX && !scaleY) return;
+    const anchor = object.translateToOriginPoint(object.getCenterPoint(), transform.originX, transform.originY);
+    const width = object.width * Math.abs(object.scaleX);
+    const height = object.height * Math.abs(object.scaleY);
+    const uniform = transform.action === "scale" &&
+      (object.type === "i-text" || object.type === "text" ||
+        Boolean(canvas.uniformScaling) !== Boolean(event.e?.[canvas.uniScaleKey]));
+    const snappedSize = (size) => Math.max(GRID_SIZE, Math.round(size / GRID_SIZE) * GRID_SIZE);
+    if (uniform && scaleX && scaleY) {
+      const size = Math.max(width, height);
+      if (size > 0) {
+        const ratio = snappedSize(size) / size;
+        object.set({scaleX: object.scaleX * ratio, scaleY: object.scaleY * ratio});
+      }
+    } else {
+      if (scaleX && width > 0) object.set({scaleX: Math.sign(object.scaleX) * snappedSize(width) / object.width});
+      if (scaleY && height > 0) object.set({scaleY: Math.sign(object.scaleY) * snappedSize(height) / object.height});
+    }
+    object.setPositionByOrigin(anchor, transform.originX, transform.originY);
+    object.setCoords();
+  }
+
+  function renderGrid() {
+    if (!snapToGrid) return;
+    const context = canvas.getContext();
+    const transform = canvas.viewportTransform;
+    const step = GRID_SIZE * Math.max(1, Math.ceil(8 / (GRID_SIZE * zoom)));
+    const left = Math.max(0, -transform[4] / zoom);
+    const top = Math.max(0, -transform[5] / zoom);
+    const right = Math.min(planData.plan.width, (canvas.getWidth() - transform[4]) / zoom);
+    const bottom = Math.min(planData.plan.height, (canvas.getHeight() - transform[5]) / zoom);
+    context.save();
+    context.fillStyle = "rgba(39, 52, 58, 0.3)";
+    for (let x = Math.ceil(left / step) * step; x <= right; x += step) {
+      for (let y = Math.ceil(top / step) * step; y <= bottom; y += step) {
+        context.fillRect(x * zoom + transform[4] - 1, y * zoom + transform[5] - 1, 2, 2);
+      }
+    }
+    context.restore();
+  }
 
   function getCsrfToken() {
     const input = document.querySelector("#save-form [name=csrfmiddlewaretoken]");
@@ -291,6 +348,7 @@
     object.targetKind = "";
     object.targetId = "";
     object.locked = false;
+    snapPosition(object);
     canvas.discardActiveObject();
     canvas.add(object);
     canvas.setActiveObject(object);
@@ -316,6 +374,7 @@
       duplicate.targetKind = "";
       duplicate.targetId = "";
       duplicate.locked = Boolean(source.locked);
+      snapPosition(duplicate);
       canvas.discardActiveObject();
       canvas.add(duplicate);
       canvas.setActiveObject(duplicate);
@@ -537,6 +596,23 @@
     canvas.on("selection:created", () => updateInspector());
     canvas.on("selection:updated", () => updateInspector());
     canvas.on("selection:cleared", () => updateInspector());
+    canvas.on("after:render", renderGrid);
+    canvas.on("object:moving", (event) => {
+      snapPosition(event.target);
+      updateInspector(event.target);
+    });
+    canvas.on("object:scaling", (event) => {
+      snapResize(event);
+      updateInspector(event.target);
+    });
+    canvas.on("object:rotating", (event) => {
+      const object = event.target;
+      if (snapToGrid && !panMode && !object.locked && !object.lockRotation) {
+        object.rotate(Math.round(object.angle / ROTATION_STEP) * ROTATION_STEP);
+        object.setCoords();
+      }
+      updateInspector(object);
+    });
     canvas.on("object:modified", (event) => {
       if (event.target) SolomonPlanLabels.normalizeTextScale(event.target);
       updateInspector();
@@ -606,6 +682,15 @@
       seeThrough = !seeThrough;
       SolomonPlanLabels.storeSeeThrough(seeThrough);
       applySeeThrough();
+    });
+    const snapButton = document.getElementById("toggle-snap-grid");
+    snapButton.classList.toggle("active", snapToGrid);
+    snapButton.setAttribute("aria-pressed", snapToGrid ? "true" : "false");
+    snapButton.addEventListener("click", () => {
+      snapToGrid = !snapToGrid;
+      snapButton.classList.toggle("active", snapToGrid);
+      snapButton.setAttribute("aria-pressed", snapToGrid ? "true" : "false");
+      canvas.requestRenderAll();
     });
     document.getElementById("zoom-in").addEventListener("click", () => { zoom = Math.min(3, zoom * 1.2); applyZoom(); });
     document.getElementById("zoom-out").addEventListener("click", () => { zoom = Math.max(0.1, zoom / 1.2); applyZoom(); });

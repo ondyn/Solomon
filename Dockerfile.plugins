@@ -13,6 +13,10 @@ FROM docker.io/netboxcommunity/netbox:${NETBOX_VERSION}
 
 USER root
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gettext \
+    && apt-get clean
+
 # Install dev tools: debugpy for remote debugging, watchfiles for granian --reload
 RUN /usr/local/bin/uv pip install --python /opt/netbox/venv/bin/python \
     debugpy \

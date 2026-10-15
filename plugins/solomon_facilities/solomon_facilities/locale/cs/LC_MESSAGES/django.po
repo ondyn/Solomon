@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: solomon-facilities 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-15 09:37+0200\n"
+"POT-Creation-Date: 2026-10-15 09:04+0000\n"
 "PO-Revision-Date: 2026-08-09 21:15+0200\n"
 "Last-Translator: GitHub Copilot\n"
 "Language-Team: Czech\n"
@@ -23,12 +23,12 @@ msgstr "Správa objektu"
 
 #: filterforms.py:18 models.py:57 models.py:354 models.py:392 models.py:464
 #: models.py:877 models.py:1034 tables.py:99 tables.py:116 tables.py:237
-#: templates/solomon_facilities/floorplan_editor.html:105 ui/panels.py:65
+#: templates/solomon_facilities/floorplan_editor.html:106 ui/panels.py:65
 msgid "Space"
 msgstr "Prostor"
 
 #: filterforms.py:27 forms.py:128 models.py:328
-#: templates/solomon_facilities/floorplan_editor.html:100 ui/panels.py:15
+#: templates/solomon_facilities/floorplan_editor.html:101 ui/panels.py:15
 #: ui/panels.py:25
 msgid "Type"
 msgstr "Typ"
@@ -203,32 +203,32 @@ msgstr "Výpůjčka"
 msgid "License"
 msgstr "Licence"
 
-#: models.py:54 templates/solomon_facilities/floorplan_editor.html:102
+#: models.py:54 templates/solomon_facilities/floorplan_editor.html:103
 msgid "Wall"
 msgstr "Zeď"
 
 #: models.py:55 models.py:566 models.py:594 models.py:1042 tables.py:156
-#: templates/solomon_facilities/floorplan_editor.html:103
+#: templates/solomon_facilities/floorplan_editor.html:104
 msgid "Door"
 msgstr "Dveře"
 
-#: models.py:56 templates/solomon_facilities/floorplan_editor.html:104
+#: models.py:56 templates/solomon_facilities/floorplan_editor.html:105
 msgid "Window"
 msgstr "Okno"
 
-#: models.py:58 templates/solomon_facilities/floorplan_editor.html:106
+#: models.py:58 templates/solomon_facilities/floorplan_editor.html:107
 msgid "Technical item"
 msgstr "Technický prvek"
 
-#: models.py:59 templates/solomon_facilities/floorplan_editor.html:107
+#: models.py:59 templates/solomon_facilities/floorplan_editor.html:108
 msgid "Line"
 msgstr "Čára"
 
-#: models.py:60 templates/solomon_facilities/floorplan_editor.html:108
+#: models.py:60 templates/solomon_facilities/floorplan_editor.html:109
 msgid "Text"
 msgstr "Text"
 
-#: models.py:61 templates/solomon_facilities/floorplan_editor.html:109
+#: models.py:61 templates/solomon_facilities/floorplan_editor.html:110
 msgid "Dimension"
 msgstr "Kóta"
 
@@ -798,7 +798,7 @@ msgstr "Propojené součásti musí náležet ke stejné soustavě."
 msgid "Element type"
 msgstr "Typ prvku"
 
-#: models.py:1023 templates/solomon_facilities/floorplan_editor.html:113
+#: models.py:1023 templates/solomon_facilities/floorplan_editor.html:114
 msgid "Label"
 msgstr "Popis"
 
@@ -814,7 +814,7 @@ msgstr "Styl"
 msgid "Layer order"
 msgstr "Pořadí vrstvy"
 
-#: models.py:1027 templates/solomon_facilities/floorplan_editor.html:161
+#: models.py:1027 templates/solomon_facilities/floorplan_editor.html:162
 msgid "Locked"
 msgstr "Zamčeno"
 
@@ -954,7 +954,7 @@ msgid "Zoom in"
 msgstr "Přiblížit"
 
 #: templates/solomon_facilities/floorplan.html:28
-#: templates/solomon_facilities/floorplan_editor.html:69
+#: templates/solomon_facilities/floorplan_editor.html:70
 msgid "Transparent items"
 msgstr "Průhledné prvky"
 
@@ -983,7 +983,7 @@ msgid "Open source document"
 msgstr "Otevřít zdrojový dokument"
 
 #: templates/solomon_facilities/floorplan.html:51
-#: templates/solomon_facilities/floorplan_editor.html:79
+#: templates/solomon_facilities/floorplan_editor.html:80
 msgid "Source"
 msgstr "Zdroj"
 
@@ -992,7 +992,7 @@ msgid "Edit"
 msgstr "Upravit"
 
 #: templates/solomon_facilities/floorplan.html:67
-#: templates/solomon_facilities/floorplan_editor.html:95
+#: templates/solomon_facilities/floorplan_editor.html:96
 msgid "Loading plan..."
 msgstr "Načítání půdorysu..."
 
@@ -1072,89 +1072,93 @@ msgstr "Přenést do pozadí"
 msgid "Delete selected"
 msgstr "Smazat vybrané"
 
-#: templates/solomon_facilities/floorplan_editor.html:75
+#: templates/solomon_facilities/floorplan_editor.html:69
+msgid "Snap to grid"
+msgstr "Přichytit k mřížce"
+
+#: templates/solomon_facilities/floorplan_editor.html:76
 msgid "Cancel"
 msgstr "Zrušit"
 
-#: templates/solomon_facilities/floorplan_editor.html:77
+#: templates/solomon_facilities/floorplan_editor.html:78
 msgid "Edit source and scale"
 msgstr "Upravit zdroj a měřítko"
 
-#: templates/solomon_facilities/floorplan_editor.html:86
+#: templates/solomon_facilities/floorplan_editor.html:87
 msgid "Save"
 msgstr "Uložit"
 
-#: templates/solomon_facilities/floorplan_editor.html:94
+#: templates/solomon_facilities/floorplan_editor.html:95
 #, python-format
 msgid "Edit %(name)s"
 msgstr "Upravit %(name)s"
 
-#: templates/solomon_facilities/floorplan_editor.html:98
+#: templates/solomon_facilities/floorplan_editor.html:99
 msgid "Element"
 msgstr "Prvek"
 
-#: templates/solomon_facilities/floorplan_editor.html:117
+#: templates/solomon_facilities/floorplan_editor.html:118
 msgid "Show label on floor plan"
 msgstr "Zobrazit popisek na půdorysu"
 
-#: templates/solomon_facilities/floorplan_editor.html:121
+#: templates/solomon_facilities/floorplan_editor.html:122
 msgid "Text size"
 msgstr "Velikost textu"
 
-#: templates/solomon_facilities/floorplan_editor.html:124
+#: templates/solomon_facilities/floorplan_editor.html:125
 msgid "Text orientation"
 msgstr "Orientace textu"
 
-#: templates/solomon_facilities/floorplan_editor.html:134
+#: templates/solomon_facilities/floorplan_editor.html:135
 msgid "Linked object"
 msgstr "Propojený objekt"
 
-#: templates/solomon_facilities/floorplan_editor.html:134
+#: templates/solomon_facilities/floorplan_editor.html:135
 msgid "optional"
 msgstr "volitelné"
 
-#: templates/solomon_facilities/floorplan_editor.html:136
+#: templates/solomon_facilities/floorplan_editor.html:137
 msgid "No linkable objects loaded"
 msgstr "Žádné propojitelné objekty nejsou načteny"
 
-#: templates/solomon_facilities/floorplan_editor.html:138
+#: templates/solomon_facilities/floorplan_editor.html:139
 msgid "Facility records must exist on this floor before they can be linked."
 msgstr ""
 "Záznamy správy objektu musí existovat na tomto podlaží, než je lze propojit."
 
-#: templates/solomon_facilities/floorplan_editor.html:140
+#: templates/solomon_facilities/floorplan_editor.html:141
 msgid "New space"
 msgstr "Nový prostor"
 
-#: templates/solomon_facilities/floorplan_editor.html:141
+#: templates/solomon_facilities/floorplan_editor.html:142
 msgid "New door"
 msgstr "Nové dveře"
 
-#: templates/solomon_facilities/floorplan_editor.html:142
+#: templates/solomon_facilities/floorplan_editor.html:143
 msgid "New asset"
 msgstr "Nová součást"
 
-#: templates/solomon_facilities/floorplan_editor.html:145
+#: templates/solomon_facilities/floorplan_editor.html:146
 msgid "Refresh"
 msgstr "Obnovit"
 
-#: templates/solomon_facilities/floorplan_editor.html:152
+#: templates/solomon_facilities/floorplan_editor.html:153
 msgid "Width"
 msgstr "Šířka"
 
-#: templates/solomon_facilities/floorplan_editor.html:153
+#: templates/solomon_facilities/floorplan_editor.html:154
 msgid "Height"
 msgstr "Výška"
 
-#: templates/solomon_facilities/floorplan_editor.html:156
+#: templates/solomon_facilities/floorplan_editor.html:157
 msgid "Stroke"
 msgstr "Obrys"
 
-#: templates/solomon_facilities/floorplan_editor.html:157
+#: templates/solomon_facilities/floorplan_editor.html:158
 msgid "Fill"
 msgstr "Výplň"
 
-#: templates/solomon_facilities/floorplan_editor.html:165
+#: templates/solomon_facilities/floorplan_editor.html:166
 msgid "Transparent"
 msgstr "Průhledný"
 

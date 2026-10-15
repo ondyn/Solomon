@@ -35,6 +35,15 @@ flats, people, owners, and tenants. It does not duplicate those records.
 	without bitmap caching, keeping text sharp when zooming or resizing shapes.
 - The editor can bring the selected element to front, forward, backward, or
 	to back (toolbar or `Shift+]`, `]`, `[`, `Shift+[`); the order is saved.
+- The editor's Snap to grid toolbar toggle starts enabled. When enabled, grid dots
+	appear and moving, adding, or duplicating unlocked elements snaps their
+	position to the nearest 5 plan-coordinate units (up to 2.5 units per axis).
+	Resize handles snap dimensions in 5-unit steps while keeping the opposite
+	anchor fixed, including rotated shapes. Proportional resizing preserves the
+	aspect ratio and snaps the larger dimension. Rotation snaps in 15-degree steps.
+	The grid follows zoom and pan; multi-selections move together. Enabling it
+	does not change existing elements or mark the plan changed. Inspector values
+	remain exact; the grid is not saved or exported.
 - Each element has a saved Transparent switch. The Transparent items toolbar
 	toggle in the viewer and editor temporarily renders all shapes see-through
 	so items hidden behind spaces become visible; it is remembered per browser.
