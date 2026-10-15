@@ -5,7 +5,17 @@ import json
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.db import transaction
-from django.db.models import Max, Prefetch, Q
+from django.db.models import (
+    Count,
+    IntegerField,
+    Max,
+    OuterRef,
+    Prefetch,
+    Q,
+    Subquery,
+    Value,
+)
+from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
@@ -19,7 +29,7 @@ from netbox.views.generic import ObjectChangeLogView
 from solomon_property.models import Building, Flat, Person, PropertyOwner
 from utilities.views import ViewTab, register_model_view
 
-from . import filtersets, forms, models, tables
+from . import filterforms, filtersets, forms, models, tables
 from .ui.panels import (
     DoorPanel,
     KeyCopyPanel,
@@ -387,6 +397,7 @@ class SpaceListView(generic.ObjectListView):
     queryset = models.Space.objects.select_related("level", "building")
     table = tables.SpaceTable
     filterset = filtersets.SpaceFilterSet
+    filterset_form = filterforms.SpaceFilterForm
 
     def get_queryset(self, request):
         today = timezone.localdate()
@@ -408,18 +419,50 @@ class SpaceListView(generic.ObjectListView):
             )
             .select_related("person", "owner")
         )
-        return super().get_queryset(request).prefetch_related(
-            Prefetch(
-                "flat_assignments",
-                queryset=assignments,
-                to_attr="current_flat_assignments",
-            ),
-            Prefetch("usages", queryset=usages, to_attr="current_usages"),
-            Prefetch(
-                "technical_assets",
-                queryset=models.TechnicalAsset.objects.restrict(request.user, "view"),
-                to_attr="visible_technical_assets",
-            ),
+        technical_assets = models.TechnicalAsset.objects.restrict(request.user, "view")
+
+        def related_count(queryset):
+            return (
+                queryset.filter(space_id=OuterRef("pk"))
+                .order_by()
+                .values("space_id")
+                .annotate(count=Count("pk", distinct=True))
+                .values("count")
+            )
+
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(
+                _flat_assignment_count=Coalesce(
+                    Subquery(related_count(assignments), output_field=IntegerField()),
+                    Value(0),
+                ),
+                _usage_count=Coalesce(
+                    Subquery(related_count(usages), output_field=IntegerField()),
+                    Value(0),
+                ),
+                _technical_asset_count=Coalesce(
+                    Subquery(
+                        related_count(technical_assets),
+                        output_field=IntegerField(),
+                    ),
+                    Value(0),
+                ),
+            )
+            .prefetch_related(
+                Prefetch(
+                    "flat_assignments",
+                    queryset=assignments,
+                    to_attr="current_flat_assignments",
+                ),
+                Prefetch("usages", queryset=usages, to_attr="current_usages"),
+                Prefetch(
+                    "technical_assets",
+                    queryset=technical_assets,
+                    to_attr="visible_technical_assets",
+                ),
+            )
         )
 
 

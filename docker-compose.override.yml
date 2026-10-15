@@ -55,6 +55,7 @@ services:
       - ./docker/docker-entrypoint.sh:/opt/netbox/solomon-entrypoint.sh:z,ro
       # ── Plugin entrypoint (chains to solomon-entrypoint.sh) ──
       - ./docker/plugin-entrypoint.sh:/opt/netbox/plugin-entrypoint.sh:z,ro
+      - ./docker/compile-translations.sh:/opt/netbox/compile-translations.sh:z,ro
     ports:
       - "${NETBOX_PORT:-8000}:8080"
       # ── debugpy remote debugging port ──

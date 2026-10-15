@@ -140,6 +140,39 @@ class SpaceListViewTest(TestCase):
         self.assertContains(response, "Rental")
         self.assertContains(response, "Occupancy")
 
+    def test_filter_form_filters_spaces(self):
+        response = self.get_list(kind="common_room")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Filter")
+        self.assertContains(response, 'name="kind"')
+        self.assertEqual(
+            [row.record.pk for row in response.context["table"].rows],
+            [self.space.pk],
+        )
+
+    def test_related_columns_sort_by_visible_record_count(self):
+        empty_space = Space.objects.create(
+            level=self.level, reference="S-02", name="Empty room", kind="room"
+        )
+        self.select_columns()
+
+        for column in self.columns:
+            with self.subTest(column=column, direction="descending"):
+                response = self.get_list(sort=f"-{column}")
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    [row.record.pk for row in response.context["table"].rows],
+                    [self.space.pk, empty_space.pk],
+                )
+
+            with self.subTest(column=column, direction="ascending"):
+                response = self.get_list(sort=column)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(
+                    [row.record.pk for row in response.context["table"].rows],
+                    [empty_space.pk, self.space.pk],
+                )
+
     def test_related_column_headers_are_translated(self):
         with override("cs"):
             table = SpaceTable([])
@@ -153,7 +186,7 @@ class SpaceListViewTest(TestCase):
                 str(table.columns["technical_assets"].header), "Technické součásti"
             )
             form = SpaceBulkEditForm()
-            self.assertEqual(str(form.fields["level"].label), "Úroveň")
+            self.assertEqual(str(form.fields["level"].label), "Podlaží")
             self.assertEqual(
                 str(form.fields["building"].label), "Vchod nebo budova"
             )
@@ -568,6 +601,29 @@ class FloorPlanViewTest(TestCase):
         self.assertContains(response, "schematic-canvas")
         self.assertContains(response, "Second floor")
 
+    def test_czech_viewer_and_editor_controls(self):
+        self.client.cookies["django_language"] = "cs"
+        grant_object_permission(self.user, FloorPlan, "change")
+        grant_object_permission(self.user, PlanRevision, "change")
+        response = self.client.get(
+            reverse("plugins:solomon_facilities:floorplan", kwargs={"pk": self.plan.pk})
+        )
+        self.assertEqual(response.status_code, 200)
+        for text in ("Prostory", "Dveře", "Technické", "Konstrukce", "Přiblížit"):
+            self.assertContains(response, text)
+        catalog_url = reverse("plugins:solomon_facilities:javascript_catalog")
+        self.assertContains(response, catalog_url)
+        response = self.client.get(
+            reverse("plugins:solomon_facilities:floorplan_draw", kwargs={"pk": self.plan.pk})
+        )
+        self.assertEqual(response.status_code, 200)
+        for text in (
+            "Přidat zeď", "Propojený objekt", "Zobrazit popisek na půdorysu",
+            "Průhledný", "Obrys", "Výplň", "Uložit",
+        ):
+            self.assertContains(response, text)
+        self.assertContains(response, catalog_url)
+
     def test_space_usage_form_uses_netbox_date_pickers(self):
         grant_object_permission(self.user, SpaceUsage, "add")
         form = SpaceUsageForm()
@@ -608,8 +664,8 @@ class FloorPlanViewTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "viewer.js?v=5")
-        self.assertContains(response, "solomon_facilities/labels.js?v=2")
+        self.assertContains(response, "viewer.js?v=9")
+        self.assertContains(response, "solomon_facilities/labels.js?v=4")
 
     def test_space_detail_links_to_selected_schematic(self):
         grant_object_permission(self.user, Space, "view")
@@ -716,7 +772,7 @@ class FloorPlanViewTest(TestCase):
         editor_response = self.client.get(
             reverse("plugins:solomon_facilities:floorplan_draw", kwargs={"pk": plan.pk})
         )
-        self.assertContains(editor_response, 'class="form-select no-ts"', count=2)
+        self.assertContains(editor_response, 'class="form-select no-ts"', count=3)
         self.assertContains(editor_response, "No linkable objects loaded")
         self.assertContains(editor_response, "New space")
         self.assertContains(editor_response, "New door")
@@ -726,10 +782,18 @@ class FloorPlanViewTest(TestCase):
         self.assertContains(editor_response, 'id="save-form"')
         self.assertNotContains(editor_response, 'id="publish-form"')
         self.assertNotContains(editor_response, ">Publish<")
-        self.assertContains(editor_response, "editor.js?v=12")
-        self.assertContains(editor_response, "solomon_facilities/labels.js?v=2")
+        self.assertContains(editor_response, "editor.js?v=15")
+        self.assertContains(editor_response, "solomon_facilities/labels.js?v=4")
         self.assertContains(editor_response, 'id="element-label-visible"')
         self.assertContains(editor_response, "Show label on floor plan")
+        self.assertContains(editor_response, 'id="element-font-size"')
+        self.assertContains(editor_response, "Text size")
+        self.assertContains(editor_response, 'id="element-label-angle"')
+        self.assertContains(editor_response, "Text orientation")
+        for angle in (0, 90, 180, 270):
+            self.assertContains(
+                editor_response, f'<option value="{angle}">{angle}&deg;</option>'
+            )
         self.assertContains(editor_response, "Refresh")
 
         data_response = self.client.get(data_url, {"draft": "1"})
@@ -849,7 +913,11 @@ class FloorPlanViewTest(TestCase):
                     "width": 100,
                     "height": 60,
                 },
-                "style": {"label_visible": visible},
+                "style": {
+                    "label_visible": visible,
+                    "font_size": 32.5 if visible else 48,
+                    "label_angle": 90 if visible else 270,
+                },
             }
             for visible in (True, False)
         ]
@@ -859,6 +927,14 @@ class FloorPlanViewTest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 200)
+        expected_styles = [item["style"] for item in elements]
+        self.assertEqual(
+            [
+                item["style"]
+                for item in self.client.get(data_url, {"draft": "1"}).json()["elements"]
+            ],
+            expected_styles,
+        )
         self.assertEqual(
             [
                 element["style"]["label_visible"]
@@ -875,6 +951,7 @@ class FloorPlanViewTest(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         published = self.client.get(data_url).json()["elements"]
+        self.assertEqual([item["style"] for item in published], expected_styles)
         self.assertEqual(
             [item["label"] for item in published], ["Visible room", "Hidden room"]
         )
@@ -886,7 +963,10 @@ class FloorPlanViewTest(TestCase):
         )
         response = self.client.get(editor_url, HTTP_ACCEPT_LANGUAGE="cs")
         self.assertContains(response, "Zobrazit popisek na půdorysu")
+        self.assertContains(response, "Velikost textu")
+        self.assertContains(response, "Orientace textu")
         copied = self.client.get(data_url, {"draft": "1"}).json()["elements"]
+        self.assertEqual([item["style"] for item in copied], expected_styles)
         self.assertEqual(
             [item["style"]["label_visible"] for item in copied], [True, False]
         )

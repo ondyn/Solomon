@@ -1,11 +1,11 @@
 """Object detail panels for Solomon Facilities."""
 
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from netbox.ui import attrs, panels
 
 
 class SpacePanel(panels.ObjectAttributesPanel):
-    level = attrs.RelatedObjectAttr("level", label=_("Level"), linkify=True)
+    level = attrs.RelatedObjectAttr("level", label=pgettext_lazy("building floor", "Level"), linkify=True)
     building = attrs.RelatedObjectAttr(
         "building", label=_("Entrance or building"), linkify=True
     )
@@ -19,7 +19,7 @@ class SpacePanel(panels.ObjectAttributesPanel):
 
 
 class DoorPanel(panels.ObjectAttributesPanel):
-    level = attrs.RelatedObjectAttr("level", label=_("Level"), linkify=True)
+    level = attrs.RelatedObjectAttr("level", label=pgettext_lazy("building floor", "Level"), linkify=True)
     reference = attrs.TextAttr("reference", label=_("Reference"))
     name = attrs.TextAttr("name", label=_("Name"))
     door_type = attrs.ChoiceAttr("door_type", label=_("Type"))
@@ -61,7 +61,7 @@ class TechnicalAssetPanel(panels.ObjectAttributesPanel):
     parent = attrs.RelatedObjectAttr(
         "parent", label=_("Parent component"), linkify=True
     )
-    level = attrs.RelatedObjectAttr("level", label=_("Level"), linkify=True)
+    level = attrs.RelatedObjectAttr("level", label=pgettext_lazy("building floor", "Level"), linkify=True)
     space = attrs.RelatedObjectAttr("space", label=_("Space"), linkify=True)
     code = attrs.TextAttr("code", label=_("Asset code"))
     name = attrs.TextAttr("name", label=_("Name"))

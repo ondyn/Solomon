@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: solomon-facilities 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-14 23:09+0200\n"
+"POT-Creation-Date: 2026-10-15 09:37+0200\n"
 "PO-Revision-Date: 2026-08-09 21:15+0200\n"
 "Last-Translator: GitHub Copilot\n"
 "Language-Team: Czech\n"
@@ -21,8 +21,25 @@ msgstr ""
 msgid "Solomon Facilities"
 msgstr "Správa objektu"
 
-#: forms.py:26 models.py:115 models.py:634 models.py:820 ui/panels.py:35
-#: ui/panels.py:52
+#: filterforms.py:18 models.py:57 models.py:354 models.py:392 models.py:464
+#: models.py:877 models.py:1034 tables.py:99 tables.py:116 tables.py:237
+#: templates/solomon_facilities/floorplan_editor.html:105 ui/panels.py:65
+msgid "Space"
+msgstr "Prostor"
+
+#: filterforms.py:27 forms.py:128 models.py:328
+#: templates/solomon_facilities/floorplan_editor.html:100 ui/panels.py:15
+#: ui/panels.py:25
+msgid "Type"
+msgstr "Typ"
+
+#: filterforms.py:32 forms.py:134 models.py:241 models.py:334 models.py:709
+#: models.py:892 ui/panels.py:16 ui/panels.py:46 ui/panels.py:69
+msgid "Status"
+msgstr "Stav"
+
+#: forms.py:26 models.py:115 models.py:634 models.py:820 tables.py:12
+#: tables.py:165 tables.py:226 ui/panels.py:35 ui/panels.py:52
 msgid "Building object"
 msgstr "Bytový komplex"
 
@@ -47,35 +64,26 @@ msgid "Optional SVG, PNG, or JPEG displayed beneath editable drawing elements."
 msgstr ""
 "Volitelný SVG, PNG nebo JPEG zobrazený pod editovatelnými prvky výkresu."
 
-#: forms.py:114 models.py:175 models.py:307 models.py:523 models.py:869
-#: ui/panels.py:8 ui/panels.py:22 ui/panels.py:64
+#: forms.py:115 models.py:175 models.py:307 models.py:523 models.py:869
+#: tables.py:29 tables.py:48 tables.py:137 tables.py:236 ui/panels.py:8
+#: ui/panels.py:22 ui/panels.py:64
+msgctxt "building floor"
 msgid "Level"
 msgstr "Podlaží"
 
-#: forms.py:118 models.py:315 ui/panels.py:10
+#: forms.py:120 models.py:315 tables.py:49 ui/panels.py:10
 msgid "Entrance or building"
 msgstr "Vchod nebo budova"
 
-#: forms.py:122 models.py:323 ui/panels.py:12
+#: forms.py:124 models.py:323 ui/panels.py:12
 msgid "Parent space"
 msgstr "Nadřazený prostor"
 
-#: forms.py:126 models.py:328
-#: templates/solomon_facilities/floorplan_editor.html:100 ui/panels.py:15
-#: ui/panels.py:25
-msgid "Type"
-msgstr "Typ"
-
-#: forms.py:132 models.py:241 models.py:334 models.py:709 models.py:892
-#: ui/panels.py:16 ui/panels.py:46 ui/panels.py:69
-msgid "Status"
-msgstr "Stav"
-
-#: forms.py:238 models.py:642 views.py:573
+#: forms.py:240 models.py:642 views.py:616
 msgid "Locks opened"
 msgstr "Otevírané zámky"
 
-#: forms.py:254
+#: forms.py:256
 msgid "Every lock must belong to the selected building object."
 msgstr "Každý zámek musí náležet k vybranému bytovému komplexu."
 
@@ -99,7 +107,7 @@ msgstr "Zveřejněno"
 msgid "Archived"
 msgstr "Archivováno"
 
-#: models.py:22 models.py:398
+#: models.py:22 models.py:398 tables.py:100
 msgid "Flat"
 msgstr "Byt"
 
@@ -199,7 +207,7 @@ msgstr "Licence"
 msgid "Wall"
 msgstr "Zeď"
 
-#: models.py:55 models.py:566 models.py:594 models.py:1042
+#: models.py:55 models.py:566 models.py:594 models.py:1042 tables.py:156
 #: templates/solomon_facilities/floorplan_editor.html:103
 msgid "Door"
 msgstr "Dveře"
@@ -207,12 +215,6 @@ msgstr "Dveře"
 #: models.py:56 templates/solomon_facilities/floorplan_editor.html:104
 msgid "Window"
 msgstr "Okno"
-
-#: models.py:57 models.py:354 models.py:392 models.py:464 models.py:877
-#: models.py:1034 templates/solomon_facilities/floorplan_editor.html:105
-#: ui/panels.py:65
-msgid "Space"
-msgstr "Prostor"
 
 #: models.py:58 templates/solomon_facilities/floorplan_editor.html:106
 msgid "Technical item"
@@ -338,7 +340,7 @@ msgstr "Číslo podlaží"
 msgid "Basements are negative; ground floor is zero."
 msgstr "Suterény jsou záporné; přízemí je nula."
 
-#: models.py:123
+#: models.py:123 tables.py:11
 msgid "Displayed reference"
 msgstr "Zobrazená zkratka"
 
@@ -347,8 +349,9 @@ msgid "For example 1PP, 1NP, or 4NP."
 msgstr "Například 1PP, 1NP nebo 4NP."
 
 #: models.py:126 models.py:177 models.py:326 models.py:526 models.py:596
-#: models.py:637 models.py:822 models.py:880 ui/panels.py:14 ui/panels.py:24
-#: ui/panels.py:38 ui/panels.py:54 ui/panels.py:67
+#: models.py:637 models.py:822 models.py:880 tables.py:28 tables.py:225
+#: ui/panels.py:14 ui/panels.py:24 ui/panels.py:38 ui/panels.py:54
+#: ui/panels.py:67
 msgid "Name"
 msgstr "Název"
 
@@ -387,7 +390,7 @@ msgstr "Výška plátna"
 msgid "Measurement unit"
 msgstr "Jednotka míry"
 
-#: models.py:204
+#: models.py:204 tables.py:30
 msgid "Active revision"
 msgstr "Aktivní revize"
 
@@ -448,7 +451,8 @@ msgstr "Revize půdorysu"
 msgid "Plan revisions"
 msgstr "Revize půdorysů"
 
-#: models.py:325 models.py:525 ui/panels.py:13 ui/panels.py:23
+#: models.py:325 models.py:525 tables.py:47 tables.py:136 ui/panels.py:13
+#: ui/panels.py:23
 msgid "Reference"
 msgstr "Označení"
 
@@ -456,7 +460,8 @@ msgstr "Označení"
 msgid "Area (m²)"
 msgstr "Plocha (m²)"
 
-#: models.py:355 templates/solomon_facilities/floorplan.html:36
+#: models.py:355 navigation.py:29
+#: templates/solomon_facilities/floorplan.html:36
 msgid "Spaces"
 msgstr "Prostory"
 
@@ -552,11 +557,12 @@ msgstr "Pro vnější dveře nechte jednu stranu prázdnou."
 msgid "Fire rating"
 msgstr "Požární odolnost"
 
-#: models.py:554 ui/panels.py:29
+#: models.py:554 tables.py:138 ui/panels.py:29
 msgid "Emergency exit"
 msgstr "Nouzový východ"
 
-#: models.py:567 templates/solomon_facilities/floorplan.html:37
+#: models.py:567 navigation.py:37
+#: templates/solomon_facilities/floorplan.html:37
 msgid "Doors"
 msgstr "Dveře"
 
@@ -584,19 +590,19 @@ msgstr "Aktivní od"
 msgid "Active to"
 msgstr "Aktivní do"
 
-#: models.py:610
+#: models.py:610 tables.py:180
 msgid "Lock cylinder"
 msgstr "Zámková vložka"
 
-#: models.py:611 views.py:523
+#: models.py:611 views.py:566
 msgid "Lock cylinders"
 msgstr "Zámkové vložky"
 
-#: models.py:636 ui/panels.py:37
+#: models.py:636 tables.py:164 ui/panels.py:37
 msgid "Profile code"
 msgstr "Kód profilu"
 
-#: models.py:654 models.py:697 ui/panels.py:43
+#: models.py:654 models.py:697 tables.py:179 tables.py:189 ui/panels.py:43
 msgid "Key profile"
 msgstr "Klíčový profil"
 
@@ -616,7 +622,7 @@ msgstr "Zámky klíčového profilu"
 msgid "The key profile and lock must belong to the same building object."
 msgstr "Klíčový profil a zámek musí náležet ke stejnému bytovému komplexu."
 
-#: models.py:700 ui/panels.py:44
+#: models.py:700 tables.py:188 ui/panels.py:44
 msgid "Inventory code"
 msgstr "Inventární číslo"
 
@@ -624,7 +630,7 @@ msgstr "Inventární číslo"
 msgid "Serial number"
 msgstr "Sériové číslo"
 
-#: models.py:715 models.py:732
+#: models.py:715 models.py:732 tables.py:204
 msgid "Physical key"
 msgstr "Fyzický klíč"
 
@@ -700,7 +706,7 @@ msgstr "Technická soustava"
 msgid "Technical systems"
 msgstr "Technické soustavy"
 
-#: models.py:853 ui/panels.py:60
+#: models.py:853 tables.py:235 ui/panels.py:60
 msgid "System"
 msgstr "Soustava"
 
@@ -708,7 +714,7 @@ msgstr "Soustava"
 msgid "Parent component"
 msgstr "Nadřazená součást"
 
-#: models.py:879 ui/panels.py:66
+#: models.py:879 tables.py:234 ui/panels.py:66
 msgid "Asset code"
 msgstr "Kód součásti"
 
@@ -736,7 +742,7 @@ msgstr "Pokyny pro nouzové situace"
 msgid "Technical asset"
 msgstr "Technická součást"
 
-#: models.py:920 tables.py:65 views.py:434
+#: models.py:920 tables.py:65 views.py:477
 msgid "Technical assets"
 msgstr "Technické součásti"
 
@@ -760,11 +766,11 @@ msgstr "Součást nemůže být svou vlastní nadřazenou součástí."
 msgid "Parent asset must belong to the same system."
 msgstr "Nadřazená součást musí náležet ke stejné soustavě."
 
-#: models.py:968
+#: models.py:968 tables.py:255
 msgid "From component"
 msgstr "Zdrojová součást"
 
-#: models.py:974
+#: models.py:974 tables.py:256
 msgid "To component"
 msgstr "Cílová součást"
 
@@ -808,7 +814,7 @@ msgstr "Styl"
 msgid "Layer order"
 msgstr "Pořadí vrstvy"
 
-#: models.py:1027 templates/solomon_facilities/floorplan_editor.html:148
+#: models.py:1027 templates/solomon_facilities/floorplan_editor.html:161
 msgid "Locked"
 msgstr "Zamčeno"
 
@@ -860,29 +866,77 @@ msgstr "Přidat"
 msgid "Facilities"
 msgstr "Správa objektu"
 
-#: navigation.py:25 views.py:731
+#: navigation.py:25 views.py:774
 msgid "Schematics"
 msgstr "Schemata"
+
+#: navigation.py:27
+msgid "Building Levels"
+msgstr "Podlaží"
+
+#: navigation.py:28
+msgid "Floor Plans"
+msgstr "Půdorysy"
+
+#: navigation.py:30
+msgid "Flat Assignments"
+msgstr "Přiřazení prostorů"
+
+#: navigation.py:31
+msgid "Rentals and Occupancy"
+msgstr "Pronájmy a užívání"
 
 #: navigation.py:35
 msgid "Access"
 msgstr "Přístupy"
 
+#: navigation.py:38
+msgid "Lock Cylinders"
+msgstr "Zámkové vložky"
+
+#: navigation.py:39
+msgid "Key Profiles"
+msgstr "Klíčové profily"
+
+#: navigation.py:40
+msgid "Physical Keys"
+msgstr "Fyzické klíče"
+
+#: navigation.py:41
+msgid "Key Issues"
+msgstr "Výdeje klíčů"
+
 #: navigation.py:45
 msgid "Building Systems"
 msgstr "Technické soustavy"
 
-#: tables.py:53 views.py:432
+#: navigation.py:47
+msgid "Technical Systems"
+msgstr "Technické soustavy"
+
+#: navigation.py:48
+msgid "Technical Assets"
+msgstr "Technické součásti"
+
+#: navigation.py:50
+msgid "System Connections"
+msgstr "Technická propojení"
+
+#: tables.py:53 views.py:475
 msgid "Flat assignments"
 msgstr "Přiřazení prostorů"
 
-#: tables.py:59 views.py:433
+#: tables.py:59 views.py:476
 msgid "Rentals and occupancy"
 msgstr "Pronájmy a užívání"
 
 #: tables.py:167
 msgid "Copies"
 msgstr "Kopie"
+
+#: templates/solomon_facilities/floorplan.html:17
+msgid "Plan controls"
+msgstr "Ovládání půdorysu"
 
 #: templates/solomon_facilities/floorplan.html:19
 #: templates/solomon_facilities/floorplan_editor.html:66
@@ -1030,6 +1084,11 @@ msgstr "Upravit zdroj a měřítko"
 msgid "Save"
 msgstr "Uložit"
 
+#: templates/solomon_facilities/floorplan_editor.html:94
+#, python-format
+msgid "Edit %(name)s"
+msgstr "Upravit %(name)s"
+
 #: templates/solomon_facilities/floorplan_editor.html:98
 msgid "Element"
 msgstr "Prvek"
@@ -1039,55 +1098,63 @@ msgid "Show label on floor plan"
 msgstr "Zobrazit popisek na půdorysu"
 
 #: templates/solomon_facilities/floorplan_editor.html:121
+msgid "Text size"
+msgstr "Velikost textu"
+
+#: templates/solomon_facilities/floorplan_editor.html:124
+msgid "Text orientation"
+msgstr "Orientace textu"
+
+#: templates/solomon_facilities/floorplan_editor.html:134
 msgid "Linked object"
 msgstr "Propojený objekt"
 
-#: templates/solomon_facilities/floorplan_editor.html:121
+#: templates/solomon_facilities/floorplan_editor.html:134
 msgid "optional"
 msgstr "volitelné"
 
-#: templates/solomon_facilities/floorplan_editor.html:123
+#: templates/solomon_facilities/floorplan_editor.html:136
 msgid "No linkable objects loaded"
 msgstr "Žádné propojitelné objekty nejsou načteny"
 
-#: templates/solomon_facilities/floorplan_editor.html:125
+#: templates/solomon_facilities/floorplan_editor.html:138
 msgid "Facility records must exist on this floor before they can be linked."
 msgstr ""
 "Záznamy správy objektu musí existovat na tomto podlaží, než je lze propojit."
 
-#: templates/solomon_facilities/floorplan_editor.html:127
+#: templates/solomon_facilities/floorplan_editor.html:140
 msgid "New space"
 msgstr "Nový prostor"
 
-#: templates/solomon_facilities/floorplan_editor.html:128
+#: templates/solomon_facilities/floorplan_editor.html:141
 msgid "New door"
 msgstr "Nové dveře"
 
-#: templates/solomon_facilities/floorplan_editor.html:129
+#: templates/solomon_facilities/floorplan_editor.html:142
 msgid "New asset"
 msgstr "Nová součást"
 
-#: templates/solomon_facilities/floorplan_editor.html:132
+#: templates/solomon_facilities/floorplan_editor.html:145
 msgid "Refresh"
 msgstr "Obnovit"
 
-#: templates/solomon_facilities/floorplan_editor.html:139
+#: templates/solomon_facilities/floorplan_editor.html:152
 msgid "Width"
 msgstr "Šířka"
 
-#: templates/solomon_facilities/floorplan_editor.html:140
+#: templates/solomon_facilities/floorplan_editor.html:153
 msgid "Height"
 msgstr "Výška"
 
-#: templates/solomon_facilities/floorplan_editor.html:143
+#: templates/solomon_facilities/floorplan_editor.html:156
 msgid "Stroke"
 msgstr "Obrys"
 
-#: templates/solomon_facilities/floorplan_editor.html:144
+#: templates/solomon_facilities/floorplan_editor.html:157
 msgid "Fill"
 msgstr "Výplň"
 
-#: templates/solomon_facilities/floorplan_editor.html:152
+#: templates/solomon_facilities/floorplan_editor.html:165
 msgid "Transparent"
 msgstr "Průhledný"
 
@@ -1104,74 +1171,41 @@ msgstr "Zobrazit schéma"
 msgid "No schematic is available."
 msgstr "Žádné schéma není k dispozici."
 
-#: views.py:182
+#: views.py:192
 msgid "This plan has no revision."
 msgstr "Tento půdorys nemá žádnou revizi."
 
-#: views.py:190
+#: views.py:200
 msgid "Invalid JSON payload."
 msgstr "Neplatná JSON data."
 
-#: views.py:195
+#: views.py:205
 msgid "Elements must be a JSON array."
 msgstr "Prvky musí být JSON pole."
 
-#: views.py:199
+#: views.py:209
 msgid "A revision may contain at most 5000 elements."
 msgstr "Revize může obsahovat nejvýše 5 000 prvků."
 
-#: views.py:572
+#: views.py:615
 msgid "Physical copies"
 msgstr "Fyzické kopie"
 
-#: views.py:606
+#: views.py:649
 msgid "Custody history"
 msgstr "Historie vydání"
 
-#: views.py:650
+#: views.py:693
 msgid "Components"
 msgstr "Součásti"
 
-#: views.py:683
+#: views.py:726
 msgid "Downstream relationships"
 msgstr "Odchozí propojení"
 
-#: views.py:686
+#: views.py:729
 msgid "Upstream relationships"
 msgstr "Příchozí propojení"
-
-#~ msgid "Building Levels"
-#~ msgstr "Podlaží"
-
-#~ msgid "Floor Plans"
-#~ msgstr "Půdorysy"
-
-#~ msgid "Flat Assignments"
-#~ msgstr "Přiřazení prostorů"
-
-#~ msgid "Rentals and Occupancy"
-#~ msgstr "Pronájmy a užívání"
-
-#~ msgid "Lock Cylinders"
-#~ msgstr "Zámkové vložky"
-
-#~ msgid "Key Profiles"
-#~ msgstr "Klíčové profily"
-
-#~ msgid "Physical Keys"
-#~ msgstr "Fyzické klíče"
-
-#~ msgid "Key Issues"
-#~ msgstr "Výdeje klíčů"
-
-#~ msgid "Technical Systems"
-#~ msgstr "Technické soustavy"
-
-#~ msgid "Technical Assets"
-#~ msgstr "Technické součásti"
-
-#~ msgid "System Connections"
-#~ msgstr "Technická propojení"
 
 #~ msgid "Publish"
 #~ msgstr "Zveřejnit"

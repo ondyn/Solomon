@@ -36,7 +36,7 @@ class Element {
   addEventListener() {}
 }
 
-async function loadViewer(highlight = "") {
+async function loadViewer(highlight = "", translations = {}, planElements) {
   const inspector = new Element();
   const defaultHeading = new Element();
   defaultHeading.textContent = "Floor plan";
@@ -79,7 +79,7 @@ async function loadViewer(highlight = "") {
         "2": {url: "/spaces/2/", label: "Second space", kind_label: "Cellar"},
       },
     },
-    elements: [
+    elements: planElements || [
       {element_type: "space", space_id: 1, geometry: {type: "rect"}, style: {}},
       {element_type: "space", geometry: {type: "rect"}, style: {}},
       {element_type: "space", space_id: 2, geometry: {type: "rect"}, style: {}},
@@ -88,7 +88,13 @@ async function loadViewer(highlight = "") {
   const source = fs.readFileSync(
     path.join(__dirname, "../static/solomon_facilities/viewer.js"), "utf8"
   );
-  const fabric = {Canvas, Rect: Shape, Shadow: Shape};
+  class Text extends Shape {
+    constructor(text, options) {
+      super({...options, text, type: "text", scaleX: 1, scaleY: 1});
+    }
+    setCoords() {}
+  }
+  const fabric = {Canvas, Rect: Shape, Shadow: Shape, Text};
   const labelsWindow = {};
   vm.runInNewContext(
     fs.readFileSync(path.join(__dirname, "../static/solomon_facilities/labels.js"), "utf8"),
@@ -102,7 +108,8 @@ async function loadViewer(highlight = "") {
     },
     window: {fabric, addEventListener() {}},
     fabric,
-    SolomonPlanLabels: {...labelsWindow.SolomonPlanLabels, attach() {}},
+    SolomonPlanLabels: labelsWindow.SolomonPlanLabels,
+    gettext: (message) => translations[message] || message,
     fetch: async () => ({ok: true, json: async () => planData}),
   });
   await new Promise((resolve) => setImmediate(resolve));
@@ -150,6 +157,31 @@ test("unlinked selection clears details from an initially highlighted space", as
   canvas.handlers["mouse:down"]({target: canvas.objects[1]});
   assert.equal(inspector.childNodes.length, 0);
   assert.equal(canvas.objects[1].stroke, "#efb419");
+});
+
+test("viewer uses translated inspector labels without changing record data", async () => {
+  const {canvas, inspector} = await loadViewer("", {Type: "Typ", Area: "Plocha"});
+  canvas.handlers["mouse:down"]({target: canvas.objects[0]});
+  assert.equal(heading(inspector), "Linked space");
+  assert.deepEqual(
+    inspector.childNodes[1].childNodes.map((node) => node.textContent),
+    ["Typ", "Room", "Plocha", "12 m²"]
+  );
+});
+
+test("viewer loads saved caption and standalone text styling with legacy defaults", async () => {
+  const {canvas} = await loadViewer("", {}, [
+    {element_type: "space", label: "Room", geometry: {type: "rect"}, style: {font_size: 36, label_angle: 270, angle: 25}},
+    {element_type: "text", geometry: {type: "text", text: "Note"}, style: {font_size: 48, angle: 90}},
+    {element_type: "space", label: "Legacy", geometry: {type: "rect"}, style: {}},
+  ]);
+  assert.equal(canvas.objects[0].labelFontSize, 36);
+  assert.equal(canvas.objects[0].labelAngle, 270);
+  assert.equal(canvas.objects[0].angle, 25);
+  assert.equal(canvas.objects[1].fontSize, 48);
+  assert.equal(canvas.objects[1].angle, 90);
+  assert.equal(canvas.objects[2].labelFontSize, 18);
+  assert.equal(canvas.objects[2].labelAngle, 0);
 });
 
 function loadLabels() {

@@ -1,7 +1,7 @@
 """NetBox forms for Solomon Facilities."""
 
 from django import forms
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from netbox.forms import NetBoxModelBulkEditForm, NetBoxModelForm
 from solomon_property.models import (
     Building,
@@ -111,7 +111,9 @@ class SpaceForm(NetBoxModelForm):
 
 class SpaceBulkEditForm(NetBoxModelBulkEditForm):
     level = DynamicModelChoiceField(
-        queryset=models.BuildingLevel.objects.all(), label=_("Level"), required=False
+        queryset=models.BuildingLevel.objects.all(),
+        label=pgettext_lazy("building floor", "Level"),
+        required=False,
     )
     building = DynamicModelChoiceField(
         queryset=Building.objects.all(),

@@ -1,0 +1,120 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: solomon-facilities 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-15 09:31+0200\n"
+"PO-Revision-Date: 2026-10-15 09:35+0200\n"
+"Last-Translator: Solomon\n"
+"Language-Team: Czech\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+#: static/solomon_facilities/editor.js:52
+#: static/solomon_facilities/editor.js:496
+#: static/solomon_facilities/viewer.js:252
+#, javascript-format
+msgid "Plan request failed (%s)"
+msgstr "Požadavek na půdorys selhal (%s)"
+
+#: static/solomon_facilities/editor.js:53
+msgid "Plan request returned an invalid response"
+msgstr "Požadavek na půdorys vrátil neplatnou odpověď"
+
+#: static/solomon_facilities/editor.js:95
+#: static/solomon_facilities/editor.js:276
+#: static/solomon_facilities/editor.js:287
+#: static/solomon_facilities/viewer.js:73
+msgid "Label"
+msgstr "Popis"
+
+#: static/solomon_facilities/editor.js:328
+msgid "Changed"
+msgstr "Změněno"
+
+#: static/solomon_facilities/editor.js:366
+msgid "No linked object"
+msgstr "Žádný propojený objekt"
+
+#: static/solomon_facilities/editor.js:369
+msgid "Spaces"
+msgstr "Prostory"
+
+#: static/solomon_facilities/editor.js:370
+msgid "Doors"
+msgstr "Dveře"
+
+#: static/solomon_facilities/editor.js:371
+msgid "Technical assets"
+msgstr "Technické součásti"
+
+#: static/solomon_facilities/editor.js:389
+#, javascript-format
+msgid "Select linked object (%s available)"
+msgstr "Vyberte propojený objekt (k dispozici: %s)"
+
+#: static/solomon_facilities/editor.js:390
+msgid "No linkable objects exist on this floor"
+msgstr "Na tomto podlaží nejsou žádné propojitelné objekty"
+
+#: static/solomon_facilities/editor.js:394
+msgid ""
+"Optional. Any painted element can link to a facility record on this floor."
+msgstr "Volitelné. Každý nakreslený prvek lze propojit se záznamem správy objektu na tomto podlaží."
+
+#: static/solomon_facilities/editor.js:395
+msgid ""
+"Create a space, door, or technical asset for this floor, then select Refresh."
+msgstr "Vytvořte prostor, dveře nebo technickou součást pro toto podlaží a poté klikněte na Obnovit."
+
+#: static/solomon_facilities/editor.js:465
+msgid "Saving..."
+msgstr "Ukládání..."
+
+#: static/solomon_facilities/editor.js:479
+msgid "Saved"
+msgstr "Uloženo"
+
+#: static/solomon_facilities/editor.js:494
+#: static/solomon_facilities/viewer.js:250
+msgid "Fabric.js did not load"
+msgstr "Knihovna Fabric.js se nenačetla"
+
+#: static/solomon_facilities/viewer.js:171
+msgid "Type"
+msgstr "Typ"
+
+#: static/solomon_facilities/viewer.js:172
+msgid "System"
+msgstr "Soustava"
+
+#: static/solomon_facilities/viewer.js:173
+msgid "Area"
+msgstr "Plocha"
+
+#: static/solomon_facilities/viewer.js:174
+msgid "Space"
+msgstr "Prostor"
+
+#: static/solomon_facilities/viewer.js:175
+msgid "Serves"
+msgstr "Obsluhuje"
+
+#: static/solomon_facilities/viewer.js:177
+msgid "Flat assignments"
+msgstr "Přiřazení prostorů"
+
+#: static/solomon_facilities/viewer.js:178
+msgid "Current use"
+msgstr "Aktuální užívání"
+
+#: static/solomon_facilities/viewer.js:185
+msgid "Emergency instructions"
+msgstr "Pokyny pro nouzové situace"

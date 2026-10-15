@@ -82,7 +82,7 @@ def _build_current_share_stats():
 
 
 class MeetingTypeTable(NetBoxTable):
-    name = tables.Column(linkify=True)
+    name = tables.Column(linkify=True, verbose_name=_("Name"))
 
     class Meta(NetBoxTable.Meta):
         model = MeetingType
@@ -106,7 +106,7 @@ class MeetingTypeTable(NetBoxTable):
 
 
 class MeetingTable(NetBoxTable):
-    title = tables.Column(linkify=True)
+    title = tables.Column(linkify=True, verbose_name=_("Title"))
 
     class Meta(NetBoxTable.Meta):
         model = Meeting
@@ -134,7 +134,7 @@ class MeetingTable(NetBoxTable):
 
 
 class AgendaItemTable(NetBoxTable):
-    title = tables.Column(linkify=True)
+    title = tables.Column(linkify=True, verbose_name=_("Title"))
 
     class Meta(NetBoxTable.Meta):
         model = AgendaItem
@@ -166,7 +166,7 @@ class AgendaItemTable(NetBoxTable):
 
 
 class MeetingAttendanceTable(NetBoxTable):
-    owner = tables.Column(linkify=True)
+    owner = tables.Column(linkify=True, verbose_name=_("Owner"))
 
     class Meta(NetBoxTable.Meta):
         model = MeetingAttendance
@@ -207,7 +207,7 @@ class VoteTable(NetBoxTable):
 
 
 class VoteWeightStyleTable(NetBoxTable):
-    label = tables.Column(linkify=True)
+    label = tables.Column(linkify=True, verbose_name=_("Label"))
     is_current = tables.BooleanColumn(verbose_name=_("Current"))
     color = tables.Column(verbose_name=_("Color"))
     share_count = tables.Column(
@@ -287,7 +287,7 @@ class VoteWeightStyleTable(NetBoxTable):
 
 
 class MeetingMinutesTable(NetBoxTable):
-    meeting = tables.Column(linkify=True)
+    meeting = tables.Column(linkify=True, verbose_name=_("Meeting"))
 
     class Meta(NetBoxTable.Meta):
         model = MeetingMinutes
@@ -311,7 +311,7 @@ class MeetingMinutesTable(NetBoxTable):
 
 
 class MeetingInvitationTable(NetBoxTable):
-    owner = tables.Column(linkify=True)
+    owner = tables.Column(linkify=True, verbose_name=_("Owner"))
 
     class Meta(NetBoxTable.Meta):
         model = MeetingInvitation
@@ -335,7 +335,7 @@ class MeetingInvitationTable(NetBoxTable):
 
 
 class MeetingOwnerSnapshotTable(NetBoxTable):
-    owner_display_name = tables.Column()
+    owner_display_name = tables.Column(verbose_name=_("Owner display name"))
 
     class Meta(NetBoxTable.Meta):
         model = MeetingOwnerSnapshot
@@ -359,7 +359,7 @@ class MeetingOwnerSnapshotTable(NetBoxTable):
 
 
 class MeetingAttendanceEventTable(NetBoxTable):
-    owner_snapshot = tables.Column()
+    owner_snapshot = tables.Column(verbose_name=_("Owner snapshot"))
 
     class Meta(NetBoxTable.Meta):
         model = MeetingAttendanceEvent
@@ -383,7 +383,7 @@ class MeetingAttendanceEventTable(NetBoxTable):
 
 
 class AgendaVoteSessionTable(NetBoxTable):
-    agenda_item = tables.Column(linkify=True)
+    agenda_item = tables.Column(linkify=True, verbose_name=_("Agenda item"))
 
     class Meta(NetBoxTable.Meta):
         model = AgendaVoteSession
@@ -407,7 +407,7 @@ class AgendaVoteSessionTable(NetBoxTable):
 
 
 class AgendaVoteBallotTable(NetBoxTable):
-    session = tables.Column()
+    session = tables.Column(verbose_name=_("Vote session"))
 
     class Meta(NetBoxTable.Meta):
         model = AgendaVoteBallot

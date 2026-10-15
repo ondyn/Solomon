@@ -23,8 +23,16 @@ flats, people, owners, and tenants. It does not duplicate those records.
 	export. The Show label on floor plan switch below Label controls visibility
 	for each element, including standalone text. Labels are visible by default;
 	the setting is saved with the element and retained when duplicating it.
+- Select an element in the editor to set Text size and Text orientation
+	(0, 90, 180, or 270 degrees) beneath its label. Shape captions rotate
+	independently of the shape, relative to its orientation; standalone text
+	rotates around its center. Size and orientation persist when saving,
+	duplicating, viewing, and exporting SVG. Existing captions default to size 18.
 - Borders keep a fixed thickness when shapes are resized, and labels never
 	stretch; resizing a text element changes its font size proportionally.
+- The editor and viewer render vectors on a Retina-aware canvas; SVG export
+	remains vector-based. Shape captions render directly at the canvas resolution
+	without bitmap caching, keeping text sharp when zooming or resizing shapes.
 - The editor can bring the selected element to front, forward, backward, or
 	to back (toolbar or `Shift+]`, `]`, `[`, `Shift+[`); the order is saved.
 - Each element has a saved Transparent switch. The Transparent items toolbar
@@ -39,8 +47,9 @@ flats, people, owners, and tenants. It does not duplicate those records.
 	and located technical assets. Enable them through the table's column
 	configuration under Available Columns. Assignments and occupancy show only
 	records active today (including both date boundaries); technical assets
-	include all statuses, matching the space detail page. Related records and
-	holders respect the user's object-view permissions.
+	include all statuses, matching the space detail page. Each related-record
+	column can be sorted by its visible record count. Related records and holders
+	respect the user's object-view permissions.
 - NetBox-native bulk editing of selected spaces or all spaces matching the
 	current filters, with optional field clearing, tag updates, validation,
 	and change logging. Space references remain individually editable.
@@ -84,15 +93,37 @@ docker compose exec netbox python manage.py import_salounova_schematics --dry-ru
 
 ## Tests
 
-Viewer selection regression tests use Node.js's built-in test runner:
+Editor, viewer, and label regression tests use Node.js's built-in test runner:
 
 ```bash
-node --test plugins/solomon_facilities/solomon_facilities/tests/test_viewer.js
+node --test plugins/solomon_facilities/solomon_facilities/tests/test_editor.js plugins/solomon_facilities/solomon_facilities/tests/test_viewer.js
 ```
 
 ```bash
 docker compose exec netbox python manage.py test \
 	solomon_facilities.tests.test_models \
 	solomon_facilities.tests.test_views \
+	solomon_facilities.tests.test_translations \
 	solomon_facilities.tests.test_import_command
 ```
+
+## Localization
+
+English and Czech cover navigation, table headers, floor-plan controls,
+tooltips, and dynamically rendered viewer/editor messages. Catalogs belong
+under each Python package's `locale/cs/LC_MESSAGES/`, so Django and plugin
+wheels can discover them. Older plugins expose their top-level catalogs
+through a package-local `locale` symlink.
+
+After changing user-facing strings, extract both translation domains from
+the package directory, translate new entries, and compile:
+
+```bash
+docker compose exec -w /opt/netbox/plugins_dev/solomon_facilities/solomon_facilities netbox python /opt/netbox/netbox/manage.py makemessages -l cs
+docker compose exec -w /opt/netbox/plugins_dev/solomon_facilities/solomon_facilities netbox python /opt/netbox/netbox/manage.py makemessages -l cs -d djangojs
+docker compose exec -w /opt/netbox/plugins_dev/solomon_facilities/solomon_facilities netbox python /opt/netbox/netbox/manage.py compilemessages
+```
+
+Restart the app after compiling to clear Django's cached translations.
+Development startup, production image builds, and plugin publishing compile
+catalogs automatically. Do not translate stored object names or drawing labels.

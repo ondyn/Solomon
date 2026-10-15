@@ -36,6 +36,11 @@ if [ -d /opt/netbox/plugins_dev ]; then
     done
 fi
 
+# Compile source catalogs on every startup, including already-installed plugins.
+if [ -d /opt/netbox/plugins_dev ]; then
+    sh /opt/netbox/compile-translations.sh /opt/netbox/plugins_dev
+fi
+
 # Collect static files from plugins (only if we installed something)
 if [ "$INSTALLED_PLUGIN" = true ]; then
     echo "📦 Collecting static files from plugins..."

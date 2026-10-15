@@ -2,7 +2,7 @@ ARG NETBOX_VERSION=latest
 
 FROM python:3.12-alpine AS plugin-builder
 
-RUN pip install --no-cache-dir build
+RUN apk add --no-cache gettext && pip install --no-cache-dir build
 
 WORKDIR /build
 COPY plugins/solomon_theme plugins/solomon_theme
@@ -10,8 +10,10 @@ COPY plugins/solomon_property plugins/solomon_property
 COPY plugins/solomon_meetings plugins/solomon_meetings
 COPY plugins/solomon_facilities plugins/solomon_facilities
 COPY plugins/solomon_issues plugins/solomon_issues
+COPY docker/compile-translations.sh /build/compile-translations.sh
 
-RUN mkdir /wheels && \
+RUN sh /build/compile-translations.sh /build/plugins && \
+    mkdir /wheels && \
     python -m build --wheel --outdir /wheels plugins/solomon_theme && \
     python -m build --wheel --outdir /wheels plugins/solomon_property && \
     python -m build --wheel --outdir /wheels plugins/solomon_meetings && \

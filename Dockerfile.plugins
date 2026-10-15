@@ -38,6 +38,7 @@ RUN chmod -R g+w /opt/netbox/netbox/static/
 
 # Copy the plugin entrypoint that installs local (editable) plugins at startup
 COPY docker/plugin-entrypoint.sh /opt/netbox/plugin-entrypoint.sh
+COPY docker/compile-translations.sh /opt/netbox/compile-translations.sh
 RUN chmod +x /opt/netbox/plugin-entrypoint.sh
 
 # Copy the dev launch script with reload support

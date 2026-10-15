@@ -11,6 +11,8 @@
     type: document.getElementById("element-type"),
     label: document.getElementById("element-label"),
     labelVisible: document.getElementById("element-label-visible"),
+    fontSize: document.getElementById("element-font-size"),
+    labelAngle: document.getElementById("element-label-angle"),
     target: document.getElementById("element-target"),
     x: document.getElementById("element-x"),
     y: document.getElementById("element-y"),
@@ -49,8 +51,8 @@
     const contentType = response.headers.get("Content-Type") || "";
     if (contentType.includes("application/json")) return response.json();
     const text = await response.text();
-    if (!response.ok) throw new Error(`Plan request failed (${response.status})`);
-    throw new Error(text || "Plan request returned an invalid response");
+    if (!response.ok) throw new Error(interpolate(gettext("Plan request failed (%s)"), [response.status]));
+    throw new Error(text || gettext("Plan request returned an invalid response"));
   }
 
   function targetFromElement(element) {
@@ -92,7 +94,7 @@
       const radius = Number(style.radius || 10);
       object = new fabric.Circle({...common, left: geometry.x - radius, top: geometry.y - radius, radius, fill: style.fill || "#b83f3f"});
     } else {
-      object = new fabric.IText(geometry.text || element.label || "Label", {
+      object = new fabric.IText(geometry.text || element.label || gettext("Label"), {
         ...common,
         left: geometry.x || 0,
         top: geometry.y || 0,
@@ -109,7 +111,7 @@
     object.elementType = element.element_type;
     object.itemOpacity = common.opacity;
     prepareObject(object);
-    SolomonPlanLabels.attach(object, element.label, style.label_visible !== false);
+    SolomonPlanLabels.attach(object, element.label, style.label_visible !== false, style.font_size || 18, style.label_angle || 0);
     object.targetKind = target.kind;
     object.targetId = target.id ? String(target.id) : "";
     object.locked = Boolean(element.locked);
@@ -181,7 +183,8 @@
         position_x: object.left,
         position_y: object.top,
         radius: object.radius || undefined,
-        font_size: object.fontSize || undefined,
+        font_size: object.fontSize || object.labelFontSize,
+        label_angle: object.labelAngle,
         label_visible: object.labelVisible,
       },
       z_index: index,
@@ -273,7 +276,7 @@
         strokeWidth: 2,
       });
     } else {
-      object = new fabric.IText("Label", {
+      object = new fabric.IText(gettext("Label"), {
         left: center.x,
         top: center.y,
         fill: "#27343a",
@@ -284,7 +287,7 @@
     object.elementType = elementType;
     object.itemOpacity = elementType === "space" ? TRANSPARENT_OPACITY : 1;
     prepareObject(object);
-    SolomonPlanLabels.attach(object, elementType === "text" ? "Label" : "");
+    SolomonPlanLabels.attach(object, elementType === "text" ? gettext("Label") : "");
     object.targetKind = "";
     object.targetId = "";
     object.locked = false;
@@ -309,7 +312,7 @@
       duplicate.elementType = source.elementType;
       duplicate.itemOpacity = source.itemOpacity;
       prepareObject(duplicate);
-      SolomonPlanLabels.attach(duplicate, source.elementLabel, source.labelVisible);
+      SolomonPlanLabels.attach(duplicate, source.elementLabel, source.labelVisible, source.labelFontSize, source.labelAngle);
       duplicate.targetKind = "";
       duplicate.targetId = "";
       duplicate.locked = Boolean(source.locked);
@@ -325,7 +328,7 @@
 
   function markChanged() {
     dirty = true;
-    saveState.textContent = "Changed";
+    saveState.textContent = gettext("Changed");
   }
 
   function objectDimensionBases(object) {
@@ -363,12 +366,12 @@
     fields.target.replaceChildren();
     const empty = document.createElement("option");
     empty.value = "";
-    empty.textContent = "No linked object";
+    empty.textContent = gettext("No linked object");
     fields.target.appendChild(empty);
     const collections = [
-      ["space", "Spaces", planData.targets.spaces],
-      ["door", "Doors", planData.targets.doors],
-      ["technical_asset", "Technical assets", planData.targets.technical_assets],
+      ["space", gettext("Spaces"), planData.targets.spaces],
+      ["door", gettext("Doors"), planData.targets.doors],
+      ["technical_asset", gettext("Technical assets"), planData.targets.technical_assets],
     ];
     let total = 0;
     collections.forEach(([kind, label, records]) => {
@@ -386,13 +389,13 @@
       total += available.length;
     });
     empty.textContent = total
-      ? `Select linked object (${total} available)`
-      : "No linkable objects exist on this floor";
+      ? interpolate(gettext("Select linked object (%s available)"), [total])
+      : gettext("No linkable objects exist on this floor");
     fields.target.disabled = !canvas.getActiveObject() || total === 0;
     fields.target.value = selectedValue;
     targetHelp.textContent = total
-      ? "Optional. Any painted element can link to a facility record on this floor."
-      : "Create a space, door, or technical asset for this floor, then select Refresh.";
+      ? gettext("Optional. Any painted element can link to a facility record on this floor.")
+      : gettext("Create a space, door, or technical asset for this floor, then select Refresh.");
     targetActions.classList.toggle("is-empty", total === 0);
   }
 
@@ -406,6 +409,10 @@
     fields.type.value = object.elementType || "line";
     fields.label.value = object.elementLabel || (object.type === "i-text" ? object.text : "");
     fields.labelVisible.checked = object.labelVisible;
+    const isText = object.type === "i-text" || object.type === "text";
+    fields.fontSize.value = isText ? object.fontSize : object.labelFontSize;
+    const labelAngle = isText ? object.angle : object.labelAngle;
+    fields.labelAngle.value = String(((Math.round(labelAngle / 90) * 90) % 360 + 360) % 360);
     populateTargetOptions();
     fields.target.value = object.targetKind && object.targetId ? `${object.targetKind}:${object.targetId}` : "";
     fields.x.value = Number(object.left || 0).toFixed(1);
@@ -427,6 +434,27 @@
     if (object.type === "i-text") object.set({text: fields.label.value || "Label"});
     object.setCoords();
     canvas.requestRenderAll();
+    markChanged();
+  }
+
+  function updateLabelStyle(event) {
+    const object = canvas.getActiveObject();
+    if (!object) return;
+    const field = event.currentTarget;
+    if (!field.reportValidity()) return;
+    const isText = object.type === "i-text" || object.type === "text";
+    if (field === fields.fontSize) {
+      const fontSize = Number(field.value);
+      if (isText) object.set({fontSize});
+      else object.labelFontSize = fontSize;
+    } else {
+      const angle = Number(field.value);
+      if (isText) object.rotate(angle);
+      else object.labelAngle = angle;
+    }
+    object.setCoords();
+    canvas.requestRenderAll();
+    updateInspector(object);
     markChanged();
   }
 
@@ -462,7 +490,7 @@
   }
 
   async function savePlan() {
-    saveState.textContent = "Saving...";
+    saveState.textContent = gettext("Saving...");
     const elements = canvas.getObjects().map(serializeObject);
     const response = await fetch(app.dataset.saveUrl, {
       method: "PUT",
@@ -476,7 +504,7 @@
     const result = await responseData(response);
     if (!response.ok) throw new Error(typeof result.detail === "string" ? result.detail : JSON.stringify(result.detail));
     dirty = false;
-    saveState.textContent = "Saved";
+    saveState.textContent = gettext("Saved");
     return result;
   }
 
@@ -491,9 +519,9 @@
   }
 
   async function initialize() {
-    if (!window.fabric) throw new Error("Fabric.js did not load");
+    if (!window.fabric) throw new Error(gettext("Fabric.js did not load"));
     const response = await fetch(app.dataset.url, {headers: {Accept: "application/json"}});
-    if (!response.ok) throw new Error(`Plan request failed (${response.status})`);
+    if (!response.ok) throw new Error(interpolate(gettext("Plan request failed (%s)"), [response.status]));
     planData = await responseData(response);
     canvas = new fabric.Canvas("schematic-canvas", {
       width: planData.plan.width,
@@ -539,8 +567,10 @@
     }));
     document.querySelectorAll("[data-tool]").forEach((button) => button.addEventListener("click", () => setTool(button.dataset.tool)));
     Object.entries(fields).forEach(([name, field]) => {
-      if (!["type", "label", "labelVisible"].includes(name)) field.addEventListener("change", updateObject);
+      if (!["type", "label", "labelVisible", "fontSize", "labelAngle"].includes(name)) field.addEventListener("change", updateObject);
     });
+    fields.fontSize.addEventListener("change", updateLabelStyle);
+    fields.labelAngle.addEventListener("change", updateLabelStyle);
     fields.label.addEventListener("input", updateLabel);
     fields.label.addEventListener("change", updateLabel);
     fields.labelVisible.addEventListener("change", updateLabel);

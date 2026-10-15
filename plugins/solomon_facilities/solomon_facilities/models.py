@@ -8,7 +8,7 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from netbox.models import NetBoxModel
 
 
@@ -172,7 +172,7 @@ class FloorPlan(NetBoxModel):
         BuildingLevel,
         on_delete=models.PROTECT,
         related_name="plan",
-        verbose_name=_("Level"),
+        verbose_name=pgettext_lazy("building floor", "Level"),
     )
     name = models.CharField(max_length=200, verbose_name=_("Name"))
     width = models.DecimalField(
@@ -304,7 +304,7 @@ class Space(NetBoxModel):
         BuildingLevel,
         on_delete=models.PROTECT,
         related_name="spaces",
-        verbose_name=_("Level"),
+        verbose_name=pgettext_lazy("building floor", "Level"),
     )
     building = models.ForeignKey(
         "solomon_property.Building",
@@ -520,7 +520,7 @@ class Door(NetBoxModel):
         BuildingLevel,
         on_delete=models.PROTECT,
         related_name="doors",
-        verbose_name=_("Level"),
+        verbose_name=pgettext_lazy("building floor", "Level"),
     )
     reference = models.CharField(max_length=80, verbose_name=_("Reference"))
     name = models.CharField(max_length=200, verbose_name=_("Name"))
@@ -866,7 +866,7 @@ class TechnicalAsset(NetBoxModel):
         null=True,
         blank=True,
         related_name="technical_assets",
-        verbose_name=_("Level"),
+        verbose_name=pgettext_lazy("building floor", "Level"),
     )
     space = models.ForeignKey(
         Space,

@@ -5,7 +5,7 @@ from netbox.plugins.navigation import PluginMenu, PluginMenuButton, PluginMenuIt
 def item(link, text, model):
     return PluginMenuItem(
         link=f"plugins:solomon_facilities:{link}_list",
-        link_text=_(text),
+        link_text=text,
         permissions=[f"solomon_facilities.view_{model}"],
         buttons=(
             PluginMenuButton(
@@ -24,30 +24,30 @@ menu = PluginMenu(
         (
             _("Schematics"),
             (
-                item("level", "Building Levels", "buildinglevel"),
-                item("floorplan", "Floor Plans", "floorplan"),
-                item("space", "Spaces", "space"),
-                item("spaceflatassignment", "Flat Assignments", "spaceflatassignment"),
-                item("spaceusage", "Rentals and Occupancy", "spaceusage"),
+                item("level", _("Building Levels"), "buildinglevel"),
+                item("floorplan", _("Floor Plans"), "floorplan"),
+                item("space", _("Spaces"), "space"),
+                item("spaceflatassignment", _("Flat Assignments"), "spaceflatassignment"),
+                item("spaceusage", _("Rentals and Occupancy"), "spaceusage"),
             ),
         ),
         (
             _("Access"),
             (
-                item("door", "Doors", "door"),
-                item("lockcylinder", "Lock Cylinders", "lockcylinder"),
-                item("keyprofile", "Key Profiles", "keyprofile"),
-                item("keycopy", "Physical Keys", "keycopy"),
-                item("keyissue", "Key Issues", "keyissue"),
+                item("door", _("Doors"), "door"),
+                item("lockcylinder", _("Lock Cylinders"), "lockcylinder"),
+                item("keyprofile", _("Key Profiles"), "keyprofile"),
+                item("keycopy", _("Physical Keys"), "keycopy"),
+                item("keyissue", _("Key Issues"), "keyissue"),
             ),
         ),
         (
             _("Building Systems"),
             (
-                item("technicalsystem", "Technical Systems", "technicalsystem"),
-                item("technicalasset", "Technical Assets", "technicalasset"),
+                item("technicalsystem", _("Technical Systems"), "technicalsystem"),
+                item("technicalasset", _("Technical Assets"), "technicalasset"),
                 item(
-                    "technicalconnection", "System Connections", "technicalconnection"
+                    "technicalconnection", _("System Connections"), "technicalconnection"
                 ),
             ),
         ),

@@ -14,7 +14,7 @@
     data-url="{% if revision %}{% url 'plugins:solomon_facilities:floorplan_data' pk=object.pk %}{% if revision.status == 'draft' %}?draft=1{% endif %}{% endif %}"
     data-highlight="{{ request.GET.highlight|default:'' }}"
   >
-    <div class="schematic-commandbar" role="toolbar" aria-label="Plan controls">
+    <div class="schematic-commandbar" role="toolbar" aria-label="{% trans 'Plan controls' %}">
       <div class="schematic-command-group">
         <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-out" title="{% trans 'Zoom out' %}" aria-label="{% trans 'Zoom out' %}">
           <i class="mdi mdi-magnify-minus-outline"></i>
@@ -81,7 +81,8 @@
     </div>
   </div>
   {% if revision %}
-    <script src="{% static 'solomon_facilities/labels.js' %}?v=3"></script>
-    <script src="{% static 'solomon_facilities/viewer.js' %}?v=7"></script>
+    <script src="{% url 'plugins:solomon_facilities:javascript_catalog' %}"></script>
+    <script src="{% static 'solomon_facilities/labels.js' %}?v=5"></script>
+    <script src="{% static 'solomon_facilities/viewer.js' %}?v=9"></script>
   {% endif %}
 {% endblock content %}

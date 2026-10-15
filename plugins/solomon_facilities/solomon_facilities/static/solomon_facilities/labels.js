@@ -1,15 +1,19 @@
 (function () {
   "use strict";
 
-  function attach(object, label, visible = true) {
+  function attach(object, label, visible = true, fontSize = 18, angle = 0) {
     object.elementLabel = label || "";
     object.labelVisible = visible;
+    object.labelFontSize = Number(fontSize);
+    object.labelAngle = Number(angle);
     // Labels can extend beyond narrow shapes, so do not clip them to an object cache.
     object.objectCaching = false;
     const isText = object.type === "i-text" || object.type === "text";
     const render = object._render;
     const toSvg = object._toSVG;
     const caption = new fabric.Text("", {
+      // Detached captions cannot size bitmap caches for the canvas zoom or Retina scaling.
+      objectCaching: false,
       originX: "center",
       originY: "center",
       fill: "#27343a",
@@ -21,7 +25,7 @@
 
     function visibleCaption() {
       if (isText || !object.labelVisible || !object.elementLabel) return null;
-      caption.set({text: object.elementLabel});
+      caption.set({text: object.elementLabel, fontSize: object.labelFontSize, angle: object.labelAngle});
       return caption;
     }
 

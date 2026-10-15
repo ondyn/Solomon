@@ -8,10 +8,10 @@ from . import models
 
 
 class IssueCategoryTable(NetBoxTable):
-    name = tables.Column(linkify=True)
-    color = columns.ColorColumn()
-    default_priority = columns.ChoiceFieldColumn()
-    is_active = columns.BooleanColumn()
+    name = tables.Column(linkify=True, verbose_name=_("Name"))
+    color = columns.ColorColumn(verbose_name=_("Color"))
+    default_priority = columns.ChoiceFieldColumn(verbose_name=_("Default priority"))
+    is_active = columns.BooleanColumn(verbose_name=_("Active"))
     issue_count = tables.Column(verbose_name=_("Issues"))
 
     class Meta(NetBoxTable.Meta):
@@ -41,10 +41,10 @@ class IssueCategoryTable(NetBoxTable):
 
 
 class AssetTagTable(NetBoxTable):
-    label = tables.Column(linkify=True)
-    code = tables.Column(linkify=True)
-    status = columns.ChoiceFieldColumn()
-    category = tables.Column(linkify=True)
+    label = tables.Column(linkify=True, verbose_name=_("Label"))
+    code = tables.Column(linkify=True, verbose_name=_("Code"))
+    status = columns.ChoiceFieldColumn(verbose_name=_("Status"))
+    category = tables.Column(linkify=True, verbose_name=_("Category"))
     open_issue_count = tables.Column(verbose_name=_("Open issues"))
     allow_public_reports = columns.BooleanColumn(verbose_name=_("Public reports"))
 
@@ -75,14 +75,14 @@ class AssetTagTable(NetBoxTable):
 
 
 class IssueTable(NetBoxTable):
-    number = tables.Column(linkify=True)
-    title = tables.Column(linkify=True)
-    status = columns.ChoiceFieldColumn()
-    priority = columns.ChoiceFieldColumn()
-    source = columns.ChoiceFieldColumn()
-    asset_tag = tables.Column(linkify=True)
-    category = tables.Column(linkify=True)
-    created = columns.DateTimeColumn()
+    number = tables.Column(linkify=True, verbose_name=_("Number"))
+    title = tables.Column(linkify=True, verbose_name=_("Title"))
+    status = columns.ChoiceFieldColumn(verbose_name=_("Status"))
+    priority = columns.ChoiceFieldColumn(verbose_name=_("Priority"))
+    source = columns.ChoiceFieldColumn(verbose_name=_("Source"))
+    asset_tag = tables.Column(linkify=True, verbose_name=_("Asset tag"))
+    category = tables.Column(linkify=True, verbose_name=_("Category"))
+    created = columns.DateTimeColumn(verbose_name=_("Created"))
 
     class Meta(NetBoxTable.Meta):
         model = models.Issue
@@ -117,9 +117,9 @@ class IssueTable(NetBoxTable):
 
 
 class IssueCommentTable(NetBoxTable):
-    issue = tables.Column(linkify=True)
-    visibility = columns.ChoiceFieldColumn()
-    created = columns.DateTimeColumn()
+    issue = tables.Column(linkify=True, verbose_name=_("Issue"))
+    visibility = columns.ChoiceFieldColumn(verbose_name=_("Visibility"))
+    created = columns.DateTimeColumn(verbose_name=_("Created"))
 
     class Meta(NetBoxTable.Meta):
         model = models.IssueComment

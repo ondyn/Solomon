@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-01 06:29+0000\n"
+"POT-Creation-Date: 2026-10-15 09:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "Solomon Issues"
 msgstr "Solomon Problémy"
 
-#: choices.py:15 models.py:107 models.py:716
+#: choices.py:15 models.py:107 models.py:716 tables.py:14
 #: templates/solomon_issues/issuecategory.html:20
 msgid "Active"
 msgstr "Aktivní"
@@ -206,13 +206,13 @@ msgstr "Ponechte prázdné pro automatické vygenerování kódu."
 msgid "Select a %(model)s or clear the type."
 msgstr "Vyberte %(model)s, nebo zrušte volbu typu."
 
-#: forms.py:188 models.py:230 models.py:303
+#: forms.py:188 models.py:230 models.py:303 tables.py:83
 #: templates/solomon_issues/assettag.html:13
 #: templates/solomon_issues/issue.html:31
 msgid "Asset tag"
 msgstr "Štítek zařízení"
 
-#: forms.py:193 forms.py:288 models.py:323
+#: forms.py:193 forms.py:288 models.py:323 tables.py:47 tables.py:84
 #: templates/solomon_issues/issue.html:39
 #: templates/solomon_issues/issuecategory.html:8
 msgid "Category"
@@ -238,7 +238,7 @@ msgstr "Zpráva"
 msgid "New status"
 msgstr "Nový stav"
 
-#: forms.py:247 models.py:337
+#: forms.py:247 models.py:337 tables.py:81
 #: templates/solomon_issues/email/manager_notification.txt:5
 #: templates/solomon_issues/issue.html:23
 msgid "Priority"
@@ -313,7 +313,8 @@ msgstr "Doplnit informace"
 msgid "Scan me and report a problem"
 msgstr "Naskenujte mě a nahlaste problém"
 
-#: models.py:61 models.py:714 templates/solomon_issues/issue.html:80
+#: models.py:61 models.py:714 tables.py:11
+#: templates/solomon_issues/issue.html:80
 #: templates/solomon_issues/issuecategory.html:11
 msgid "Name"
 msgstr "Název"
@@ -329,11 +330,12 @@ msgstr "Identifikátor"
 msgid "Description"
 msgstr "Popis"
 
-#: models.py:64
+#: models.py:64 tables.py:12
 msgid "Color"
 msgstr "Barva"
 
-#: models.py:69 models.py:205 templates/solomon_issues/assettag.html:37
+#: models.py:69 models.py:205 tables.py:13
+#: templates/solomon_issues/assettag.html:37
 #: templates/solomon_issues/issuecategory.html:15
 msgid "Default priority"
 msgstr "Výchozí priorita"
@@ -388,7 +390,8 @@ msgid ""
 "Where the label is physically placed, for example 'Entrance A, basement'."
 msgstr "Kde je štítek fyzicky umístěn, například „Vchod A, sklep“."
 
-#: models.py:173 models.py:331 templates/solomon_issues/assettag.html:19
+#: models.py:173 models.py:331 tables.py:46 tables.py:80
+#: templates/solomon_issues/assettag.html:19
 #: templates/solomon_issues/email/manager_notification.txt:4
 #: templates/solomon_issues/email/reporter_notification.txt:6
 #: templates/solomon_issues/issue.html:19
@@ -448,7 +451,7 @@ msgstr "Naposledy vytištěno"
 msgid "Asset tags"
 msgstr "Štítky zařízení"
 
-#: models.py:295 templates/solomon_issues/issue.html:16
+#: models.py:295 tables.py:78 templates/solomon_issues/issue.html:16
 msgid "Number"
 msgstr "Číslo"
 
@@ -456,7 +459,7 @@ msgstr "Číslo"
 msgid "Summary"
 msgstr "Shrnutí"
 
-#: models.py:343 templates/solomon_issues/issue.html:27
+#: models.py:343 tables.py:82 templates/solomon_issues/issue.html:27
 msgid "Source"
 msgstr "Zdroj"
 
@@ -507,7 +510,7 @@ msgid "Notify reporter"
 msgstr "Informovat hlásícího"
 
 #: models.py:407 models.py:570 models.py:622 models.py:658 models.py:711
-#: models.py:751 tables.py:131
+#: models.py:751 tables.py:120 tables.py:131
 msgid "Issue"
 msgstr "Problém"
 
@@ -535,7 +538,7 @@ msgstr "Jméno autora"
 msgid "Posted by the reporter"
 msgstr "Zaslal hlásící"
 
-#: models.py:590 models.py:678
+#: models.py:590 models.py:678 tables.py:121
 msgid "Visibility"
 msgstr "Viditelnost"
 
@@ -587,7 +590,7 @@ msgstr "Jméno aktéra"
 msgid "Details"
 msgstr "Podrobnosti"
 
-#: models.py:682
+#: models.py:682 tables.py:85 tables.py:122
 msgid "Created"
 msgstr "Vytvořeno"
 
@@ -707,6 +710,14 @@ msgstr "Aktualizace"
 msgid "Problem reported."
 msgstr "Problém byl nahlášen."
 
+#: tables.py:44
+msgid "Label"
+msgstr "Popis"
+
+#: tables.py:45
+msgid "Code"
+msgstr "Kód"
+
 #: tables.py:48 templates/solomon_issues/assettag.html:73
 #: templates/solomon_issues/issuecategory.html:33
 msgid "Open issues"
@@ -715,6 +726,10 @@ msgstr "Otevřené problémy"
 #: tables.py:49
 msgid "Public reports"
 msgstr "Veřejná hlášení"
+
+#: tables.py:79
+msgid "Title"
+msgstr "Název"
 
 #: templates/solomon_issues/assettag.html:54
 #: templates/solomon_issues/assettag.html:56

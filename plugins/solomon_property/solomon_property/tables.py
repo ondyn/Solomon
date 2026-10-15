@@ -17,10 +17,10 @@ from .models import (
 
 
 class BuildingObjectTable(NetBoxTable):
-    name = tables.Column(linkify=True)
+    name = tables.Column(linkify=True, verbose_name=_("Name"))
     municipality_name = tables.Column(verbose_name=_("Municipality"))
     city_part_name = tables.Column(verbose_name=_("City part"))
-    house_numbers = tables.Column(orderable=False)
+    house_numbers = tables.Column(orderable=False, verbose_name=_("House numbers"))
     usage_name = tables.Column(verbose_name=_("Usage"))
     cuzk_building_id = tables.Column(verbose_name=_("CUZK ID"))
 
@@ -47,12 +47,12 @@ class BuildingObjectTable(NetBoxTable):
 
 class BuildingTable(NetBoxTable):
     building_object = tables.Column(linkify=True, verbose_name=_("Building object"))
-    name = tables.Column(linkify=True)
-    street = tables.Column()
+    name = tables.Column(linkify=True, verbose_name=_("Name"))
+    street = tables.Column(verbose_name=_("Street"))
     house_number = tables.Column(verbose_name=_("House No"))
-    city = tables.Column()
+    city = tables.Column(verbose_name=_("City"))
     total_units = tables.Column(verbose_name=_("Units"))
-    elevator = columns.BooleanColumn()
+    elevator = columns.BooleanColumn(verbose_name=_("Elevator"))
     cuzk_building_id = tables.Column(verbose_name=_("CUZK ID"))
 
     class Meta(NetBoxTable.Meta):
@@ -83,10 +83,10 @@ class BuildingTable(NetBoxTable):
 
 class FlatTable(NetBoxTable):
     flat_number = tables.Column(linkify=True, verbose_name=_("Flat No"))
-    building = tables.Column(linkify=True)
-    floor = tables.Column()
+    building = tables.Column(linkify=True, verbose_name=_("Building"))
+    floor = tables.Column(verbose_name=_("Floor"))
     area_m2 = tables.Column(verbose_name=_("Area m2"))
-    disposition = tables.Column()
+    disposition = tables.Column(verbose_name=_("Disposition"))
 
     class Meta(NetBoxTable.Meta):
         model = Flat
@@ -172,11 +172,11 @@ class PropertyOwnerTable(NetBoxTable):
 
 
 class FlatOwnerTable(NetBoxTable):
-    flat = tables.Column(linkify=True)
-    owner = tables.Column(linkify=True)
+    flat = tables.Column(linkify=True, verbose_name=_("Flat"))
+    owner = tables.Column(linkify=True, verbose_name=_("Owner"))
     share = tables.Column(accessor="share", orderable=False, verbose_name=_("Share"))
-    effective_from = tables.DateColumn()
-    effective_to = tables.DateColumn()
+    effective_from = tables.DateColumn(verbose_name=_("From"))
+    effective_to = tables.DateColumn(verbose_name=_("To"))
     is_current = columns.BooleanColumn(verbose_name=_("Current"))
 
     class Meta(NetBoxTable.Meta):
@@ -202,10 +202,10 @@ class FlatOwnerTable(NetBoxTable):
 
 
 class PropertyTenantTable(NetBoxTable):
-    flat = tables.Column(linkify=True)
-    person = tables.Column(linkify=True)
-    effective_from = tables.DateColumn()
-    effective_to = tables.DateColumn()
+    flat = tables.Column(linkify=True, verbose_name=_("Flat"))
+    person = tables.Column(linkify=True, verbose_name=_("Person"))
+    effective_from = tables.DateColumn(verbose_name=_("From"))
+    effective_to = tables.DateColumn(verbose_name=_("To"))
     is_current = columns.BooleanColumn(verbose_name=_("Current"))
 
     class Meta(NetBoxTable.Meta):

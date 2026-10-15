@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.i18n import JavaScriptCatalog
 
 from . import models, views
 
@@ -8,6 +9,11 @@ def changelog(model):
 
 
 urlpatterns = [
+    path(
+        "javascript-i18n/",
+        JavaScriptCatalog.as_view(packages=["solomon_facilities"]),
+        name="javascript_catalog",
+    ),
     path("levels/", views.BuildingLevelListView.as_view(), name="level_list"),
     path("levels/add/", views.BuildingLevelEditView.as_view(), name="level_add"),
     path(

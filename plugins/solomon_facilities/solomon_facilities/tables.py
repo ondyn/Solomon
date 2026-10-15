@@ -1,15 +1,15 @@
 """Tables for Solomon Facilities list and detail views."""
 
 import django_tables2 as tables
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from netbox.tables import NetBoxTable, columns
 
 from . import models
 
 
 class BuildingLevelTable(NetBoxTable):
-    reference = tables.Column(linkify=True)
-    building_object = tables.Column(linkify=True)
+    reference = tables.Column(linkify=True, verbose_name=_("Displayed reference"))
+    building_object = tables.Column(linkify=True, verbose_name=_("Building object"))
 
     class Meta(NetBoxTable.Meta):
         model = models.BuildingLevel
@@ -25,9 +25,9 @@ class BuildingLevelTable(NetBoxTable):
 
 
 class FloorPlanTable(NetBoxTable):
-    name = tables.Column(linkify=True)
-    level = tables.Column(linkify=True)
-    active_revision = tables.Column()
+    name = tables.Column(linkify=True, verbose_name=_("Name"))
+    level = tables.Column(linkify=True, verbose_name=pgettext_lazy("building floor", "Level"))
+    active_revision = tables.Column(verbose_name=_("Active revision"))
 
     class Meta(NetBoxTable.Meta):
         model = models.FloorPlan
@@ -44,26 +44,26 @@ class FloorPlanTable(NetBoxTable):
 
 
 class SpaceTable(NetBoxTable):
-    reference = tables.Column(linkify=True)
-    level = tables.Column(linkify=True)
-    building = tables.Column(linkify=True)
+    reference = tables.Column(linkify=True, verbose_name=_("Reference"))
+    level = tables.Column(linkify=True, verbose_name=pgettext_lazy("building floor", "Level"))
+    building = tables.Column(linkify=True, verbose_name=_("Entrance or building"))
     flat_assignments = columns.TemplateColumn(
         template_name="solomon_facilities/columns/space_flat_assignments.html",
         accessor="current_flat_assignments",
         verbose_name=_("Flat assignments"),
-        orderable=False,
+        order_by=("_flat_assignment_count",),
     )
     usages = columns.TemplateColumn(
         template_name="solomon_facilities/columns/space_usages.html",
         accessor="current_usages",
         verbose_name=_("Rentals and occupancy"),
-        orderable=False,
+        order_by=("_usage_count",),
     )
     technical_assets = columns.TemplateColumn(
         template_name="solomon_facilities/columns/space_technical_assets.html",
         accessor="visible_technical_assets",
         verbose_name=_("Technical assets"),
-        orderable=False,
+        order_by=("_technical_asset_count",),
     )
 
     class Meta(NetBoxTable.Meta):
@@ -96,8 +96,8 @@ class SpaceTable(NetBoxTable):
 
 
 class SpaceFlatAssignmentTable(NetBoxTable):
-    space = tables.Column(linkify=True)
-    flat = tables.Column(linkify=True)
+    space = tables.Column(linkify=True, verbose_name=_("Space"))
+    flat = tables.Column(linkify=True, verbose_name=_("Flat"))
 
     class Meta(NetBoxTable.Meta):
         model = models.SpaceFlatAssignment
@@ -113,7 +113,7 @@ class SpaceFlatAssignmentTable(NetBoxTable):
 
 
 class SpaceUsageTable(NetBoxTable):
-    space = tables.Column(linkify=True)
+    space = tables.Column(linkify=True, verbose_name=_("Space"))
     holder = tables.Column(empty_values=(), orderable=False, verbose_name=_("Holder"))
 
     def render_holder(self, record):
@@ -133,9 +133,9 @@ class SpaceUsageTable(NetBoxTable):
 
 
 class DoorTable(NetBoxTable):
-    reference = tables.Column(linkify=True)
-    level = tables.Column(linkify=True)
-    emergency_exit = columns.BooleanColumn()
+    reference = tables.Column(linkify=True, verbose_name=_("Reference"))
+    level = tables.Column(linkify=True, verbose_name=pgettext_lazy("building floor", "Level"))
+    emergency_exit = columns.BooleanColumn(verbose_name=_("Emergency exit"))
 
     class Meta(NetBoxTable.Meta):
         model = models.Door
@@ -153,7 +153,7 @@ class DoorTable(NetBoxTable):
 
 
 class LockCylinderTable(NetBoxTable):
-    door = tables.Column(linkify=True)
+    door = tables.Column(linkify=True, verbose_name=_("Door"))
 
     class Meta(NetBoxTable.Meta):
         model = models.LockCylinder
@@ -161,8 +161,8 @@ class LockCylinderTable(NetBoxTable):
 
 
 class KeyProfileTable(NetBoxTable):
-    code = tables.Column(linkify=True)
-    building_object = tables.Column(linkify=True)
+    code = tables.Column(linkify=True, verbose_name=_("Profile code"))
+    building_object = tables.Column(linkify=True, verbose_name=_("Building object"))
     copy_count = tables.Column(
         empty_values=(), orderable=False, verbose_name=_("Copies")
     )
@@ -176,8 +176,8 @@ class KeyProfileTable(NetBoxTable):
 
 
 class KeyProfileLockTable(NetBoxTable):
-    key_profile = tables.Column(linkify=True)
-    lock = tables.Column(linkify=True)
+    key_profile = tables.Column(linkify=True, verbose_name=_("Key profile"))
+    lock = tables.Column(linkify=True, verbose_name=_("Lock cylinder"))
 
     class Meta(NetBoxTable.Meta):
         model = models.KeyProfileLock
@@ -185,8 +185,8 @@ class KeyProfileLockTable(NetBoxTable):
 
 
 class KeyCopyTable(NetBoxTable):
-    inventory_code = tables.Column(linkify=True)
-    profile = tables.Column(linkify=True)
+    inventory_code = tables.Column(linkify=True, verbose_name=_("Inventory code"))
+    profile = tables.Column(linkify=True, verbose_name=_("Key profile"))
 
     class Meta(NetBoxTable.Meta):
         model = models.KeyCopy
@@ -201,7 +201,7 @@ class KeyCopyTable(NetBoxTable):
 
 
 class KeyIssueTable(NetBoxTable):
-    key_copy = tables.Column(linkify=True)
+    key_copy = tables.Column(linkify=True, verbose_name=_("Physical key"))
     holder = tables.Column(empty_values=(), orderable=False, verbose_name=_("Holder"))
 
     def render_holder(self, record):
@@ -222,8 +222,8 @@ class KeyIssueTable(NetBoxTable):
 
 
 class TechnicalSystemTable(NetBoxTable):
-    name = tables.Column(linkify=True)
-    building_object = tables.Column(linkify=True)
+    name = tables.Column(linkify=True, verbose_name=_("Name"))
+    building_object = tables.Column(linkify=True, verbose_name=_("Building object"))
 
     class Meta(NetBoxTable.Meta):
         model = models.TechnicalSystem
@@ -231,10 +231,10 @@ class TechnicalSystemTable(NetBoxTable):
 
 
 class TechnicalAssetTable(NetBoxTable):
-    code = tables.Column(linkify=True)
-    system = tables.Column(linkify=True)
-    level = tables.Column(linkify=True)
-    space = tables.Column(linkify=True)
+    code = tables.Column(linkify=True, verbose_name=_("Asset code"))
+    system = tables.Column(linkify=True, verbose_name=_("System"))
+    level = tables.Column(linkify=True, verbose_name=pgettext_lazy("building floor", "Level"))
+    space = tables.Column(linkify=True, verbose_name=_("Space"))
 
     class Meta(NetBoxTable.Meta):
         model = models.TechnicalAsset
@@ -252,8 +252,8 @@ class TechnicalAssetTable(NetBoxTable):
 
 
 class TechnicalConnectionTable(NetBoxTable):
-    from_asset = tables.Column(linkify=True)
-    to_asset = tables.Column(linkify=True)
+    from_asset = tables.Column(linkify=True, verbose_name=_("From component"))
+    to_asset = tables.Column(linkify=True, verbose_name=_("To component"))
 
     class Meta(NetBoxTable.Meta):
         model = models.TechnicalConnection

@@ -91,7 +91,7 @@
 
     <div class="schematic-workspace schematic-editor-workspace">
       <div class="schematic-stage" id="schematic-stage">
-        <canvas id="schematic-canvas" aria-label="Edit {{ plan.name }}"></canvas>
+        <canvas id="schematic-canvas" aria-label="{% blocktrans with name=plan.name %}Edit {{ name }}{% endblocktrans %}"></canvas>
         <div class="schematic-loading" id="schematic-loading">{% trans "Loading plan..." %}</div>
       </div>
       <aside class="schematic-inspector editor-inspector" id="schematic-inspector">
@@ -115,6 +115,19 @@
           <label class="form-check form-switch mt-2">
             <input class="form-check-input" type="checkbox" role="switch" id="element-label-visible" checked>
             <span class="form-check-label">{% trans "Show label on floor plan" %}</span>
+          </label>
+        </div>
+        <div class="schematic-number-grid mb-3">
+          <label for="element-font-size">{% trans "Text size" %}
+            <input class="form-control" type="number" min="1" step="0.1" id="element-font-size" required>
+          </label>
+          <label for="element-label-angle">{% trans "Text orientation" %}
+            <select class="form-select no-ts" id="element-label-angle">
+              <option value="0">0&deg;</option>
+              <option value="90">90&deg;</option>
+              <option value="180">180&deg;</option>
+              <option value="270">270&deg;</option>
+            </select>
           </label>
         </div>
         <div class="mb-3">
@@ -154,6 +167,7 @@
       </aside>
     </div>
   </div>
-  <script src="{% static 'solomon_facilities/labels.js' %}?v=3"></script>
-  <script src="{% static 'solomon_facilities/editor.js' %}?v=13"></script>
+  <script src="{% url 'plugins:solomon_facilities:javascript_catalog' %}"></script>
+  <script src="{% static 'solomon_facilities/labels.js' %}?v=5"></script>
+  <script src="{% static 'solomon_facilities/editor.js' %}?v=15"></script>
 {% endblock content %}

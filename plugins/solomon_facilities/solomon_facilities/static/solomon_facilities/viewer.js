@@ -70,7 +70,7 @@
         fill: style.fill || "#b83f3f",
       });
     } else {
-      object = new fabric.Text(geometry.text || element.label || "Label", {
+      object = new fabric.Text(geometry.text || element.label || gettext("Label"), {
         ...common,
         left: geometry.x || 0,
         top: geometry.y || 0,
@@ -86,7 +86,7 @@
     object.facilityElement = element;
     object.itemOpacity = common.opacity;
     SolomonPlanLabels.normalizeTextScale(object);
-    SolomonPlanLabels.attach(object, element.label, style.label_visible !== false);
+    SolomonPlanLabels.attach(object, element.label, style.label_visible !== false, style.font_size || 18, style.label_angle || 0);
     object.elementType = element.element_type;
     object.target = objectTarget(element);
     return object;
@@ -168,21 +168,21 @@
     heading.appendChild(link);
     inspector.appendChild(heading);
     const details = document.createElement("dl");
-    addDetailRow(details, "Type", target.kind_label || target.type);
-    addDetailRow(details, "System", target.system);
-    addDetailRow(details, "Area", target.area_m2 ? `${target.area_m2} m²` : null);
-    addDetailRow(details, "Space", target.space);
-    addDetailRow(details, "Serves", target.serves_flats ? target.serves_flats.join(", ") : null);
+    addDetailRow(details, gettext("Type"), target.kind_label || target.type);
+    addDetailRow(details, gettext("System"), target.system);
+    addDetailRow(details, gettext("Area"), target.area_m2 ? `${target.area_m2} m²` : null);
+    addDetailRow(details, gettext("Space"), target.space);
+    addDetailRow(details, gettext("Serves"), target.serves_flats ? target.serves_flats.join(", ") : null);
     inspector.appendChild(details);
-    addLinkList(inspector, "Flat assignments", target.assignments, (entry) => `${entry.flat} - ${entry.role}`);
-    addLinkList(inspector, "Current use", target.usages, (entry) => `${entry.holder} - ${entry.type}`);
+    addLinkList(inspector, gettext("Flat assignments"), target.assignments, (entry) => `${entry.flat} - ${entry.role}`);
+    addLinkList(inspector, gettext("Current use"), target.usages, (entry) => `${entry.holder} - ${entry.type}`);
     if (target.locks && target.locks.length) {
       target.locks.forEach((lock) => addLinkList(inspector, lock.name, lock.keys, (entry) => entry.label));
     }
     if (target.emergency_instructions) {
       const heading = document.createElement("h3");
       heading.className = "h6 mt-4";
-      heading.textContent = "Emergency instructions";
+      heading.textContent = gettext("Emergency instructions");
       const text = document.createElement("p");
       text.textContent = target.emergency_instructions;
       inspector.append(heading, text);
@@ -247,9 +247,9 @@
   }
 
   async function initialize() {
-    if (!window.fabric) throw new Error("Fabric.js did not load");
+    if (!window.fabric) throw new Error(gettext("Fabric.js did not load"));
     const response = await fetch(app.dataset.url, {headers: {Accept: "application/json"}});
-    if (!response.ok) throw new Error(`Plan request failed (${response.status})`);
+    if (!response.ok) throw new Error(interpolate(gettext("Plan request failed (%s)"), [response.status]));
     planData = await response.json();
     canvas = new fabric.Canvas("schematic-canvas", {
       width: planData.plan.width,
