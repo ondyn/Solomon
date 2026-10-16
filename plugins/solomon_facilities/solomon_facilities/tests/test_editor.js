@@ -34,7 +34,13 @@ class Shape {
     Object.assign(this, {type: "rect", scaleX: 1, scaleY: 1, angle: 0, width: 100, height: 50, objectCaching: true}, options);
   }
   set(options) { Object.assign(this, options); }
-  setCoords() {}
+  setCoords() {
+    this.controlPositions = {};
+    for (const [key, control] of Object.entries(this.controls || {})) {
+      this.controlPositions[key] = control.positionHandler(null, null, this);
+    }
+  }
+  getViewportTransform() { return this.canvas?.viewportTransform || [1, 0, 0, 1, 0, 0]; }
   getCenterPoint() { return {x: this.left, y: this.top}; }
   translateToOriginPoint(point) { return point; }
   setPositionByOrigin(point, originX, originY) { this.anchor = {point, originX, originY}; }
@@ -65,6 +71,8 @@ class Line extends Shape {
     if (["x1", "x2", "y1", "y2"].some((key) => key in options)) {
       this.left = Math.min(this.x1, this.x2);
       this.top = Math.min(this.y1, this.y2);
+      this.width = Math.abs(this.x2 - this.x1);
+      this.height = Math.abs(this.y2 - this.y1);
     }
   }
   clone(callback) {
@@ -96,7 +104,11 @@ async function loadEditor(elements, translations = {}, targets = {spaces: {}, do
       this.uniformScaling = true;
       this.uniScaleKey = "shiftKey";
     }
-    add(object) { this.objects.push(object); }
+    add(object) {
+      object.canvas = this;
+      this.objects.push(object);
+      object.setCoords();
+    }
     on(name, handler) { this.handlers[name] = handler; }
     getActiveObject() { return this.active; }
     setActiveObject(object) { this.active = object; }
@@ -116,6 +128,7 @@ async function loadEditor(elements, translations = {}, targets = {spaces: {}, do
     Canvas, Rect: Shape, Line, IText: Text, Text,
     Image: {fromURL: (url, done) => done(new Shape({url, width: 500, height: 400}))},
     Point: class { constructor(x, y) { this.x = x; this.y = y; } },
+    Control: class { constructor(options) { Object.assign(this, options); } },
     util: {
       invertTransform: ([a, , , d, x, y]) => [1 / a, 0, 0, 1 / d, -x / a, -y / d],
       transformPoint: (point, [a, , , d, x, y]) => ({x: point.x * a + x, y: point.y * d + y}),
@@ -183,6 +196,21 @@ const textElement = {
   style: {font_size: 24},
 };
 
+// The drawn top-left corner of a left/top-origin shape: its stroke centerline, rotated with the shape.
+function corner(object) {
+  const half = Number(object.strokeWidth || 0) / 2;
+  const radians = object.angle * Math.PI / 180;
+  return {
+    x: object.left + half * Math.cos(radians) - half * Math.sin(radians),
+    y: object.top + half * Math.sin(radians) + half * Math.cos(radians),
+  };
+}
+
+function assertCorner(object, x, y) {
+  const point = corner(object);
+  assert.ok(Math.abs(point.x - x) < 1e-9 && Math.abs(point.y - y) < 1e-9, `corner ${point.x},${point.y} is not ${x},${y}`);
+}
+
 test("editor source visibility changes neither selection, dirty state, nor saved elements", async () => {
   const editor = await loadEditor([rectangle], {}, undefined, false, {background_url: "/source.svg"});
   const button = editor.field("toggle-background");
@@ -214,6 +242,34 @@ test("editor leaves source toggle disabled without a background", async () => {
   assert.equal(editor.field("toggle-background").handlers.click, undefined);
 });
 
+test("all line tools calculate endpoint controls before and after canvas attachment", async () => {
+  for (const snapEnabled of [false, true]) {
+    const editor = await loadEditor([], {}, undefined, snapEnabled);
+    editor.canvas.viewportTransform = [2, 0, 0, 2, 17, -11];
+    for (const type of ["wall", "door", "window", "line", "dimension"]) {
+      editor.buttons.add.dataset.add = type;
+      editor.buttons.add.handlers.click({currentTarget: editor.buttons.add});
+      const object = editor.canvas.getActiveObject();
+      assert.equal(object.elementType, type);
+      assert.equal(object.canvas, editor.canvas);
+      assert.equal(object.width, 120);
+      const detached = new Line([object.x1, object.y1, object.x2, object.y2], {});
+      detached.set({left: object.left, top: object.top, strokeWidth: object.strokeWidth});
+      detached.controls = object.controls;
+      detached.setCoords();
+      assert.equal(detached.controlPositions.p1.x, object.x1);
+      assert.equal(detached.controlPositions.p2.y, object.y2);
+      object.setCoords();
+      assert.equal(object.controlPositions.p1.x, object.x1 * 2 + 17);
+      assert.equal(object.controlPositions.p2.y, object.y2 * 2 - 11);
+    }
+    assert.equal(editor.canvas.getObjects().length, 5);
+    assert.equal(editor.field("save-state").textContent, "Changed");
+    const saved = await editor.save();
+    assert.equal(saved.elements.length, 5);
+  }
+});
+
 test("new wall thickness is thin, editable independently of length, and persists", async () => {
   const editor = await loadEditor([]);
   editor.buttons.add.dataset.add = "wall";
@@ -224,24 +280,27 @@ test("new wall thickness is thin, editable independently of length, and persists
   editor.field("element-height").change(1.5);
   assert.equal(wall.strokeWidth, 1.5);
   assert.equal(wall.scaleY, 1);
-  assert.equal(wall.width * wall.scaleX, 120);
+  assert.equal(wall.x2 - wall.x1, 120);
   editor.field("element-width").change(240);
-  assert.equal(wall.width * wall.scaleX, 240);
+  assert.equal(wall.x2 - wall.x1, 240);
   assert.equal(wall.strokeWidth, 1.5);
-  wall.angle = 90;
-  editor.field("element-height").change(2);
+  wall.controls.p2.actionHandler({}, {target: wall}, wall.x1, wall.y1 + 100);
+  assert.equal(wall.angle, 0, "Walls become vertical by moving an endpoint, not by rotating");
+  assert.equal(editor.field("element-width").value, "1.5");
+  editor.field("element-width").change(2);
   assert.equal(wall.strokeWidth, 2);
-  assert.equal(wall.angle, 90);
+  assert.equal(wall.y2 - wall.y1, 100);
   const saved = await editor.save();
   const reloaded = await loadEditor(saved.elements);
   reloaded.select(reloaded.canvas.objects[0]);
-  assert.equal(reloaded.field("element-height").value, "2.0");
-  assert.equal(reloaded.field("element-width").value, "240.0");
+  assert.equal(reloaded.field("element-width").value, "2.0");
+  assert.equal(reloaded.field("element-height").value, "100.0");
   assert.equal(saved.elements[0].style.stroke_width, 2);
+  assert.equal(saved.elements[0].style.angle, 0);
   assert.equal(saved.elements[0].style.scale_y, 1);
 });
 
-test("legacy near-horizontal doors discard pathological scale without changing length or position", async () => {
+test("legacy rotated and scaled lines are baked into the same rendered endpoints", async () => {
   const editor = await loadEditor([{
     element_type: "door", label: "A",
     geometry: {type: "line", x1: 0, x2: 120, y1: 0, y2: 1e-14},
@@ -250,20 +309,25 @@ test("legacy near-horizontal doors discard pathological scale without changing l
   }]);
   const door = editor.canvas.objects[0];
   editor.select(door);
-  assert.equal(door.height, 0);
+  assert.deepEqual([door.x1, door.y1, door.x2, door.y2], [123.5, 371.5, 123.5, 391.5]);
+  assert.equal(door.angle, 0);
+  assert.equal(door.scaleX, 1);
   assert.equal(door.scaleY, 1);
-  assert.equal(door.width * door.scaleX, 20);
-  assert.equal(door.left, 125);
+  assert.equal(door.left, 122);
   assert.equal(door.top, 370);
-  assert.equal(editor.field("element-height").value, "3.0");
+  assert.equal(editor.field("element-x").value, "123.5");
+  assert.equal(editor.field("element-width").value, "3.0");
+  assert.equal(editor.field("element-height").value, "20.0");
+  assert.notEqual(editor.field("save-state").textContent, "Changed");
   const saved = await editor.save();
-  assert.equal(saved.elements[0].style.position_x, 125);
+  assert.deepEqual(saved.elements[0].geometry, {type: "line", x1: 123.5, y1: 371.5, x2: 123.5, y2: 391.5});
+  assert.equal(saved.elements[0].style.position_x, 122);
   assert.equal(saved.elements[0].style.position_y, 370);
-  assert.equal(saved.elements[0].geometry.y2, 0);
+  assert.equal(saved.elements[0].style.angle, 0);
   assert.equal(saved.elements[0].style.scale_y, 1);
 });
 
-test("line position survives normalization on modification, save, duplicate, and reload", async () => {
+test("line endpoints survive modification, save, duplicate, and reload", async () => {
   const editor = await loadEditor([{
     element_type: "door", label: "B",
     geometry: {type: "line", x1: -60, x2: 60, y1: 0, y2: 0},
@@ -271,22 +335,81 @@ test("line position survives normalization on modification, save, duplicate, and
       position_x: 160, position_y: 370, angle: 90},
   }]);
   const door = editor.canvas.objects[0];
+  const endpoints = (line) => [line.x1, line.y1, line.x2, line.y2];
   editor.select(door);
+  assert.deepEqual(endpoints(door), [158.5, 371.5, 158.5, 391.5]);
   editor.canvas.handlers["object:modified"]({target: door});
-  assert.equal(door.left, 160);
-  assert.equal(door.top, 370);
+  assert.deepEqual(endpoints(door), [158.5, 371.5, 158.5, 391.5]);
   editor.field("duplicate-element").handlers.click();
   const duplicate = editor.canvas.objects[1];
-  assert.equal(duplicate.left, 192);
-  assert.equal(duplicate.top, 402);
+  assert.deepEqual(endpoints(duplicate), [190.5, 403.5, 190.5, 423.5]);
   const saved = await editor.save();
-  assert.equal(saved.elements[0].style.position_x, 160);
-  assert.equal(saved.elements[0].style.position_y, 370);
-  assert.equal(saved.elements[1].style.position_x, 192);
-  assert.equal(saved.elements[1].style.position_y, 402);
+  assert.equal(saved.elements[0].geometry.x1, 158.5);
+  assert.equal(saved.elements[1].geometry.y1, 403.5);
   const reloaded = await loadEditor(saved.elements);
-  assert.equal(reloaded.canvas.objects[0].left, 160);
-  assert.equal(reloaded.canvas.objects[0].top, 370);
+  assert.deepEqual(endpoints(reloaded.canvas.objects[0]), [158.5, 371.5, 158.5, 391.5]);
+  assert.deepEqual(endpoints(reloaded.canvas.objects[1]), [190.5, 403.5, 190.5, 423.5]);
+});
+
+test("line endpoints drag, snap to other elements before the grid, and lock with Shift", async () => {
+  const editor = await loadEditor([
+    {element_type: "wall", geometry: {type: "line", x1: 100, y1: 100, x2: 200, y2: 100}, style: {stroke_width: 3, position_x: 98.5, position_y: 98.5}},
+    {element_type: "space", geometry: {type: "rect", x: 249, y: 149, width: 50, height: 50}, style: {stroke_width: 2}},
+  ], {}, undefined, true);
+  const wall = editor.canvas.objects[0];
+  const drag = (x, y, shiftKey = false) => wall.controls.p2.actionHandler({shiftKey}, {target: wall}, x, y);
+  editor.select(wall);
+  assert.equal(drag(247.5, 152.5), true);
+  assert.deepEqual([wall.x2, wall.y2], [250, 150], "Room corner wins over the grid");
+  assert.equal(wall.angle, 0);
+  assert.equal(wall.left, 98.5);
+  drag(222.4, 131);
+  assert.deepEqual([wall.x2, wall.y2], [220, 130], "Free endpoints snap to the grid");
+  drag(222.4, 107, true);
+  assert.deepEqual([wall.x2, wall.y2], [220, 100], "Shift keeps the wall horizontal");
+  assert.equal(editor.field("element-width").value, "120.0");
+  assert.equal(editor.field("element-height").value, "3.0");
+  editor.field("toggle-snap-grid").handlers.click();
+  drag(222.4, 131);
+  assert.deepEqual([wall.x2, wall.y2], [222.4, 131]);
+  wall.locked = true;
+  assert.equal(drag(0, 0), false);
+  assert.deepEqual([wall.x2, wall.y2], [222.4, 131]);
+});
+
+test("moving a line snaps an endpoint to a nearby wall endpoint", async () => {
+  const editor = await loadEditor([
+    {element_type: "wall", geometry: {type: "line", x1: 100, y1: 100, x2: 200, y2: 100}, style: {stroke_width: 3, position_x: 98.5, position_y: 98.5}},
+    {element_type: "wall", geometry: {type: "line", x1: 202, y1: 103, x2: 202, y2: 203}, style: {stroke_width: 3, position_x: 200.5, position_y: 101.5}},
+  ], {}, undefined, true);
+  const vertical = editor.canvas.objects[1];
+  editor.select(vertical);
+  editor.canvas.handlers["object:moving"]({target: vertical});
+  editor.canvas.handlers["object:modified"]({target: vertical});
+  assert.deepEqual([vertical.x1, vertical.y1, vertical.x2, vertical.y2], [200, 100, 200, 200]);
+});
+
+test("align to grid joins legacy walls and rooms on shared grid points", async () => {
+  const editor = await loadEditor([
+    {element_type: "wall", geometry: {type: "line", x1: 0, y1: 0, x2: 100, y2: 0}, style: {stroke_width: 2, position_x: 480, position_y: 320}},
+    {element_type: "wall", geometry: {type: "line", x1: 0, y1: 0, x2: 100, y2: 0}, style: {stroke_width: 2, position_x: 481, position_y: 320, angle: 90}},
+    {element_type: "space", geometry: {type: "rect", x: 480, y: 320, width: 100.4, height: 59.8}, style: {stroke_width: 2}},
+    {element_type: "space", locked: true, geometry: {type: "rect", x: 13, y: 13, width: 10, height: 10}, style: {stroke_width: 2}},
+    textElement,
+  ]);
+  const [horizontal, vertical, room, locked, text] = editor.canvas.objects;
+  assert.deepEqual([horizontal.x1, horizontal.y1], [481, 321]);
+  assert.deepEqual([vertical.x1, vertical.y1], [480, 321], "Rotated legacy walls render 2 units off");
+  editor.field("align-grid").handlers.click();
+  assert.deepEqual([horizontal.x1, horizontal.y1, horizontal.x2, horizontal.y2], [480, 320, 580, 320]);
+  assert.deepEqual([vertical.x1, vertical.y1, vertical.x2, vertical.y2], [480, 320, 480, 420]);
+  assert.equal(room.left + room.strokeWidth / 2, 480);
+  assert.equal(room.top + room.strokeWidth / 2, 320);
+  assert.equal(room.width * room.scaleX, 100);
+  assert.equal(room.height * room.scaleY, 60);
+  assert.equal(locked.left, 13);
+  assert.equal(text.left, 200);
+  assert.equal(editor.field("save-state").textContent, "Changed");
 });
 
 test("vertical line Width changes stroke thickness and Height changes length", async () => {
@@ -314,14 +437,15 @@ test("snapping starts enabled without changing existing objects or marking the p
   assert.notEqual(editor.field("save-state").textContent, "Changed");
   editor.select(object);
   editor.canvas.handlers["object:moving"]({target: object});
-  assert.equal(object.left, 25);
-  assert.equal(object.top, 40);
+  assertCorner(object, 25, 45);
+  assert.equal(editor.field("element-x").value, "25.0");
+  assert.equal(editor.field("element-y").value, "45.0");
   button.handlers.click();
   assert.equal(button.attributes["aria-pressed"], "false");
   assert.ok(!button.classes.has("active"));
 });
 
-test("grid toggle snaps movement to 5 plan units and saves positions without changing geometry", async () => {
+test("grid toggle snaps the drawn corner to 5 plan units and saves positions without changing geometry", async () => {
   const editor = await loadEditor([rectangle, textElement]);
   const object = editor.canvas.objects[0];
   editor.select(object);
@@ -338,10 +462,9 @@ test("grid toggle snaps movement to 5 plan units and saves positions without cha
   assert.ok(button.classes.has("active"));
   assert.equal(object.left, 31, "Enabling does not move existing elements");
   assert.notEqual(editor.field("save-state").textContent, "Changed");
-  for (const [x, y, expectedX, expectedY] of [[31, 49, 30, 50], [32.4, 52.6, 30, 55], [-31, -49, -30, -50], [40, 60, 40, 60]]) {
+  for (const [x, y, expectedX, expectedY] of [[31, 49, 30, 50], [32.4, 52.6, 35, 55], [-31, -49, -30, -50], [40, 60, 40, 60]]) {
     move(x, y);
-    assert.equal(object.left, expectedX);
-    assert.equal(object.top, expectedY);
+    assertCorner(object, expectedX, expectedY);
     assert.ok(Math.abs(object.left - x) <= 2.5);
     assert.ok(Math.abs(object.top - y) <= 2.5);
   }
@@ -352,12 +475,11 @@ test("grid toggle snaps movement to 5 plan units and saves positions without cha
   assert.equal(object.scaleY, 3);
   editor.canvas.handlers["object:modified"]({target: object});
   const saved = await editor.save();
-  assert.equal(saved.elements[0].style.position_x, 40);
-  assert.equal(saved.elements[0].style.position_y, 60);
+  assert.equal(saved.elements[0].style.position_x, object.left);
+  assert.equal(saved.elements[0].style.position_y, object.top);
   assert.equal(saved.elements.length, 2, "The grid is not a saved object");
   const reloaded = await loadEditor(saved.elements);
-  assert.equal(reloaded.canvas.objects[0].left, 40);
-  assert.equal(reloaded.canvas.objects[0].top, 60);
+  assertCorner(reloaded.canvas.objects[0], 40, 60);
   button.handlers.click();
   assert.equal(button.attributes["aria-pressed"], "false");
   assert.ok(!button.classes.has("active"));
@@ -374,7 +496,7 @@ test("snapping respects movement locks, pan mode, zoom, and exact inspector inpu
   object.set({left: 31, top: 49, lockMovementX: true});
   editor.canvas.handlers["object:moving"]({target: object});
   assert.equal(object.left, 31);
-  assert.equal(object.top, 50);
+  assert.ok(Math.abs(corner(object).y - 50) < 1e-9);
   const locked = editor.canvas.objects[1];
   locked.set({left: 31, top: 49});
   editor.canvas.handlers["object:moving"]({target: locked});
@@ -390,10 +512,9 @@ test("snapping respects movement locks, pan mode, zoom, and exact inspector inpu
   editor.canvas.viewportTransform[4] = 127;
   editor.canvas.viewportTransform[5] = -59;
   editor.canvas.handlers["object:moving"]({target: object});
-  assert.equal(object.left, 30);
-  assert.equal(object.top, 50);
+  assertCorner(object, 30, 50);
   editor.field("element-x").change(33);
-  assert.equal(object.left, 33, "Inspector input stays exact");
+  assert.ok(Math.abs(corner(object).x - 33) < 1e-9, "Inspector input stays exact");
 });
 
 test("new and duplicated objects snap only when enabled", async () => {
@@ -404,11 +525,13 @@ test("new and duplicated objects snap only when enabled", async () => {
   editor.field("toggle-snap-grid").handlers.click();
   editor.select(editor.canvas.objects[0]);
   editor.field("duplicate-element").handlers.click();
-  assert.equal(editor.canvas.objects[2].left, 50);
-  assert.equal(editor.canvas.objects[2].top, 70);
+  assertCorner(editor.canvas.objects[2], 50, 75);
   editor.buttons.add.handlers.click({currentTarget: editor.buttons.add});
-  assert.equal(editor.canvas.active.left, 430);
-  assert.equal(editor.canvas.active.top, 350);
+  assertCorner(editor.canvas.active, 430, 350);
+  editor.buttons.add.dataset.add = "wall";
+  editor.buttons.add.handlers.click({currentTarget: editor.buttons.add});
+  const wall = editor.canvas.active;
+  assert.deepEqual([wall.x1 % 5, wall.y1 % 5, wall.x2 % 5, wall.y2 % 5], [0, 0, 0, 0]);
 });
 
 test("grid dots follow the viewport and are omitted when snapping is disabled", async () => {

@@ -19,10 +19,14 @@ flats, people, owners, and tenants. It does not duplicate those records.
 	available only to users who can edit plans and revisions.
 - Fabric.js vector editor for walls, doors, windows, spaces, labels,
 	dimensions, and technical items.
-- New walls use a 3-unit stroke. Height controls horizontal line thickness;
-	Width controls vertical line thickness, independently of line length and rotation.
-	Legacy lines with excessive scaling on a zero-length axis are normalized on load,
-	preserving their position when modifying, duplicating, saving, and reloading.
+- Walls, doors, windows, and dimensions are line segments with a draggable
+	handle at each end instead of scale and rotation handles. Drag an endpoint
+	to change length or direction; hold Shift to keep the line horizontal or
+	vertical. New walls use a 3-unit stroke. For a horizontal line, Width is its
+	length and Height its thickness; for a vertical line, Width is its thickness
+	and Height its length. X and Y are the segment's top-left endpoint. Lines are
+	saved as absolute endpoints without rotation or scaling; legacy rotated or
+	scaled lines are converted on load without changing where they are drawn.
 - SVG export includes visible vector elements and labels at the full plan size,
 	without the source drawing or canvas background, independently of viewer zoom.
 - Element labels appear centered on shapes in the editor, viewer, and SVG
@@ -42,14 +46,22 @@ flats, people, owners, and tenants. It does not duplicate those records.
 - The editor can bring the selected element to front, forward, backward, or
 	to back (toolbar or `Shift+]`, `]`, `[`, `Shift+[`); the order is saved.
 - The editor's Snap to grid toolbar toggle starts enabled. When enabled, grid dots
-	appear and moving, adding, or duplicating unlocked elements snaps their
-	position to the nearest 5 plan-coordinate units (up to 2.5 units per axis).
-	Resize handles snap dimensions in 5-unit steps while keeping the opposite
+	appear and moving, adding, or duplicating unlocked elements snaps their drawn
+	geometry (the stroke centerline, not the bounding box) to the nearest 5
+	plan-coordinate units: line endpoints and the top-left corner of shapes, so
+	walls and room edges meet regardless of stroke width or orientation. Line
+	endpoints within 6 screen pixels of another line's endpoint or a room corner
+	snap to that point first. Resize handles snap dimensions in 5-unit steps while keeping the opposite
 	anchor fixed, including rotated shapes. Proportional resizing preserves the
 	aspect ratio and snaps the larger dimension. Rotation snaps in 15-degree steps.
 	The grid follows zoom and pan; multi-selections move together. Enabling it
 	does not change existing elements or mark the plan changed. Inspector values
 	remain exact; the grid is not saved or exported.
+- The editor's Align elements to grid toolbar button aligns an existing plan in
+	one step: it rounds every unlocked line endpoint to the grid, rounds
+	axis-aligned room sizes to 5 units, and moves each room's top-left corner onto
+	the grid. Text, circles, and locked elements are unchanged. Save afterwards to
+	keep the result.
 - Each element has a saved Transparent switch. The Transparent items toolbar
 	toggle in the viewer and editor temporarily renders all shapes see-through
 	so items hidden behind spaces become visible; it is remembered per browser.

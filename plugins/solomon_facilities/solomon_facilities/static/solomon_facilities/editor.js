@@ -37,13 +37,211 @@
   const TRANSPARENT_OPACITY = 0.62;
   const GRID_SIZE = 5;
   const ROTATION_STEP = 15;
+  const ANCHOR_TOLERANCE_PX = 6;
   let snapToGrid = true;
+
+  // Snapping and alignment use drawn geometry (stroke centerlines), not Fabric's
+  // bounding box, whose offset from the geometry depends on stroke width and rotation.
+  function isLine(object) {
+    return object.type === "line";
+  }
+
+  function isText(object) {
+    return object.type === "i-text" || object.type === "text";
+  }
+
+  function rotatePoint(x, y, angle) {
+    const degrees = Number(angle || 0);
+    const radians = degrees * Math.PI / 180;
+    const quarter = degrees % 90 === 0;
+    const cos = quarter ? Math.round(Math.cos(radians)) : Math.cos(radians);
+    const sin = quarter ? Math.round(Math.sin(radians)) : Math.sin(radians);
+    return {x: x * cos - y * sin, y: x * sin + y * cos};
+  }
+
+  function objectGeometry(object) {
+    const strokeWidth = Number(object.strokeWidth || 0);
+    const width = Number(object.width || 0) * Math.abs(Number(object.scaleX || 1));
+    const height = Number(object.height || 0) * Math.abs(Number(object.scaleY || 1));
+    const offset = rotatePoint((width + strokeWidth) / 2, (height + strokeWidth) / 2, object.angle);
+    return {center: {x: object.left + offset.x, y: object.top + offset.y}, width, height};
+  }
+
+  function lineEndpoints(object) {
+    const {center} = objectGeometry(object);
+    const halfX = Number(object.width || 0) * Number(object.scaleX || 1) / 2 * (object.x1 <= object.x2 ? -1 : 1);
+    const halfY = Number(object.height || 0) * Number(object.scaleY || 1) / 2 * (object.y1 <= object.y2 ? -1 : 1);
+    const offset = rotatePoint(halfX, halfY, object.angle);
+    return [
+      {x: center.x + offset.x, y: center.y + offset.y},
+      {x: center.x - offset.x, y: center.y - offset.y},
+    ];
+  }
+
+  function setLineEndpoints(object, start, end) {
+    const strokeWidth = Number(object.strokeWidth || 0);
+    object.set({x1: start.x, y1: start.y, x2: end.x, y2: end.y, angle: 0, scaleX: 1, scaleY: 1, flipX: false, flipY: false});
+    object.set({
+      width: Math.abs(end.x - start.x),
+      height: Math.abs(end.y - start.y),
+      left: Math.min(start.x, end.x) - strokeWidth / 2,
+      top: Math.min(start.y, end.y) - strokeWidth / 2,
+    });
+    object.setCoords();
+  }
+
+  // Lines are stored as absolute endpoints without rotation or scaling.
+  function bakeLine(object) {
+    if (!isLine(object)) return;
+    SolomonPlanLabels.normalizeLineScale(object);
+    const [start, end] = lineEndpoints(object);
+    setLineEndpoints(object, start, end);
+  }
+
+  function shapeCorners(object) {
+    const {center, width, height} = objectGeometry(object);
+    return [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sy]) => {
+      const offset = rotatePoint(sx * width / 2, sy * height / 2, object.angle);
+      return {x: center.x + offset.x, y: center.y + offset.y};
+    });
+  }
+
+  function referencePoint(object) {
+    if (isLine(object)) {
+      const [start, end] = lineEndpoints(object);
+      return {x: Math.min(start.x, end.x), y: Math.min(start.y, end.y)};
+    }
+    if (isText(object) || object.type === "activeSelection" || object.type === "group") {
+      return {x: object.left, y: object.top};
+    }
+    return shapeCorners(object)[0];
+  }
+
+  function snapValue(value) {
+    return Math.round(value / GRID_SIZE) * GRID_SIZE;
+  }
+
+  function anchorPoints(exclude) {
+    if (!canvas) return [];
+    const points = [];
+    canvas.getObjects().forEach((object) => {
+      if (object === exclude || object.visible === false) return;
+      if (isLine(object)) points.push(...lineEndpoints(object));
+      else if (object.type === "rect") points.push(...shapeCorners(object));
+    });
+    return points;
+  }
+
+  function nearestAnchor(points, anchors) {
+    const tolerance = ANCHOR_TOLERANCE_PX / zoom;
+    let best = null;
+    points.forEach((point) => anchors.forEach((anchor) => {
+      const distance = Math.hypot(anchor.x - point.x, anchor.y - point.y);
+      if (distance <= tolerance && (!best || distance < best.distance)) best = {point, anchor, distance};
+    }));
+    return best;
+  }
+
+  function snapEndpoint(point, object, other, constrain) {
+    let target = {x: point.x, y: point.y};
+    if (constrain) {
+      if (Math.abs(target.x - other.x) < Math.abs(target.y - other.y)) target.x = other.x;
+      else target.y = other.y;
+    }
+    if (!snapToGrid) return target;
+    const anchor = constrain ? null : nearestAnchor([target], anchorPoints(object));
+    if (anchor) return {x: anchor.anchor.x, y: anchor.anchor.y};
+    return {
+      x: constrain && target.x === other.x ? target.x : snapValue(target.x),
+      y: constrain && target.y === other.y ? target.y : snapValue(target.y),
+    };
+  }
+
+  function endpointControl(index) {
+    return new fabric.Control({
+      cursorStyle: "crosshair",
+      actionName: "modifyLine",
+      positionHandler(dimensions, finalMatrix, object) {
+        const point = lineEndpoints(object)[index];
+        const transform = object.getViewportTransform();
+        return new fabric.Point(point.x * transform[0] + transform[4], point.y * transform[3] + transform[5]);
+      },
+      actionHandler(eventData, transform, x, y) {
+        const object = transform.target;
+        if (object.locked) return false;
+        const endpoints = lineEndpoints(object);
+        const other = endpoints[1 - index];
+        endpoints[index] = snapEndpoint({x, y}, object, other, Boolean(eventData?.shiftKey));
+        setLineEndpoints(object, endpoints[0], endpoints[1]);
+        updateInspector(object);
+        return true;
+      },
+    });
+  }
+
+  function moveBy(object, dx, dy) {
+    if (!object.lockMovementX) object.set({left: object.left + dx});
+    if (!object.lockMovementY) object.set({top: object.top + dy});
+    object.setCoords();
+  }
 
   function snapPosition(object) {
     if (!snapToGrid || panMode || object.locked) return;
-    if (!object.lockMovementX) object.set({left: Math.round(object.left / GRID_SIZE) * GRID_SIZE});
-    if (!object.lockMovementY) object.set({top: Math.round(object.top / GRID_SIZE) * GRID_SIZE});
-    object.setCoords();
+    if (isLine(object)) {
+      const endpoints = lineEndpoints(object);
+      const anchor = nearestAnchor(endpoints, anchorPoints(object));
+      if (anchor) {
+        moveBy(object, anchor.anchor.x - anchor.point.x, anchor.anchor.y - anchor.point.y);
+        return;
+      }
+    }
+    const reference = referencePoint(object);
+    moveBy(object, snapValue(reference.x) - reference.x, snapValue(reference.y) - reference.y);
+  }
+
+  function alignToGrid() {
+    // Objects inside a multi-selection have group-relative coordinates.
+    canvas.discardActiveObject();
+    let changed = false;
+    const moved = (before, after) => Math.abs(before - after) > 1e-6;
+    canvas.getObjects().forEach((object) => {
+      if (object.locked || isText(object)) return;
+      if (isLine(object)) {
+        const endpoints = lineEndpoints(object);
+        const snapped = endpoints.map((point) => ({x: snapValue(point.x), y: snapValue(point.y)}));
+        if (endpoints.some((point, index) => moved(point.x, snapped[index].x) || moved(point.y, snapped[index].y))) {
+          setLineEndpoints(object, snapped[0], snapped[1]);
+          changed = true;
+        }
+        return;
+      }
+      if (object.type !== "rect") return;
+      if (Math.abs(Number(object.angle || 0)) % 90 === 0) {
+        const {width, height} = objectGeometry(object);
+        const sizeX = Math.max(GRID_SIZE, snapValue(width));
+        const sizeY = Math.max(GRID_SIZE, snapValue(height));
+        if (object.width && moved(width, sizeX)) {
+          object.set({scaleX: Math.sign(object.scaleX || 1) * sizeX / object.width});
+          changed = true;
+        }
+        if (object.height && moved(height, sizeY)) {
+          object.set({scaleY: Math.sign(object.scaleY || 1) * sizeY / object.height});
+          changed = true;
+        }
+      }
+      const reference = referencePoint(object);
+      const dx = snapValue(reference.x) - reference.x;
+      const dy = snapValue(reference.y) - reference.y;
+      if (moved(dx, 0) || moved(dy, 0)) {
+        object.set({left: object.left + dx, top: object.top + dy});
+        object.setCoords();
+        changed = true;
+      }
+    });
+    canvas.requestRenderAll();
+    updateInspector();
+    if (changed) markChanged();
+    return changed;
   }
 
   function snapResize(event) {
@@ -179,7 +377,13 @@
   function prepareObject(object) {
     SolomonPlanLabels.normalizeLineScale(object);
     object.set({strokeUniform: true, opacity: SolomonPlanLabels.displayOpacity(object, seeThrough)});
-    if (object.type === "i-text" || object.type === "text") {
+    if (isLine(object)) {
+      bakeLine(object);
+      // Walls and other lines are edited by dragging their endpoints, never by scaling or rotating.
+      object.controls = {p1: endpointControl(0), p2: endpointControl(1)};
+      object.hasBorders = false;
+    }
+    if (isText(object)) {
       SolomonPlanLabels.normalizeTextScale(object);
       // Only corner handles, so text grows proportionally and is never stretched.
       object.setControlsVisibility({mt: false, mb: false, ml: false, mr: false});
@@ -197,6 +401,7 @@
 
   function serializeObject(object, index) {
     SolomonPlanLabels.normalizeLineScale(object);
+    bakeLine(object);
     let geometry;
     if (object.type === "line") {
       geometry = {
@@ -355,6 +560,7 @@
     object.targetId = "";
     object.locked = false;
     snapPosition(object);
+    bakeLine(object);
     canvas.discardActiveObject();
     canvas.add(object);
     canvas.setActiveObject(object);
@@ -381,6 +587,7 @@
       duplicate.targetId = "";
       duplicate.locked = Boolean(source.locked);
       snapPosition(duplicate);
+      bakeLine(duplicate);
       canvas.discardActiveObject();
       canvas.add(duplicate);
       canvas.setActiveObject(duplicate);
@@ -480,11 +687,19 @@
     fields.labelAngle.value = String(((Math.round(labelAngle / 90) * 90) % 360 + 360) % 360);
     populateTargetOptions();
     fields.target.value = object.targetKind && object.targetId ? `${object.targetKind}:${object.targetId}` : "";
-    fields.x.value = Number(object.left || 0).toFixed(1);
-    fields.y.value = Number(object.top || 0).toFixed(1);
-    const dimensionBases = objectDimensionBases(object);
-    fields.width.value = Number(dimensionBases.width * (object.type === "line" && !object.width ? 1 : object.scaleX) || 0).toFixed(1);
-    fields.height.value = Number(dimensionBases.height * (object.type === "line" && !object.height ? 1 : object.scaleY) || 0).toFixed(1);
+    const reference = referencePoint(object);
+    fields.x.value = Number(reference.x || 0).toFixed(1);
+    fields.y.value = Number(reference.y || 0).toFixed(1);
+    if (isLine(object)) {
+      const [start, end] = lineEndpoints(object);
+      const strokeWidth = Number(object.strokeWidth || 0);
+      fields.width.value = Number(Math.abs(end.x - start.x) || strokeWidth).toFixed(1);
+      fields.height.value = Number(Math.abs(end.y - start.y) || strokeWidth).toFixed(1);
+    } else {
+      const dimensionBases = objectDimensionBases(object);
+      fields.width.value = Number(dimensionBases.width * object.scaleX || 0).toFixed(1);
+      fields.height.value = Number(dimensionBases.height * object.scaleY || 0).toFixed(1);
+    }
     fields.stroke.value = /^#[0-9a-f]{6}$/i.test(object.stroke) ? object.stroke : "#27343a";
     fields.fill.value = /^#[0-9a-f]{6}$/i.test(object.fill) ? object.fill : "#dce9e4";
     fields.locked.checked = Boolean(object.locked);
@@ -530,27 +745,39 @@
     const [targetKind = "", targetId = ""] = fields.target.value.split(":");
     object.targetKind = targetKind;
     object.targetId = targetId;
+    const x = Number(fields.x.value || 0);
+    const y = Number(fields.y.value || 0);
+    const width = Number(fields.width.value);
+    const height = Number(fields.height.value);
     object.set({
-      left: Number(fields.x.value || 0),
-      top: Number(fields.y.value || 0),
       stroke: fields.stroke.value,
-      fill: object.type === "line" ? undefined : fields.fill.value,
+      fill: isLine(object) ? undefined : fields.fill.value,
       lockMovementX: fields.locked.checked,
       lockMovementY: fields.locked.checked,
       hasControls: !fields.locked.checked,
     });
-    const dimensionBases = objectDimensionBases(object);
-    const width = Number(fields.width.value);
-    const height = Number(fields.height.value);
-    if (object.type === "line" && !object.width) {
-      if (width > 0) object.set({strokeWidth: width});
-    } else if (dimensionBases.width && width > 0) {
-      object.set({scaleX: width / dimensionBases.width});
-    }
-    if (object.type === "line" && !object.height) {
-      if (height > 0) object.set({strokeWidth: height});
-    } else if (dimensionBases.height && height > 0) {
-      object.set({scaleY: height / dimensionBases.height});
+    if (isLine(object)) {
+      // X/Y is the segment's top-left point. A zero span's field sets thickness; otherwise it sets the span.
+      const [start, end] = lineEndpoints(object);
+      const minX = Math.min(start.x, end.x);
+      const minY = Math.min(start.y, end.y);
+      const spanX = Math.abs(end.x - start.x);
+      const spanY = Math.abs(end.y - start.y);
+      const ratioX = spanX && width > 0 ? width / spanX : 1;
+      const ratioY = spanY && height > 0 ? height / spanY : 1;
+      if (!spanX && width > 0) object.set({strokeWidth: width});
+      if (!spanY && height > 0) object.set({strokeWidth: height});
+      const place = (point) => ({x: x + (point.x - minX) * ratioX, y: y + (point.y - minY) * ratioY});
+      setLineEndpoints(object, place(start), place(end));
+    } else {
+      const reference = referencePoint(object);
+      object.set({left: object.left + x - reference.x, top: object.top + y - reference.y});
+      const dimensionBases = objectDimensionBases(object);
+      if (dimensionBases.width && width > 0) object.set({scaleX: width / dimensionBases.width});
+      if (dimensionBases.height && height > 0) object.set({scaleY: height / dimensionBases.height});
+      // Resizing must keep the reference corner where the inspector placed it.
+      const resized = referencePoint(object);
+      object.set({left: object.left + x - resized.x, top: object.top + y - resized.y});
     }
     SolomonPlanLabels.normalizeTextScale(object);
     object.locked = fields.locked.checked;
@@ -633,6 +860,7 @@
     canvas.on("object:modified", (event) => {
       if (event.target) {
         SolomonPlanLabels.normalizeLineScale(event.target);
+        bakeLine(event.target);
         SolomonPlanLabels.normalizeTextScale(event.target);
       }
       updateInspector();
@@ -712,6 +940,7 @@
       snapButton.setAttribute("aria-pressed", snapToGrid ? "true" : "false");
       canvas.requestRenderAll();
     });
+    document.getElementById("align-grid").addEventListener("click", alignToGrid);
     document.getElementById("zoom-in").addEventListener("click", () => { zoom = Math.min(3, zoom * 1.2); applyZoom(); });
     document.getElementById("zoom-out").addEventListener("click", () => { zoom = Math.max(0.1, zoom / 1.2); applyZoom(); });
     document.getElementById("zoom-fit").addEventListener("click", fitCanvas);
