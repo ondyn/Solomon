@@ -58,6 +58,20 @@
     };
   }
 
+  function normalizeLineScale(object) {
+    if (object.type !== "line") return;
+    const {left, top} = object;
+    // Floating-point endpoint noise must not turn a zero-length axis into a huge scale.
+    if (Math.abs(object.x2 - object.x1) < 1e-8) {
+      object.set({x2: object.x1, width: 0, scaleX: 1});
+    }
+    if (Math.abs(object.y2 - object.y1) < 1e-8) {
+      object.set({y2: object.y1, height: 0, scaleY: 1});
+    }
+    // Fabric recalculates left/top when an endpoint is set, even if it did not change.
+    object.set({left, top});
+  }
+
   // Text elements resize through their font size so glyphs keep their proportions.
   function normalizeTextScale(object) {
     if (object.type !== "i-text" && object.type !== "text") return false;
@@ -99,11 +113,28 @@
     }
   }
 
+  function bindBackgroundToggle(canvas, button) {
+    const image = canvas.backgroundImage;
+    image.set({visible: true});
+    button.disabled = false;
+    button.classList.toggle("active", true);
+    button.setAttribute("aria-pressed", "true");
+    button.addEventListener("click", () => {
+      const visible = !image.visible;
+      image.set({visible});
+      button.classList.toggle("active", visible);
+      button.setAttribute("aria-pressed", visible ? "true" : "false");
+      canvas.requestRenderAll();
+    });
+  }
+
   window.SolomonPlanLabels = {
     attach,
+    normalizeLineScale,
     normalizeTextScale,
     displayOpacity,
     loadSeeThrough,
     storeSeeThrough,
+    bindBackgroundToggle,
   };
 })();

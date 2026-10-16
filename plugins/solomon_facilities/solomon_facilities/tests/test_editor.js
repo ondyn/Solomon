@@ -54,16 +54,37 @@ class Text extends Shape {
   toSVG() { return `<text font-size="${this.fontSize}" transform="rotate(${this.angle})">${this.text}</text>`; }
 }
 
+class Line extends Shape {
+  constructor([x1, y1, x2, y2], options) {
+    super({...options, type: "line", x1, y1, x2, y2,
+      left: Math.min(x1, x2), top: Math.min(y1, y2),
+      width: Math.abs(x2 - x1), height: Math.abs(y2 - y1)});
+  }
+  set(options) {
+    super.set(options);
+    if (["x1", "x2", "y1", "y2"].some((key) => key in options)) {
+      this.left = Math.min(this.x1, this.x2);
+      this.top = Math.min(this.y1, this.y2);
+    }
+  }
+  clone(callback) {
+    const duplicate = new Line([this.x1, this.y1, this.x2, this.y2], {...this});
+    duplicate.set({left: this.left, top: this.top});
+    callback(duplicate);
+  }
+}
+
 function source(name) {
   return fs.readFileSync(path.join(__dirname, "../static/solomon_facilities", name), "utf8");
 }
 
-async function loadEditor(elements, translations = {}, targets = {spaces: {}, doors: {}, technical_assets: {}}, snapEnabled = false) {
+async function loadEditor(elements, translations = {}, targets = {spaces: {}, doors: {}, technical_assets: {}}, snapEnabled = false, revision = {}) {
   const fields = {};
   const field = (id) => fields[id] ||= new Field();
   field("schematic-editor").dataset = {url: "/data/", saveUrl: "/data/", revisionId: "1"};
   field("schematic-stage").clientWidth = 1036;
   field("element-label-angle").reportValidity = () => true;
+  field("toggle-background").disabled = true;
   let canvas;
   let saved;
   class Canvas {
@@ -89,9 +110,11 @@ async function loadEditor(elements, translations = {}, targets = {spaces: {}, do
     getContext() { return this.context; }
     setViewportTransform(transform) { this.viewportTransform = transform; }
     requestRenderAll() {}
+    setBackgroundImage(image, done) { this.backgroundImage = image; done(); }
   }
   const fabric = {
-    Canvas, Rect: Shape, IText: Text, Text,
+    Canvas, Rect: Shape, Line, IText: Text, Text,
+    Image: {fromURL: (url, done) => done(new Shape({url, width: 500, height: 400}))},
     Point: class { constructor(x, y) { this.x = x; this.y = y; } },
     util: {
       invertTransform: ([a, , , d, x, y]) => [1 / a, 0, 0, 1 / d, -x / a, -y / d],
@@ -126,7 +149,7 @@ async function loadEditor(elements, translations = {}, targets = {spaces: {}, do
         ok: true,
         headers: {get: () => "application/json"},
         json: async () => options.method === "PUT" ? {} : {
-          plan: {width: 1000, height: 800}, revision: {}, elements,
+          plan: {width: 1000, height: 800}, revision, elements,
           targets,
         },
       };
@@ -159,6 +182,126 @@ const textElement = {
   geometry: {type: "text", x: 200, y: 100, text: "Note"},
   style: {font_size: 24},
 };
+
+test("editor source visibility changes neither selection, dirty state, nor saved elements", async () => {
+  const editor = await loadEditor([rectangle], {}, undefined, false, {background_url: "/source.svg"});
+  const button = editor.field("toggle-background");
+  const image = editor.canvas.backgroundImage;
+  const object = editor.canvas.objects[0];
+  editor.select(object);
+  const before = await editor.save();
+  const saveState = editor.field("save-state").textContent;
+  assert.equal(button.disabled, false);
+  assert.equal(image.visible, true);
+  assert.equal(button.attributes["aria-pressed"], "true");
+  button.handlers.click();
+  assert.equal(image.visible, false);
+  assert.equal(button.attributes["aria-pressed"], "false");
+  assert.equal(button.classes.has("active"), false);
+  assert.equal(editor.canvas.getActiveObject(), object);
+  assert.equal(editor.field("save-state").textContent, saveState);
+  assert.deepEqual(await editor.save(), before);
+  button.handlers.click();
+  assert.equal(image.visible, true);
+  assert.equal(image.opacity, 0.7);
+  assert.equal(button.attributes["aria-pressed"], "true");
+  assert.equal(button.classes.has("active"), true);
+});
+
+test("editor leaves source toggle disabled without a background", async () => {
+  const editor = await loadEditor([]);
+  assert.equal(editor.field("toggle-background").disabled, true);
+  assert.equal(editor.field("toggle-background").handlers.click, undefined);
+});
+
+test("new wall thickness is thin, editable independently of length, and persists", async () => {
+  const editor = await loadEditor([]);
+  editor.buttons.add.dataset.add = "wall";
+  editor.buttons.add.handlers.click({currentTarget: editor.buttons.add});
+  const wall = editor.canvas.objects[0];
+  assert.equal(wall.strokeWidth, 3);
+  assert.equal(editor.field("element-height").value, "3.0");
+  editor.field("element-height").change(1.5);
+  assert.equal(wall.strokeWidth, 1.5);
+  assert.equal(wall.scaleY, 1);
+  assert.equal(wall.width * wall.scaleX, 120);
+  editor.field("element-width").change(240);
+  assert.equal(wall.width * wall.scaleX, 240);
+  assert.equal(wall.strokeWidth, 1.5);
+  wall.angle = 90;
+  editor.field("element-height").change(2);
+  assert.equal(wall.strokeWidth, 2);
+  assert.equal(wall.angle, 90);
+  const saved = await editor.save();
+  const reloaded = await loadEditor(saved.elements);
+  reloaded.select(reloaded.canvas.objects[0]);
+  assert.equal(reloaded.field("element-height").value, "2.0");
+  assert.equal(reloaded.field("element-width").value, "240.0");
+  assert.equal(saved.elements[0].style.stroke_width, 2);
+  assert.equal(saved.elements[0].style.scale_y, 1);
+});
+
+test("legacy near-horizontal doors discard pathological scale without changing length or position", async () => {
+  const editor = await loadEditor([{
+    element_type: "door", label: "A",
+    geometry: {type: "line", x1: 0, x2: 120, y1: 0, y2: 1e-14},
+    style: {scale_x: 1 / 6, scale_y: 9014775342729034, stroke_width: 3,
+      position_x: 125, position_y: 370, angle: 90},
+  }]);
+  const door = editor.canvas.objects[0];
+  editor.select(door);
+  assert.equal(door.height, 0);
+  assert.equal(door.scaleY, 1);
+  assert.equal(door.width * door.scaleX, 20);
+  assert.equal(door.left, 125);
+  assert.equal(door.top, 370);
+  assert.equal(editor.field("element-height").value, "3.0");
+  const saved = await editor.save();
+  assert.equal(saved.elements[0].style.position_x, 125);
+  assert.equal(saved.elements[0].style.position_y, 370);
+  assert.equal(saved.elements[0].geometry.y2, 0);
+  assert.equal(saved.elements[0].style.scale_y, 1);
+});
+
+test("line position survives normalization on modification, save, duplicate, and reload", async () => {
+  const editor = await loadEditor([{
+    element_type: "door", label: "B",
+    geometry: {type: "line", x1: -60, x2: 60, y1: 0, y2: 0},
+    style: {scale_x: 1 / 6, scale_y: 1, stroke_width: 3,
+      position_x: 160, position_y: 370, angle: 90},
+  }]);
+  const door = editor.canvas.objects[0];
+  editor.select(door);
+  editor.canvas.handlers["object:modified"]({target: door});
+  assert.equal(door.left, 160);
+  assert.equal(door.top, 370);
+  editor.field("duplicate-element").handlers.click();
+  const duplicate = editor.canvas.objects[1];
+  assert.equal(duplicate.left, 192);
+  assert.equal(duplicate.top, 402);
+  const saved = await editor.save();
+  assert.equal(saved.elements[0].style.position_x, 160);
+  assert.equal(saved.elements[0].style.position_y, 370);
+  assert.equal(saved.elements[1].style.position_x, 192);
+  assert.equal(saved.elements[1].style.position_y, 402);
+  const reloaded = await loadEditor(saved.elements);
+  assert.equal(reloaded.canvas.objects[0].left, 160);
+  assert.equal(reloaded.canvas.objects[0].top, 370);
+});
+
+test("vertical line Width changes stroke thickness and Height changes length", async () => {
+  const editor = await loadEditor([{
+    element_type: "wall", geometry: {type: "line", x1: 10, x2: 10, y1: 20, y2: 120},
+    style: {stroke_width: 7, scale_x: 1000},
+  }]);
+  const wall = editor.canvas.objects[0];
+  editor.select(wall);
+  editor.field("element-width").change(2);
+  editor.field("element-height").change(200);
+  assert.equal(wall.strokeWidth, 2);
+  assert.equal(wall.scaleX, 1);
+  assert.equal(wall.height * wall.scaleY, 200);
+});
 
 test("snapping starts enabled without changing existing objects or marking the plan changed", async () => {
   const editor = await loadEditor([{...rectangle, geometry: {...rectangle.geometry, x: 23, y: 42}}], {}, undefined, true);

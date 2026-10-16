@@ -79,6 +79,7 @@
         fontFamily: "Avenir Next, Trebuchet MS, sans-serif",
       });
     }
+    SolomonPlanLabels.normalizeLineScale(object);
     if (style.position_x !== undefined && style.position_y !== undefined) {
       object.set({left: Number(style.position_x), top: Number(style.position_y)});
       object.setCoords();
@@ -112,7 +113,10 @@
         });
         image.scaleX = (quarterTurn ? planData.plan.height : planData.plan.width) / image.width;
         image.scaleY = (quarterTurn ? planData.plan.width : planData.plan.height) / image.height;
-        canvas.setBackgroundImage(image, done);
+        canvas.setBackgroundImage(image, () => {
+          SolomonPlanLabels.bindBackgroundToggle(canvas, document.getElementById("toggle-background"));
+          done();
+        });
       },
       {crossOrigin: "anonymous"}
     );
@@ -238,7 +242,22 @@
   }
 
   function exportSvg() {
-    const blob = new Blob([canvas.toSVG()], {type: "image/svg+xml;charset=utf-8"});
+    const backgroundImage = canvas.backgroundImage;
+    const backgroundColor = canvas.backgroundColor;
+    let svg;
+    try {
+      canvas.backgroundImage = null;
+      canvas.backgroundColor = "";
+      svg = canvas.toSVG({
+        width: planData.plan.width,
+        height: planData.plan.height,
+        viewBox: {x: 0, y: 0, width: planData.plan.width, height: planData.plan.height},
+      });
+    } finally {
+      canvas.backgroundImage = backgroundImage;
+      canvas.backgroundColor = backgroundColor;
+    }
+    const blob = new Blob([svg], {type: "image/svg+xml;charset=utf-8"});
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = `${planData.plan.name}.svg`;

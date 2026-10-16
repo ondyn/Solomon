@@ -160,6 +160,7 @@
         fontFamily: "Avenir Next, Trebuchet MS, sans-serif",
       });
     }
+    SolomonPlanLabels.normalizeLineScale(object);
     if (style.position_x !== undefined && style.position_y !== undefined) {
       object.set({left: Number(style.position_x), top: Number(style.position_y)});
       object.setCoords();
@@ -176,6 +177,7 @@
   }
 
   function prepareObject(object) {
+    SolomonPlanLabels.normalizeLineScale(object);
     object.set({strokeUniform: true, opacity: SolomonPlanLabels.displayOpacity(object, seeThrough)});
     if (object.type === "i-text" || object.type === "text") {
       SolomonPlanLabels.normalizeTextScale(object);
@@ -194,6 +196,7 @@
   }
 
   function serializeObject(object, index) {
+    SolomonPlanLabels.normalizeLineScale(object);
     let geometry;
     if (object.type === "line") {
       geometry = {
@@ -276,7 +279,10 @@
         });
         image.scaleX = (quarterTurn ? planData.plan.height : planData.plan.width) / image.width;
         image.scaleY = (quarterTurn ? planData.plan.width : planData.plan.height) / image.height;
-        canvas.setBackgroundImage(image, done);
+        canvas.setBackgroundImage(image, () => {
+          SolomonPlanLabels.bindBackgroundToggle(canvas, document.getElementById("toggle-background"));
+          done();
+        });
       },
       {crossOrigin: "anonymous"}
     );
@@ -310,7 +316,7 @@
       const colors = {door: "#d08b27", window: "#2f7e9a", dimension: "#65757b"};
       object = new fabric.Line([center.x - 60, center.y, center.x + 60, center.y], {
         stroke: colors[elementType] || "#27343a",
-        strokeWidth: elementType === "wall" ? 7 : 3,
+        strokeWidth: 3,
       });
     } else if (elementType === "space") {
       object = new fabric.Rect({
@@ -477,8 +483,8 @@
     fields.x.value = Number(object.left || 0).toFixed(1);
     fields.y.value = Number(object.top || 0).toFixed(1);
     const dimensionBases = objectDimensionBases(object);
-    fields.width.value = Number(dimensionBases.width * object.scaleX || 0).toFixed(1);
-    fields.height.value = Number(dimensionBases.height * object.scaleY || 0).toFixed(1);
+    fields.width.value = Number(dimensionBases.width * (object.type === "line" && !object.width ? 1 : object.scaleX) || 0).toFixed(1);
+    fields.height.value = Number(dimensionBases.height * (object.type === "line" && !object.height ? 1 : object.scaleY) || 0).toFixed(1);
     fields.stroke.value = /^#[0-9a-f]{6}$/i.test(object.stroke) ? object.stroke : "#27343a";
     fields.fill.value = /^#[0-9a-f]{6}$/i.test(object.fill) ? object.fill : "#dce9e4";
     fields.locked.checked = Boolean(object.locked);
@@ -534,8 +540,18 @@
       hasControls: !fields.locked.checked,
     });
     const dimensionBases = objectDimensionBases(object);
-    if (dimensionBases.width && Number(fields.width.value) > 0) object.scaleX = Number(fields.width.value) / dimensionBases.width;
-    if (dimensionBases.height && Number(fields.height.value) > 0) object.scaleY = Number(fields.height.value) / dimensionBases.height;
+    const width = Number(fields.width.value);
+    const height = Number(fields.height.value);
+    if (object.type === "line" && !object.width) {
+      if (width > 0) object.set({strokeWidth: width});
+    } else if (dimensionBases.width && width > 0) {
+      object.set({scaleX: width / dimensionBases.width});
+    }
+    if (object.type === "line" && !object.height) {
+      if (height > 0) object.set({strokeWidth: height});
+    } else if (dimensionBases.height && height > 0) {
+      object.set({scaleY: height / dimensionBases.height});
+    }
     SolomonPlanLabels.normalizeTextScale(object);
     object.locked = fields.locked.checked;
     const currentOpacity = object.itemOpacity === undefined ? 1 : Number(object.itemOpacity);
@@ -545,6 +561,7 @@
     object.set({opacity: SolomonPlanLabels.displayOpacity(object, seeThrough)});
     object.setCoords();
     canvas.requestRenderAll();
+    updateInspector(object);
     markChanged();
   }
 
@@ -614,7 +631,10 @@
       updateInspector(object);
     });
     canvas.on("object:modified", (event) => {
-      if (event.target) SolomonPlanLabels.normalizeTextScale(event.target);
+      if (event.target) {
+        SolomonPlanLabels.normalizeLineScale(event.target);
+        SolomonPlanLabels.normalizeTextScale(event.target);
+      }
       updateInspector();
       markChanged();
     });

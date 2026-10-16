@@ -9,10 +9,17 @@ class Element {
     this.childNodes = [];
     this.textContent = "";
     this.dataset = {};
-    this.classList = {add() {}, remove() {}, toggle() {}};
+    this.handlers = {};
+    this.attributes = {};
+    this.classes = new Set();
+    this.classList = {
+      add: (name) => this.classes.add(name),
+      remove: (name) => this.classes.delete(name),
+      toggle: (name, enabled) => enabled ? this.classes.add(name) : this.classes.delete(name),
+    };
   }
 
-  setAttribute() {}
+  setAttribute(name, value) { this.attributes[name] = value; }
 
   append(...nodes) {
     this.childNodes.push(...nodes);
@@ -33,10 +40,11 @@ class Element {
     return clone;
   }
 
-  addEventListener() {}
+  addEventListener(name, handler) { this.handlers[name] = handler; }
+  click() {}
 }
 
-async function loadViewer(highlight = "", translations = {}, planElements) {
+async function loadViewer(highlight = "", translations = {}, planElements, revision = {}) {
   const inspector = new Element();
   const defaultHeading = new Element();
   defaultHeading.textContent = "Floor plan";
@@ -48,7 +56,10 @@ async function loadViewer(highlight = "", translations = {}, planElements) {
     "schematic-inspector": inspector,
     "schematic-stage": {clientWidth: 1036},
     "schematic-loading": new Element(),
+    "export-svg": new Element(),
+    "toggle-background": new Element(),
   };
+  elements["toggle-background"].disabled = true;
   let canvas;
 
   class Canvas {
@@ -63,6 +74,12 @@ async function loadViewer(highlight = "", translations = {}, planElements) {
     setDimensions() {}
     setViewportTransform() {}
     requestRenderAll() {}
+    setBackgroundImage(image, done) { this.backgroundImage = image; done(); }
+    toSVG(options) {
+      this.exported = {options, backgroundImage: this.backgroundImage, backgroundColor: this.backgroundColor};
+      if (this.exportError) throw this.exportError;
+      return "<svg/>";
+    }
   }
 
   class Shape {
@@ -72,7 +89,7 @@ async function loadViewer(highlight = "", translations = {}, planElements) {
 
   const planData = {
     plan: {width: 1000, height: 800},
-    revision: {},
+    revision,
     targets: {
       spaces: {
         "1": {url: "/spaces/1/", label: "Linked space", kind_label: "Room", area_m2: 12},
@@ -94,13 +111,18 @@ async function loadViewer(highlight = "", translations = {}, planElements) {
     }
     setCoords() {}
   }
-  const fabric = {Canvas, Rect: Shape, Shadow: Shape, Text};
+  const fabric = {
+    Canvas, Rect: Shape, Shadow: Shape, Text,
+    Image: {fromURL: (url, done) => done(new Shape({url, width: 500, height: 400}))},
+  };
   const labelsWindow = {};
   vm.runInNewContext(
     fs.readFileSync(path.join(__dirname, "../static/solomon_facilities/labels.js"), "utf8"),
     {window: labelsWindow, fabric}
   );
   vm.runInNewContext(source, {
+    Blob,
+    URL: {createObjectURL: () => "blob:export", revokeObjectURL() {}},
     document: {
       getElementById: (id) => elements[id] || new Element(),
       createElement: () => new Element(),
@@ -115,8 +137,76 @@ async function loadViewer(highlight = "", translations = {}, planElements) {
   await new Promise((resolve) => setImmediate(resolve));
   assert.ok(canvas, elements["schematic-loading"].textContent);
   assert.ok(canvas.handlers["mouse:down"], "Viewer initialized successfully");
-  return {canvas, inspector};
+  return {
+    canvas, inspector, backgroundButton: elements["toggle-background"],
+    exportSvg: () => elements["export-svg"].handlers.click(),
+  };
 }
+
+test("source background toggles independently of vectors and stays hidden after SVG export", async () => {
+  const {canvas, backgroundButton, exportSvg} = await loadViewer("", {}, undefined, {
+    background_url: "/source.svg", background_rotation: 90,
+  });
+  const image = canvas.backgroundImage;
+  const vectors = [...canvas.objects];
+  assert.equal(backgroundButton.disabled, false);
+  assert.equal(backgroundButton.attributes["aria-pressed"], "true");
+  assert.equal(image.visible, true);
+  assert.equal(image.opacity, 0.82);
+  assert.equal(image.angle, 90);
+  backgroundButton.handlers.click();
+  assert.equal(image.visible, false);
+  assert.equal(backgroundButton.attributes["aria-pressed"], "false");
+  assert.equal(backgroundButton.classes.has("active"), false);
+  assert.deepEqual(canvas.objects, vectors);
+  exportSvg();
+  assert.equal(canvas.exported.backgroundImage, null);
+  assert.equal(canvas.backgroundImage, image);
+  assert.equal(image.visible, false);
+  canvas.exportError = new Error("Export failed");
+  assert.throws(exportSvg, /Export failed/);
+  assert.equal(image.visible, false);
+  backgroundButton.handlers.click();
+  assert.equal(image.visible, true);
+  assert.equal(image.opacity, 0.82);
+  assert.equal(backgroundButton.classes.has("active"), true);
+  assert.equal(backgroundButton.attributes["aria-pressed"], "true");
+});
+
+test("viewer leaves source background toggle disabled without a source", async () => {
+  const {backgroundButton} = await loadViewer();
+  assert.equal(backgroundButton.disabled, true);
+  assert.equal(backgroundButton.handlers.click, undefined);
+});
+
+test("SVG export excludes backgrounds, uses full plan dimensions, and restores the viewer", async () => {
+  const viewer = await loadViewer();
+  const background = {url: "source.svg"};
+  viewer.canvas.backgroundImage = background;
+  viewer.canvas.backgroundColor = "#ffffff";
+  viewer.exportSvg();
+  assert.equal(viewer.canvas.exported.backgroundImage, null);
+  assert.equal(viewer.canvas.exported.backgroundColor, "");
+  assert.equal(JSON.stringify(viewer.canvas.exported.options), JSON.stringify({
+    width: 1000, height: 800, viewBox: {x: 0, y: 0, width: 1000, height: 800},
+  }));
+  assert.equal(viewer.canvas.backgroundImage, background);
+  assert.equal(viewer.canvas.backgroundColor, "#ffffff");
+  viewer.canvas.exportError = new Error("Export failed");
+  assert.throws(viewer.exportSvg, /Export failed/);
+  assert.equal(viewer.canvas.backgroundImage, background);
+  assert.equal(viewer.canvas.backgroundColor, "#ffffff");
+});
+
+test("line normalization fixes degenerate axes but preserves diagonal geometry and scales", () => {
+  const labels = loadLabels();
+  const line = {type: "line", x1: 0, x2: 100, y1: 0, y2: 50, scaleX: 2, scaleY: 3,
+    set(values) { Object.assign(this, values); }};
+  labels.normalizeLineScale(line);
+  assert.equal(line.scaleX, 2);
+  assert.equal(line.scaleY, 3);
+  assert.equal(line.y2, 50);
+});
 
 function heading(inspector) {
   return inspector.childNodes[0].childNodes[0].textContent;

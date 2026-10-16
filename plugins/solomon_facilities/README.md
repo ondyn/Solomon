@@ -19,6 +19,12 @@ flats, people, owners, and tenants. It does not duplicate those records.
 	available only to users who can edit plans and revisions.
 - Fabric.js vector editor for walls, doors, windows, spaces, labels,
 	dimensions, and technical items.
+- New walls use a 3-unit stroke. Height controls horizontal line thickness;
+	Width controls vertical line thickness, independently of line length and rotation.
+	Legacy lines with excessive scaling on a zero-length axis are normalized on load,
+	preserving their position when modifying, duplicating, saving, and reloading.
+- SVG export includes visible vector elements and labels at the full plan size,
+	without the source drawing or canvas background, independently of viewer zoom.
 - Element labels appear centered on shapes in the editor, viewer, and SVG
 	export. The Show label on floor plan switch below Label controls visibility
 	for each element, including standalone text. Labels are visible by default;
@@ -49,6 +55,10 @@ flats, people, owners, and tenants. It does not duplicate those records.
 	so items hidden behind spaces become visible; it is remembered per browser.
 - Versioned plans with source PDF, SVG background, scale, orientation, draft,
 	and published revisions.
+- The Show source background toolbar toggle in the viewer and editor hides or
+	shows the PDF-derived source drawing without changing vector elements or saved
+	plan data. The background starts visible on each page load; the toggle is
+	disabled when no background is available. SVG export still excludes the source.
 - Spaces for flats, rooms, common rooms, cellar cubicles, circulation,
 	technical rooms, shafts, and loggias.
 - Dated flat-space assignments and independently dated rentals/occupancy.

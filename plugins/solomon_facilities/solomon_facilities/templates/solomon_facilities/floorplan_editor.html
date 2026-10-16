@@ -67,6 +67,7 @@
         <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-fit" title="{% trans 'Fit floor' %}" aria-label="{% trans 'Fit floor' %}"><i class="mdi mdi-fit-to-screen-outline"></i></button>
         <button type="button" class="btn btn-outline-secondary btn-icon" id="zoom-in" title="{% trans 'Zoom in' %}" aria-label="{% trans 'Zoom in' %}"><i class="mdi mdi-magnify-plus-outline"></i></button>
         <button type="button" class="btn btn-outline-secondary btn-icon active" id="toggle-snap-grid" title="{% trans 'Snap to grid' %}" aria-label="{% trans 'Snap to grid' %}" aria-pressed="true"><i class="mdi mdi-grid" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-outline-secondary btn-icon" id="toggle-background" title="{% trans 'Show source background' %}" aria-label="{% trans 'Show source background' %}" aria-pressed="false" disabled><i class="mdi mdi-file-image-outline" aria-hidden="true"></i></button>
         <button type="button" class="btn btn-outline-secondary btn-icon" id="toggle-see-through" title="{% trans 'Transparent items' %}" aria-label="{% trans 'Transparent items' %}" aria-pressed="false"><i class="mdi mdi-circle-opacity"></i></button>
       </div>
       <div class="schematic-command-actions">
@@ -169,6 +170,6 @@
     </div>
   </div>
   <script src="{% url 'plugins:solomon_facilities:javascript_catalog' %}"></script>
-  <script src="{% static 'solomon_facilities/labels.js' %}?v=5"></script>
-  <script src="{% static 'solomon_facilities/editor.js' %}?v=18"></script>
+  <script src="{% static 'solomon_facilities/labels.js' %}?v=8"></script>
+  <script src="{% static 'solomon_facilities/editor.js' %}?v=20"></script>
 {% endblock content %}
